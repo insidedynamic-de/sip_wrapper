@@ -3,7 +3,7 @@
 A minimal, production-ready FreeSWITCH SIP relay for forwarding all inbound and outbound calls between a single SIP user and a single SIP provider. No business logic, no web services, no persistent storage.
 
 ## Features
-- One SIP user (default: 1001)
+- One SIP user (example: exampleuser)
 - All inbound and outbound calls are transparently bridged to a SIP provider
 - No number rewriting, no caller ID manipulation
 - Configuration-only: all settings via environment variables
@@ -11,75 +11,83 @@ A minimal, production-ready FreeSWITCH SIP relay for forwarding all inbound and 
 - No web services, no APIs, no databases
 - Suitable for Docker, Coolify, and GitHub Actions deployments
 
-## Environment Variables
-See `.env.example` for all required and optional variables:
-- `SIP_USER` (default: 1001)
-- `SIP_PASSWORD`
-- `SIP_DOMAIN`
-- `PROVIDER_HOST`
-- `PROVIDER_PORT`
-- `PROVIDER_USERNAME` (optional)
-- `PROVIDER_PASSWORD` (optional)
-- `PROVIDER_TRANSPORT` (udp/tcp)
-- `EXTERNAL_IP` (optional)
+## Quick Start (Coolify or Docker Compose)
 
-## Usage
+1. **Copy the docker-compose.yml file** to your project or Coolify app.
+2. **Edit the environment variables** in the `docker-compose.yml` file to match your SIP credentials and provider details:
 
-### 1. Build the Docker image
-```sh
-docker build -t sip_wrapper .
-```
-
-### 2. Prepare your environment
-Copy `.env.example` to `.env` and fill in your credentials and provider info.
-
-### 3. Run with Docker
-```sh
-docker run --env-file .env --rm sip_wrapper
-```
-
-### 4. (Optional) Docker Compose
-Create a `docker-compose.yml`:
 ```yaml
-version: '3.8'
-services:
-  freeswitch:
-    build: .
-    env_file: .env
-    restart: unless-stopped
-    ports:
-      - "5060:5060/udp"
-      - "5060:5060/tcp"
-      - "5080:5080/udp"
-      - "5080:5080/tcp"
-      - "16384-16484:16384-16484/udp"
-```
-Then run:
-```sh
-docker compose up
+environment:
+  SIP_USER: exampleuser
+  SIP_PASSWORD: examplepass
+  SIP_DOMAIN: example.sip.domain
+  PROVIDER_HOST: example.provider.host
+  PROVIDER_PORT: 5060
+  PROVIDER_USERNAME: provideruser
+  PROVIDER_PASSWORD: providerpass
+  PROVIDER_TRANSPORT: udp
+  EXTERNAL_IP: example.external.ip
+  GITHUB_URL: https://github.com/insidedynamic-de/sip_wrapper
 ```
 
-## How it works
-- All configuration is generated at container startup by `entrypoint.sh` from environment variables.
-- No data is persisted between runs.
+3. **Set the correct ports** for SIP and RTP in the `docker-compose.yml` file:
+```yaml
+ports:
+  - "5060:5060/udp"
+  - "5080:5080/udp"
+  - "16384-32768:16384-32768/udp"
+```
+
+4. **Deploy with Coolify** (or locally):
+   - In Coolify, create a new Docker Compose app and upload your `docker-compose.yml`.
+   - Make sure to set or override environment variables in the Coolify UI if needed.
+   - Deploy the app.
+
+5. **Check logs and registration**
+   - Use `fs_cli -x "sofia status"` and `fs_cli -x "show registrations"` to verify SIP registration and call routing.
+
+## Environment Variables
+- `SIP_USER` — SIP user/extension (e.g., 1001)
+- `SIP_PASSWORD` — SIP user password
+- `SIP_DOMAIN` — SIP domain or host for user registration
+- `PROVIDER_HOST` — SIP provider host
+- `PROVIDER_PORT` — SIP provider port (default: 5060)
+- `PROVIDER_USERNAME` — Provider username (if required)
+- `PROVIDER_PASSWORD` — Provider password (if required)
+- `PROVIDER_TRANSPORT` — udp or tcp (default: udp)
+- `EXTERNAL_IP` — External IP or hostname for RTP/SIP (e.g., your Coolify app hostname)
+- `GITHUB_URL` — (optional) Link to this repository
+
+## Notes
+- All configuration is generated at container startup from environment variables.
+- No persistent storage is required.
 - Logs are sent to stdout.
 - The container fails fast on misconfiguration or if the SIP user/provider is unreachable.
 
-## Dialplan Logic
-- **Inbound calls**: Any call received is immediately bridged to the SIP provider (no filtering, no voicemail, no IVR).
-- **Outbound calls**: Only calls from the configured SIP user are accepted and immediately bridged to the provider.
-- **Phone numbers**: Passed exactly as received (e.g., +49176..., 0176..., 0049176...). No normalization or rewriting.
-- **Caller ID**: Passed transparently.
-- **Fail fast**: If the user is not registered or the provider is unreachable, the container exits with an error.
-
-## Directory Structure
-- `Dockerfile` - Container build
-- `entrypoint.sh` - Startup script, generates configs
-- `freeswitch/` - Mount point for generated configs
-  - `sip_profiles/` - Generated SIP profiles
-  - `dialplan/` - Generated dialplan
-- `templates/` - XML templates for config generation
-- `.env.example` - Example environment file
+## Example docker-compose.yml
+```yaml
+version: '3.9'
+services:
+  freeswitch:
+    build: .
+    container_name: freeswitch
+    environment:
+      SIP_USER: exampleuser
+      SIP_PASSWORD: examplepass
+      SIP_DOMAIN: example.sip.domain
+      PROVIDER_HOST: example.provider.host
+      PROVIDER_PORT: 5060
+      PROVIDER_USERNAME: provideruser
+      PROVIDER_PASSWORD: providerpass
+      PROVIDER_TRANSPORT: udp
+      EXTERNAL_IP: example.external.ip
+      GITHUB_URL: https://github.com/insidedynamic-de/sip_wrapper
+    ports:
+      - "5060:5060/udp"
+      - "5080:5080/udp"
+      - "16384-32768:16384-32768/udp"
+    restart: unless-stopped
+```
 
 ## Security
 - No credentials or sensitive data are stored in the image or repo.

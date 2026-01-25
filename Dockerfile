@@ -2,20 +2,15 @@ FROM debian:stable-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install FreeSWITCH and dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      freeswitch freeswitch-mod-sofia freeswitch-mod-dialplan-xml freeswitch-lang-en freeswitch-sounds-en-us-callie \
-      xmlstarlet curl ca-certificates && \
+      curl ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Add entrypoint and config directories
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-COPY templates/ /templates/
+WORKDIR /app
 
-VOLUME ["/freeswitch"]
+# Download docker-compose.yml from GitHub
+ARG COMPOSE_URL=https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/docker-compose.yml
+RUN curl -fsSL "$COMPOSE_URL" -o docker-compose.yml
 
-EXPOSE 5060/udp 5060/tcp 5080/udp 5080/tcp 16384-16484/udp
-
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["cat", "docker-compose.yml"]
