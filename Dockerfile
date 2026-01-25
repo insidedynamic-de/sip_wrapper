@@ -1,16 +1,14 @@
-FROM debian:stable-slim
+FROM dheaps/freeswitch:latest
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-      curl ca-certificates && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Try both Alpine and Debian package managers for git
+RUN apk add --no-cache git || (apt-get update && apt-get install -y git)
 
 WORKDIR /app
 
-# Download docker-compose.yml from GitHub
-ARG COMPOSE_URL=https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/docker-compose.yml
-RUN curl -fsSL "$COMPOSE_URL" -o docker-compose.yml
+# Download entrypoint.sh and templates/ from GitHub
+RUN curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/entrypoint.sh -o /entrypoint.sh && \
+    chmod +x /entrypoint.sh && \
+    git clone --depth=1 https://github.com/insidedynamic-de/sip_wrapper.git /tmp/sip_wrapper && \
+    cp -r /tmp/sip_wrapper/templates /templates
 
-CMD ["cat", "docker-compose.yml"]
+CMD ["/entrypoint.sh"]

@@ -1,8 +1,8 @@
 version: '3.9'
 services:
   freeswitch:
-    build: .
-    container_name: freeswitch
+    image: 'dheaps/freeswitch:latest'
+    container_name: sip-wraper
     environment:
       SIP_USER: exampleuser
       SIP_PASSWORD: examplepass
@@ -14,8 +14,15 @@ services:
       PROVIDER_TRANSPORT: udp
       EXTERNAL_IP: example.external.ip
       GITHUB_URL: https://github.com/insidedynamic-de/sip_wrapper
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - 'fs_data:/usr/local/freeswitch'
     ports:
       - "5060:5060/udp"
       - "5080:5080/udp"
       - "16384-32768:16384-32768/udp"
-    restart: unless-stopped
+    command: >
+      sh -c "curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/entrypoint.sh -o /tmp/entrypoint.sh && chmod +x /tmp/entrypoint.sh && mkdir -p /templates && curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/templates/internal.xml.tpl -o /templates/internal.xml.tpl && curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/templates/external.xml.tpl -o /templates/external.xml.tpl && curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/templates/provider.xml.tpl -o /templates/provider.xml.tpl && curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/templates/default.xml.tpl -o /templates/default.xml.tpl && sh /tmp/entrypoint.sh && /usr/local/freeswitch/bin/freeswitch -nonat -nf"
+volumes:
+  fs_data: null
