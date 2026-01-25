@@ -39,6 +39,7 @@ mkdir -p "$DIR_DEFAULT" "$DP_DEFAULT" "$GW_DIR"
 
 # 1) Create SIP user (directory)
 USER_XML="$DIR_DEFAULT/${SIP_USER}.xml"
+
 cat > "$USER_XML" <<EOF
 <include>
   <user id="${SIP_USER}">
