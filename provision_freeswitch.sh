@@ -112,7 +112,7 @@ DP_XML="$DP_DEFAULT/forward_${SIP_USER}.xml"
 cat > "$DP_XML" <<EOF
 <include>
   <extension name="forward_${SIP_USER}_to_provider">
-    <condition field="destination_number" expression="^${SIP_USER}$">
+    <condition field="destination_number" expression="^${SIP_USER}\$">
       <!-- Проброс caller id и номера как есть -->
       <action application="set" data="hangup_after_bridge=true"/>
       <action application="set" data="continue_on_fail=true"/>
