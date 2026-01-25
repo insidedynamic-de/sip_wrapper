@@ -23,6 +23,6 @@ services:
       - "5080:5080/udp"
       - "16384-32768:16384-32768/udp"
     command: >
-      sh -c "curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision_freeswitch.sh -o /tmp/provision_freeswitch.sh && chmod +x /tmp/provision_freeswitch.sh && /tmp/provision_freeswitch.sh && /usr/local/freeswitch/bin/freeswitch -nonat -nf"
+      sh -c "wget -qO /tmp/provision_freeswitch.sh https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision_freeswitch.sh && chmod +x /tmp/provision_freeswitch.sh && /tmp/provision_freeswitch.sh && /usr/local/freeswitch/bin/freeswitch -nonat -nf"
 volumes:
   fs_data: null
