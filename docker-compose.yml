@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   freeswitch:
-    image: 'dheaps/freeswitch:latest'
+    image: 'safarov/freeswitch:latest'
     container_name: sip-wraper
     environment:
       SIP_USER: exampleuser
