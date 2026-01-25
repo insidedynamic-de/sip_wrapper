@@ -16,25 +16,43 @@ need() {
   fi
 }
 
-# Required env vars
+
+echo "[DEBUG] Checking required environment variables..."
 need SIP_USER
+echo "[DEBUG] SIP_USER set to '$SIP_USER'"
 need SIP_PASSWORD
+echo "[DEBUG] SIP_PASSWORD set to '$SIP_PASSWORD'"
 need SIP_DOMAIN
+echo "[DEBUG] SIP_DOMAIN set to '$SIP_DOMAIN'"
 need PROVIDER_HOST
+echo "[DEBUG] PROVIDER_HOST set to '$PROVIDER_HOST'"
 need PROVIDER_PORT
+echo "[DEBUG] PROVIDER_PORT set to '$PROVIDER_PORT'"
 need PROVIDER_USERNAME
+echo "[DEBUG] PROVIDER_USERNAME set to '$PROVIDER_USERNAME'"
 need PROVIDER_PASSWORD
+echo "[DEBUG] PROVIDER_PASSWORD set to '$PROVIDER_PASSWORD'"
 need PROVIDER_TRANSPORT
+echo "[DEBUG] PROVIDER_TRANSPORT set to '$PROVIDER_TRANSPORT'"
 need EXTERNAL_IP
+echo "[DEBUG] EXTERNAL_IP set to '$EXTERNAL_IP'"
+echo "[DEBUG] All required environment variables are set."
 
-# Paths
+
+echo "[DEBUG] Setting up FreeSWITCH config paths..."
 DIR_DEFAULT="$FS_CONF_DIR/directory/default"
+echo "[DEBUG] DIR_DEFAULT set to '$DIR_DEFAULT'"
 DP_DEFAULT="$FS_CONF_DIR/dialplan/default"
+echo "[DEBUG] DP_DEFAULT set to '$DP_DEFAULT'"
 GW_DIR="$FS_CONF_DIR/sip_profiles/external"
+echo "[DEBUG] GW_DIR set to '$GW_DIR'"
 VARS_XML="$FS_CONF_DIR/vars.xml"
+echo "[DEBUG] VARS_XML set to '$VARS_XML'"
 VARS_LOCAL="$FS_CONF_DIR/vars_local.xml"
-
+echo "[DEBUG] VARS_LOCAL set to '$VARS_LOCAL'"
+echo "[DEBUG] Creating config directories if not exist..."
 mkdir -p "$DIR_DEFAULT" "$DP_DEFAULT" "$GW_DIR"
+echo "[DEBUG] Directory setup complete."
 
 
 # 1) Create SIP user (directory)
