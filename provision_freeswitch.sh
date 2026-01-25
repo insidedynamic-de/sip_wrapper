@@ -44,7 +44,7 @@ cat > "$USER_XML" <<EOF
   <user id="${SIP_USER}">
     <params>
       <param name="password" value="${SIP_PASSWORD}"/>
-      <param name="dial-string" value="{sip_invite_domain=${SIP_DOMAIN}}sofia/internal/${destination_number}@${domain_name}"/>
+      <param name="dial-string" value="{sip_invite_domain=${SIP_DOMAIN}}sofia/internal/\${destination_number}@\${domain_name}"/>
     </params>
     <variables>
       <variable name="user_context" value="default"/>
