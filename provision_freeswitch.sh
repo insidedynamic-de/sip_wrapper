@@ -116,7 +116,7 @@ cat > "$DP_XML" <<EOF
       <!-- Проброс caller id и номера как есть -->
       <action application="set" data="hangup_after_bridge=true"/>
       <action application="set" data="continue_on_fail=true"/>
-      <action application="bridge" data="sofia/gateway/provider/${destination_number}"/>
+      <action application="bridge" data="sofia/gateway/provider/\${destination_number}"/>
     </condition>
   </extension>
 </include>
