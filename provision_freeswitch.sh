@@ -53,6 +53,7 @@ cat > "$USER_XML" <<EOF
   </user>
 </include>
 EOF
+echo "[STEP] User XML block done."
 
 # Output and check if user file was created
 if [ -f "$USER_XML" ]; then
@@ -63,6 +64,7 @@ if [ -f "$USER_XML" ]; then
 else
   echo "[ERROR] User XML was NOT created: $USER_XML" >&2
 fi
+echo "[STEP] User XML check done."
 
 # 2) Create Provider Gateway
 GW_XML="$GW_DIR/provider.xml"
@@ -83,6 +85,7 @@ cat > "$GW_XML" <<EOF
   </gateway>
 </include>
 EOF
+echo "[STEP] Provider Gateway block done."
 
 # 3) Dialplan: any call to SIP_USER goes to provider
 DP_XML="$DP_DEFAULT/forward_${SIP_USER}.xml"
@@ -98,6 +101,7 @@ cat > "$DP_XML" <<EOF
   </extension>
 </include>
 EOF
+echo "[STEP] Dialplan block done."
 
 # 4) external ip override
 cat > "$VARS_LOCAL" <<EOF
@@ -107,19 +111,22 @@ cat > "$VARS_LOCAL" <<EOF
   <X-PRE-PROCESS cmd="set" data="external_rtp_ip=${EXTERNAL_IP}"/>
 </include>
 EOF
+echo "[STEP] External IP block done."
 
 # 5) Ensure vars.xml includes vars_local.xml
 # Try to insert before closing </include>. If not present, append safely.
 if grep -q "vars_local.xml" "$VARS_XML" 2>/dev/null; then
-  : # already included
+  echo "[STEP] vars_local.xml already included in vars.xml."
 else
   if grep -q "</include>" "$VARS_XML" 2>/dev/null; then
     # insert before last </include>
     sed -i '0,/<\/include>/{s/<\/include>/<\!-- include local overrides --\>\n  <X-PRE-PROCESS cmd="include" data="vars_local.xml"\/>\n<\/include>/}' "$VARS_XML" \
       || echo "Could not auto-edit vars.xml; include vars_local.xml manually." >&2
+    echo "[STEP] Added vars_local.xml include to vars.xml."
   else
     # If vars.xml is unusual, just append include directive line
     echo '<X-PRE-PROCESS cmd="include" data="vars_local.xml"/>' >> "$VARS_XML"
+    echo "[STEP] Appended vars_local.xml include to vars.xml."
   fi
 fi
 
