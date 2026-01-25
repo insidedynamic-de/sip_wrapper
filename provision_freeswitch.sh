@@ -1,11 +1,15 @@
-#!/usr/bin/env bash
-set -euo pipefail
+
+#!/bin/sh
+set -eu
+
 
 FS_CONF_DIR="${FS_CONF_DIR:-/etc/freeswitch}"
 
+
 need() {
-  local k="$1"
-  if [[ -z "${!k:-}" ]]; then
+  k="$1"
+  eval v="\${$k}"
+  if [ "x$v" = "x" ]; then
     echo "Missing env: $k" >&2
     exit 1
   fi
@@ -51,7 +55,7 @@ cat > "$USER_XML" <<EOF
 EOF
 
 # Output and check if user file was created
-if [[ -f "$USER_XML" ]]; then
+if [ -f "$USER_XML" ]; then
   echo "[OK] User XML created: $USER_XML"
   echo "--- $USER_XML ---"
   cat "$USER_XML"
@@ -127,6 +131,6 @@ echo " - $VARS_LOCAL"
 
 # Optionally reload if fs_cli exists
 if command -v fs_cli >/dev/null 2>&1; then
-  fs_cli -x "reloadxml" || true
+  fs_cli -x reloadxml || true
   fs_cli -x "sofia profile external restart" || true
 fi
