@@ -1,6 +1,10 @@
 
+
 #!/bin/sh
 set -eu
+
+# Print line and command on error for debugging
+trap 'echo "[ERROR] Script failed at line $LINENO: $BASH_COMMAND" >&2' ERR
 
 echo "[START] FreeSWITCH provisioning script"
 
