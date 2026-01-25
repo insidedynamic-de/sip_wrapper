@@ -23,6 +23,6 @@ services:
       - "5080:5080/udp"
       - "16384-32768:16384-32768/udp"
     command: >
-      sh -c "curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/entrypoint.sh -o /tmp/entrypoint.sh && chmod +x /tmp/entrypoint.sh && mkdir -p /templates && curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/templates/internal.xml.tpl -o /templates/internal.xml.tpl && curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/templates/external.xml.tpl -o /templates/external.xml.tpl && curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/templates/provider.xml.tpl -o /templates/provider.xml.tpl && curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/templates/default.xml.tpl -o /templates/default.xml.tpl && sh /tmp/entrypoint.sh && /usr/local/freeswitch/bin/freeswitch -nonat -nf"
+      sh -c "curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision_freeswitch.sh -o /tmp/provision_freeswitch.sh && chmod +x /tmp/provision_freeswitch.sh && /tmp/provision_freeswitch.sh && /usr/local/freeswitch/bin/freeswitch -nonat -nf"
 volumes:
   fs_data: null
