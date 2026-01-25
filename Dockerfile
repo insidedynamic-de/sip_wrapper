@@ -10,7 +10,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Download docker-compose.yml from GitHub
-ARG COMPOSE_URL=https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/docker-compose.yml
+ARG COMPOSE_URL=https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/docker-compose.yml
 RUN curl -fsSL "$COMPOSE_URL" -o docker-compose.yml
 
 CMD ["cat", "docker-compose.yml"]
