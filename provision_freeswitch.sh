@@ -32,7 +32,6 @@ need PROVIDER_HOST
 echo "[DEBUG] PROVIDER_HOST set to '$PROVIDER_HOST'"
 need PROVIDER_PORT
 echo "[DEBUG] PROVIDER_PORT set to '$PROVIDER_PORT'"
-          <action application="bridge" data="sofia/gateway/provider/\${destination_number}"/>
 echo "[DEBUG] PROVIDER_USERNAME set to '$PROVIDER_USERNAME'"
 need PROVIDER_PASSWORD
 echo "[DEBUG] PROVIDER_PASSWORD set to '$PROVIDER_PASSWORD'"
