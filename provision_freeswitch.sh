@@ -2,6 +2,7 @@
 #!/bin/sh
 set -eu
 
+echo "[START] FreeSWITCH provisioning script"
 
 FS_CONF_DIR="${FS_CONF_DIR:-/etc/freeswitch}"
 
