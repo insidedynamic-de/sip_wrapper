@@ -31,6 +31,7 @@ VARS_LOCAL="$FS_CONF_DIR/vars_local.xml"
 
 mkdir -p "$DIR_DEFAULT" "$DP_DEFAULT" "$GW_DIR"
 
+
 # 1) Create SIP user (directory)
 USER_XML="$DIR_DEFAULT/${SIP_USER}.xml"
 cat > "$USER_XML" <<EOF
@@ -48,6 +49,16 @@ cat > "$USER_XML" <<EOF
   </user>
 </include>
 EOF
+
+# Output and check if user file was created
+if [[ -f "$USER_XML" ]]; then
+  echo "[OK] User XML created: $USER_XML"
+  echo "--- $USER_XML ---"
+  cat "$USER_XML"
+  echo "-----------------"
+else
+  echo "[ERROR] User XML was NOT created: $USER_XML" >&2
+fi
 
 # 2) Create Provider Gateway
 GW_XML="$GW_DIR/provider.xml"
