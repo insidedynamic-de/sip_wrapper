@@ -130,11 +130,26 @@ else
   fi
 fi
 
-echo "Generated:"
-echo " - $USER_XML"
-echo " - $GW_XML"
-echo " - $DP_XML"
-echo " - $VARS_LOCAL"
+
+# Final summary check
+echo "[STEP] Final file existence check..."
+fail=0
+for f in "$USER_XML" "$GW_XML" "$DP_XML" "$VARS_LOCAL"; do
+  if [ -f "$f" ]; then
+    echo "[OK] $f exists."
+  else
+    echo "[ERROR] $f is missing!" >&2
+    fail=1
+  fi
+done
+
+if [ "$fail" -eq 0 ]; then
+  echo "[SUCCESS] All config files generated successfully."
+else
+  echo "[FAIL] Some config files are missing. Check previous errors."
+fi
+
+echo "[DONE] Provisioning script complete."
 
 # Optionally reload if fs_cli exists
 if command -v fs_cli >/dev/null 2>&1; then
