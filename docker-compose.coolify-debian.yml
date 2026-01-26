@@ -1,0 +1,136 @@
+################################################################################
+# FreeSWITCH for Coolify - Debian Version (WORKING!)
+# Использует Debian и устанавливает FreeSWITCH + provision
+#
+# ПРОВЕРЕНО: Работает в Coolify без проблем
+#
+# ИСПОЛЬЗОВАНИЕ:
+# 1. Coolify → Docker Compose file: docker-compose.coolify-debian.yml
+# 2. Set ENV variables
+# 3. Deploy
+################################################################################
+
+version: '3.9'
+
+services:
+  freeswitch:
+    # Debian base image
+    image: debian:bookworm-slim
+
+    container_name: freeswitch
+
+    # Install FreeSWITCH and run provision
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        set -e
+
+        echo "[$(date)] Installing dependencies..."
+        apt-get update -qq
+        apt-get install -y -qq --no-install-recommends \
+          ca-certificates gnupg2 wget lsb-release curl bash procps
+
+        echo "[$(date)] Adding SignalWire repository..."
+        wget -qO- https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | \
+          gpg --dearmor -o /usr/share/keyrings/signalwire-freeswitch-repo.gpg
+
+        echo "deb [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://files.freeswitch.org/repo/deb/debian-release/ $(lsb_release -sc) main" \
+          > /etc/apt/sources.list.d/freeswitch.list
+
+        echo "[$(date)] Installing FreeSWITCH..."
+        apt-get update -qq
+        apt-get install -y -qq --no-install-recommends \
+          freeswitch-meta-bare \
+          freeswitch-mod-commands \
+          freeswitch-mod-console \
+          freeswitch-mod-logfile \
+          freeswitch-mod-event-socket \
+          freeswitch-mod-sofia \
+          freeswitch-mod-dialplan-xml \
+          freeswitch-mod-dptools \
+          freeswitch-mod-db \
+          freeswitch-mod-sndfile \
+          freeswitch-mod-native-file \
+          freeswitch-mod-tone-stream
+
+        rm -rf /var/lib/apt/lists/*
+
+        echo "[$(date)] Cleaning default config..."
+        if [ -d /etc/freeswitch ]; then
+          cp -a /etc/freeswitch /etc/freeswitch.orig 2>/dev/null || true
+          find /etc/freeswitch/dialplan -type f -name "*.xml" -delete 2>/dev/null || true
+          find /etc/freeswitch/directory -type f -name "*.xml" -delete 2>/dev/null || true
+          rm -f /etc/freeswitch/sip_profiles/*.xml 2>/dev/null || true
+          mkdir -p /etc/freeswitch/{dialplan/{default,public},directory/default,sip_profiles/{internal,external}}
+        fi
+
+        echo "[$(date)] Downloading provision script..."
+        curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh -o /tmp/provision.sh
+        chmod +x /tmp/provision.sh
+
+        echo "[$(date)] Running provision..."
+        bash /tmp/provision.sh
+
+        echo "[$(date)] Starting FreeSWITCH..."
+        exec /usr/bin/freeswitch -nonat -nf -nc
+
+    # Environment variables
+    environment:
+      # REQUIRED
+      FS_DOMAIN: ${FS_DOMAIN}
+      EXTERNAL_SIP_IP: ${EXTERNAL_SIP_IP}
+      EXTERNAL_RTP_IP: ${EXTERNAL_RTP_IP}
+      USERS: ${USERS}
+      GATEWAYS: ${GATEWAYS}
+
+      # ROUTING
+      DEFAULT_GATEWAY: ${DEFAULT_GATEWAY:-}
+      DEFAULT_EXTENSION: ${DEFAULT_EXTENSION:-}
+      OUTBOUND_ROUTES: ${OUTBOUND_ROUTES:-}
+      INBOUND_ROUTES: ${INBOUND_ROUTES:-}
+
+      # OPTIONAL
+      ACL_USERS: ${ACL_USERS:-}
+      INTERNAL_SIP_PORT: ${INTERNAL_SIP_PORT:-5060}
+      EXTERNAL_SIP_PORT: ${EXTERNAL_SIP_PORT:-5080}
+      RTP_START_PORT: ${RTP_START_PORT:-16384}
+      RTP_END_PORT: ${RTP_END_PORT:-32768}
+      CODEC_PREFS: ${CODEC_PREFS:-PCMU,PCMA,G729,opus}
+      SIP_DEBUG: ${SIP_DEBUG:-0}
+      SIP_TRACE: ${SIP_TRACE:-no}
+
+    # Host network
+    network_mode: host
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Volumes
+    volumes:
+      - freeswitch_backups:/var/backups/freeswitch
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "bash", "-c", "fs_cli -x 'status' | grep -q 'UP' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+volumes:
+  freeswitch_backups:
+    driver: local
+
+################################################################################
+# ENV VARIABLES FOR COOLIFY
+################################################################################
+#
+# FS_DOMAIN=apps.linkify.cloud
+# EXTERNAL_SIP_IP=your-server-ip
+# EXTERNAL_RTP_IP=your-server-ip
+# USERS=exampleuser:examplepass:1001
+# GATEWAYS=provider:fpbx.de:5060:777z9uovpu:4UMtPyXw8Qss:true:udp
+# DEFAULT_GATEWAY=provider
+# DEFAULT_EXTENSION=1001
+#
+################################################################################
