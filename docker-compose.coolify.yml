@@ -1,0 +1,118 @@
+################################################################################
+# FreeSWITCH for Coolify
+# Simplified Docker Compose for Coolify deployment
+#
+# Coolify Deployment Instructions:
+# 1. Create new service: "Docker Compose"
+# 2. Connect your Git repository
+# 3. Set docker-compose file path: docker-compose.coolify.yml
+# 4. Configure environment variables in Coolify UI (see below)
+# 5. Deploy
+################################################################################
+
+version: '3.9'
+
+services:
+  freeswitch:
+    # Build from Dockerfile in same repo
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+
+    container_name: freeswitch
+
+    # Environment variables (set these in Coolify UI)
+    environment:
+      # REQUIRED - set in Coolify UI
+      - FS_DOMAIN=${FS_DOMAIN}
+      - EXTERNAL_SIP_IP=${EXTERNAL_SIP_IP}
+      - EXTERNAL_RTP_IP=${EXTERNAL_RTP_IP}
+
+      # USERS - comma-separated: username:password:extension
+      - USERS=${USERS}
+
+      # ACL_USERS (optional) - comma-separated: username:ip:extension
+      - ACL_USERS=${ACL_USERS:-}
+
+      # GATEWAYS - comma-separated: name:host:port:user:pass:register:transport
+      - GATEWAYS=${GATEWAYS}
+
+      # OUTBOUND ROUTES (optional) - pattern:gateway:prepend:strip
+      - OUTBOUND_ROUTES=${OUTBOUND_ROUTES:-}
+      - DEFAULT_GATEWAY=${DEFAULT_GATEWAY:-}
+
+      # INBOUND ROUTES (optional) - DID:extension
+      - INBOUND_ROUTES=${INBOUND_ROUTES:-}
+      - DEFAULT_EXTENSION=${DEFAULT_EXTENSION:-}
+
+      # OPTIONAL
+      - INTERNAL_SIP_PORT=${INTERNAL_SIP_PORT:-5060}
+      - EXTERNAL_SIP_PORT=${EXTERNAL_SIP_PORT:-5080}
+      - RTP_START_PORT=${RTP_START_PORT:-16384}
+      - RTP_END_PORT=${RTP_END_PORT:-32768}
+      - CODEC_PREFS=${CODEC_PREFS:-PCMU,PCMA,G729,opus}
+      - SIP_DEBUG=${SIP_DEBUG:-0}
+      - SIP_TRACE=${SIP_TRACE:-no}
+
+    # Use host network for best SIP/RTP compatibility
+    network_mode: host
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Volume for backups
+    volumes:
+      - freeswitch_backups:/var/backups/freeswitch
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "fs_cli", "-x", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  freeswitch_backups:
+    driver: local
+
+################################################################################
+# COOLIFY ENVIRONMENT VARIABLES (set in Coolify UI)
+################################################################################
+#
+# REQUIRED:
+# ---------
+# FS_DOMAIN=sip.example.com
+# EXTERNAL_SIP_IP=your.server.ip  (or your-app.coolify.app)
+# EXTERNAL_RTP_IP=your.server.ip  (same as EXTERNAL_SIP_IP)
+# USERS=alice:SecretPass123:1001,bob:SecretPass456:1002
+# GATEWAYS=provider:sip.provider.com:5060:username:password:true:udp
+#
+# OUTBOUND ROUTING (choose one):
+# ------------------------------
+# Option A: Use default gateway for all calls
+# DEFAULT_GATEWAY=provider
+#
+# Option B: Use pattern-based routing
+# OUTBOUND_ROUTES=^00.*:provider1,^0.*:provider2
+#
+# INBOUND ROUTING (choose one):
+# -----------------------------
+# Option A: Route all to one extension
+# DEFAULT_EXTENSION=1001
+#
+# Option B: DID-based routing
+# INBOUND_ROUTES=+49301234567:1001,+49301234568:1002,*:1000
+#
+# OPTIONAL:
+# ---------
+# ACL_USERS=trunk:192.168.1.100:9000
+# INTERNAL_SIP_PORT=5060
+# EXTERNAL_SIP_PORT=5080
+# RTP_START_PORT=16384
+# RTP_END_PORT=32768
+# CODEC_PREFS=PCMU,PCMA,G729
+# SIP_DEBUG=0
+# SIP_TRACE=no
+#
+################################################################################

@@ -1,6 +1,45 @@
 # FreeSWITCH Production - Quick Start Guide
 
-## 30-Second Setup (Docker)
+## 🚀 Coolify Deployment (Easiest)
+
+**Самый простой способ** - развертывание через Coolify:
+
+### Шаг 1: Создать сервис в Coolify
+
+1. Coolify → Add New Service → **Docker Compose**
+2. Git Repository: `https://github.com/your-org/freeswitch-production`
+3. Docker Compose file: `docker-compose.coolify.yml`
+
+### Шаг 2: Настроить ENV в Coolify UI
+
+В разделе **Environment Variables** добавьте:
+
+```bash
+FS_DOMAIN=sip.example.com
+EXTERNAL_SIP_IP=your-server-ip      # Публичный IP вашего Coolify сервера
+EXTERNAL_RTP_IP=your-server-ip      # Тот же IP
+USERS=alice:SecretPass123:1001,bob:SecretPass456:1002
+GATEWAYS=provider:sip.provider.com:5060:username:password:true:udp
+DEFAULT_GATEWAY=provider
+DEFAULT_EXTENSION=1001
+```
+
+### Шаг 3: Deploy
+
+Нажмите **Deploy** и дождитесь завершения!
+
+### Проверка
+
+В Coolify Terminal:
+```bash
+fs_cli -x "sofia status"
+```
+
+**📖 Детальное руководство:** [COOLIFY.md](COOLIFY.md)
+
+---
+
+## 30-Second Setup (Docker Local)
 
 ```bash
 # 1. Copy environment template
@@ -118,6 +157,7 @@ docker exec freeswitch cat /etc/freeswitch/vars.xml | grep external
 
 ## Next Steps
 
+- **For Coolify users:** Read [COOLIFY.md](COOLIFY.md) for detailed Coolify deployment guide
 - Read [DEPLOYMENT.md](DEPLOYMENT.md) for advanced configuration
 - Read [README.production.md](README.production.md) for complete reference
 - Add more users, gateways, and routing rules as needed

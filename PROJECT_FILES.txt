@@ -1,0 +1,98 @@
+FreeSWITCH Production - Complete File List
+===========================================
+
+ОСНОВНЫЕ СКРИПТЫ (Linux deployment):
+├── install.sh (7.4 KB)                - Установка FreeSWITCH из SignalWire
+├── provision.sh (27 KB)               - Генерация конфигурации из ENV
+└── docker-entrypoint.sh (1.1 KB)      - Docker entrypoint
+
+DOCKER (Production):
+├── Dockerfile.production (4.2 KB)     - Production Docker image
+├── docker-compose.production.yml      - Docker Compose для production
+└── .env.example (6.0 KB)              - Шаблон ENV-переменных
+
+COOLIFY DEPLOYMENT:
+├── docker-compose.coolify.yml (3.6 KB) - Docker Compose для Coolify
+├── Dockerfile.coolify (4.0 KB)         - Dockerfile для Coolify
+├── COOLIFY.md (17 KB)                  - Полное руководство по Coolify
+└── COOLIFY_QUICKSTART.md (4 KB)        - Быстрый старт для Coolify
+
+ДОКУМЕНТАЦИЯ:
+├── README.production.md (13 KB)       - Полное описание решения
+├── DEPLOYMENT.md (13 KB)              - Детальное руководство развертывания
+├── QUICKSTART.md (4 KB)               - Быстрый старт за 30 секунд
+├── SUMMARY.md (13 KB)                 - Итоговая сводка проекта
+└── PROJECT_FILES.txt                  - Этот файл
+
+СТАРЫЕ ФАЙЛЫ (можно удалить):
+├── entrypoint.sh                      - Старый entrypoint
+├── provision_freeswitch.sh            - Старый provision
+├── provision_freeswitch copy.sh       - Копия старого provision
+├── README.md                          - Старый README
+├── Dockerfile                         - Старый Dockerfile
+└── docker-compose.yml                 - Старый docker-compose
+
+===========================================
+
+DEPLOYMENT МЕТОДЫ:
+
+1. Coolify (самый простой):
+   - Используйте: docker-compose.coolify.yml
+   - Документация: COOLIFY.md + COOLIFY_QUICKSTART.md
+   - Время: 2 минуты
+
+2. Docker Compose Local:
+   - Используйте: docker-compose.production.yml + .env.example
+   - Документация: QUICKSTART.md
+   - Время: 1 минута
+
+3. Bare Metal Linux:
+   - Используйте: install.sh + provision.sh
+   - Документация: DEPLOYMENT.md
+   - Время: 5-10 минут
+
+4. Kubernetes:
+   - Используйте: Dockerfile.production + provision.sh
+   - Документация: DEPLOYMENT.md (раздел Kubernetes)
+   - Время: 10-15 минут
+
+===========================================
+
+QUICK START:
+
+Coolify:
+  1. Coolify → New Service → Docker Compose
+  2. Repo → docker-compose.coolify.yml
+  3. Set ENV in Coolify UI (FS_DOMAIN, EXTERNAL_SIP_IP, USERS, GATEWAYS)
+  4. Deploy
+
+Docker:
+  1. cp .env.example .env
+  2. nano .env (edit variables)
+  3. docker-compose -f docker-compose.production.yml up -d
+  4. docker-compose exec freeswitch fs_cli -x "sofia status"
+
+Linux:
+  1. sudo bash install.sh
+  2. export FS_DOMAIN=... EXTERNAL_SIP_IP=... (etc)
+  3. sudo bash provision.sh
+  4. sudo systemctl start freeswitch
+
+===========================================
+
+МИНИМАЛЬНАЯ КОНФИГУРАЦИЯ (ENV):
+
+FS_DOMAIN=sip.example.com
+EXTERNAL_SIP_IP=203.0.113.10
+EXTERNAL_RTP_IP=203.0.113.10
+USERS=alice:pass123:1001,bob:pass456:1002
+GATEWAYS=provider:sip.provider.com:5060:user:pass:true:udp
+DEFAULT_GATEWAY=provider
+DEFAULT_EXTENSION=1001
+
+===========================================
+
+ВСЕГО СОЗДАНО: 16 новых файлов
+Общий размер: ~130 KB кода и документации
+
+Готово к production использованию! ✅

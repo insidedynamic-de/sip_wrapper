@@ -1,0 +1,97 @@
+################################################################################
+# FreeSWITCH Dockerfile for Coolify
+# Simplified version optimized for Coolify deployment
+################################################################################
+
+FROM debian:bookworm-slim
+
+LABEL maintainer="DevOps"
+LABEL description="FreeSWITCH for Coolify - Production Ready"
+
+################################################################################
+# Environment
+################################################################################
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    FS_CONF=/etc/freeswitch \
+    TZ=UTC
+
+################################################################################
+# Install FreeSWITCH
+################################################################################
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    gnupg2 \
+    wget \
+    lsb-release \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Add SignalWire repository and install FreeSWITCH
+RUN wget -O- https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | \
+    gpg --dearmor -o /usr/share/keyrings/signalwire-freeswitch-repo.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://files.freeswitch.org/repo/deb/debian-release/ $(lsb_release -sc) main" \
+    > /etc/apt/sources.list.d/freeswitch.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    freeswitch-meta-all \
+    freeswitch-all-dbg \
+    && rm -rf /var/lib/apt/lists/*
+
+################################################################################
+# Clean default configuration
+################################################################################
+
+RUN if [ -d "$FS_CONF" ]; then \
+      cp -a "$FS_CONF" "${FS_CONF}.orig"; \
+      find "$FS_CONF/dialplan" -type f -name "*.xml" -delete 2>/dev/null || true; \
+      find "$FS_CONF/directory" -type f -name "*.xml" -delete 2>/dev/null || true; \
+      find "$FS_CONF/sip_profiles" -type f -name "*.xml" ! -name "internal.xml" ! -name "external.xml" -delete 2>/dev/null || true; \
+      rm -rf "$FS_CONF/sip_profiles/external"/*.xml 2>/dev/null || true; \
+      rm -rf "$FS_CONF/sip_profiles/internal"/*.xml 2>/dev/null || true; \
+      mkdir -p "$FS_CONF"/{dialplan/{default,public},directory/default,sip_profiles/{internal,external},autoload_configs}; \
+    fi
+
+################################################################################
+# Copy scripts
+################################################################################
+
+COPY provision.sh /usr/local/bin/provision.sh
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+RUN chmod +x /usr/local/bin/provision.sh /usr/local/bin/docker-entrypoint.sh
+
+################################################################################
+# Ports (documented for Coolify)
+################################################################################
+
+# SIP signaling
+EXPOSE 5060/udp 5060/tcp
+EXPOSE 5080/udp 5080/tcp
+
+# RTP media (adjust range if needed via ENV)
+EXPOSE 16384-32768/udp
+
+# Event Socket (optional, for management)
+EXPOSE 8021/tcp
+
+################################################################################
+# Health check
+################################################################################
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD fs_cli -x "status" | grep -q "UP" || exit 1
+
+################################################################################
+# Volume for backups
+################################################################################
+
+VOLUME ["/var/backups/freeswitch"]
+
+################################################################################
+# Start
+################################################################################
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["freeswitch", "-nonat", "-nf"]

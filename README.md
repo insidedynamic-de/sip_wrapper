@@ -1,97 +1,308 @@
-# FreeSWITCH SIP Wrapper (Minimal SIP Relay)
+# FreeSWITCH Production - Coolify Ready
 
-A minimal, production-ready FreeSWITCH SIP relay for forwarding all inbound and outbound calls between a single SIP user and a single SIP provider. No business logic, no web services, no persistent storage.
+> Production-ready FreeSWITCH with ENV-based configuration. Deploy to Coolify in 2 minutes.
 
-## Features
-- One SIP user (example: exampleuser)
-- All inbound and outbound calls are transparently bridged to a SIP provider
-- No number rewriting, no caller ID manipulation
-- Configuration-only: all settings via environment variables
-- Docker-only, no persistent storage
-- No web services, no APIs, no databases
-- Suitable for Docker, Coolify, and GitHub Actions deployments
+[![GitHub](https://img.shields.io/badge/GitHub-insidedynamic--de%2Fsip__wrapper-blue?logo=github)](https://github.com/insidedynamic-de/sip_wrapper)
 
-## Quick Start (Coolify or Docker Compose)
+---
 
-1. **Copy the docker-compose.yml file** to your project or Coolify app.
-2. **Edit the environment variables** in the `docker-compose.yml` file to match your SIP credentials and provider details:
+## 🚀 Deploy to Coolify (2 минуты)
 
-```yaml
-environment:
-  SIP_USER: exampleuser
-  SIP_PASSWORD: examplepass
-  SIP_DOMAIN: example.sip.domain
-  PROVIDER_HOST: example.provider.host
-  PROVIDER_PORT: 5060
-  PROVIDER_USERNAME: provideruser
-  PROVIDER_PASSWORD: providerpass
-  PROVIDER_TRANSPORT: udp
-  EXTERNAL_IP: example.external.ip
-  GITHUB_URL: https://github.com/insidedynamic-de/sip_wrapper
+### 1. Create Service
+
+Coolify → **Add New Service** → **Docker Compose**
+
+### 2. Connect Git
+
+- **Repository:** `https://github.com/insidedynamic-de/sip_wrapper.git`
+- **Branch:** `main`
+- **Docker Compose file:** `docker-compose.coolify.yml`
+
+### 3. Set ENV Variables (в Coolify UI)
+
+```bash
+# REQUIRED
+FS_DOMAIN=sip.yourdomain.com
+EXTERNAL_SIP_IP=your-server-ip
+EXTERNAL_RTP_IP=your-server-ip
+
+# USERS (format: username:password:extension)
+USERS=alice:SecretPass123:1001,bob:SecretPass456:1002
+
+# GATEWAYS (format: name:host:port:user:pass:register:transport)
+GATEWAYS=provider:sip.provider.com:5060:username:password:true:udp
+
+# ROUTING
+DEFAULT_GATEWAY=provider
+DEFAULT_EXTENSION=1001
 ```
 
-3. **Set the correct ports** for SIP and RTP in the `docker-compose.yml` file:
-```yaml
-ports:
-  - "5060:5060/udp"
-  - "5080:5080/udp"
-  - "16384-32768:16384-32768/udp"
+**💡 Как узнать IP сервера:**
+```bash
+curl ifconfig.me
 ```
 
-4. **Deploy with Coolify** (or locally):
-   - In Coolify, create a new Docker Compose app and upload your `docker-compose.yml`.
-   - Make sure to set or override environment variables in the Coolify UI if needed.
-   - Deploy the app.
+### 4. Deploy
 
-5. **Check logs and registration**
-   - Use `fs_cli -x "sofia status"` and `fs_cli -x "show registrations"` to verify SIP registration and call routing.
+Нажмите **Deploy** → Готово! ✅
 
-## Environment Variables
-- `SIP_USER` — SIP user/extension (e.g., 1001)
-- `SIP_PASSWORD` — SIP user password
-- `SIP_DOMAIN` — SIP domain or host for user registration
-- `PROVIDER_HOST` — SIP provider host
-- `PROVIDER_PORT` — SIP provider port (default: 5060)
-- `PROVIDER_USERNAME` — Provider username (if required)
-- `PROVIDER_PASSWORD` — Provider password (if required)
-- `PROVIDER_TRANSPORT` — udp or tcp (default: udp)
-- `EXTERNAL_IP` — External IP or hostname for RTP/SIP (e.g., your Coolify app hostname)
-- `GITHUB_URL` — (optional) Link to this repository
+### 5. Verify
 
-## Notes
-- All configuration is generated at container startup from environment variables.
-- No persistent storage is required.
-- Logs are sent to stdout.
-- The container fails fast on misconfiguration or if the SIP user/provider is unreachable.
-
-## Example docker-compose.yml
-```yaml
-version: '3.9'
-services:
-  freeswitch:
-    build: .
-    container_name: freeswitch
-    environment:
-      SIP_USER: exampleuser
-      SIP_PASSWORD: examplepass
-      SIP_DOMAIN: example.sip.domain
-      PROVIDER_HOST: example.provider.host
-      PROVIDER_PORT: 5060
-      PROVIDER_USERNAME: provideruser
-      PROVIDER_PASSWORD: providerpass
-      PROVIDER_TRANSPORT: udp
-      EXTERNAL_IP: example.external.ip
-      GITHUB_URL: https://github.com/insidedynamic-de/sip_wrapper
-    ports:
-      - "5060:5060/udp"
-      - "5080:5080/udp"
-      - "16384-32768:16384-32768/udp"
-    restart: unless-stopped
+В Coolify Terminal:
+```bash
+fs_cli -x "sofia status"
 ```
 
-## Security
-- No credentials or sensitive data are stored in the image or repo.
-- All secrets are passed via environment variables at runtime.
+---
 
-## Support
-This project is intentionally minimal. For issues, open a GitHub issue or PR.
+## 📖 Документация
+
+| Файл | Описание |
+|------|----------|
+| **[COOLIFY_QUICKSTART.md](COOLIFY_QUICKSTART.md)** | Быстрый старт для Coolify |
+| **[COOLIFY.md](COOLIFY.md)** | Полное руководство по Coolify |
+| **[.env.example](.env.example)** | Все ENV переменные с примерами |
+| **[QUICKSTART.md](QUICKSTART.md)** | Быстрый старт Docker/Linux |
+| **[DEPLOYMENT.md](DEPLOYMENT.md)** | Детальное руководство |
+
+---
+
+## ⚙️ Конфигурация
+
+### Минимальная конфигурация
+
+```bash
+FS_DOMAIN=sip.example.com
+EXTERNAL_SIP_IP=203.0.113.10
+EXTERNAL_RTP_IP=203.0.113.10
+USERS=alice:pass:1001
+GATEWAYS=provider:sip.provider.com:5060:user:pass:true:udp
+DEFAULT_GATEWAY=provider
+DEFAULT_EXTENSION=1001
+```
+
+### Расширенная конфигурация
+
+**Multiple users:**
+```bash
+USERS=alice:pass1:1001,bob:pass2:1002,carol:pass3:1003
+```
+
+**ACL users (без пароля, по IP):**
+```bash
+ACL_USERS=trunk:192.168.1.100:9000
+```
+
+**Multiple gateways:**
+```bash
+GATEWAYS=provider1:sip.p1.com:5060:u1:p1:true:udp,provider2:sip.p2.com:5060:u2:p2:true:udp
+```
+
+**Pattern-based routing:**
+```bash
+OUTBOUND_ROUTES=^00.*:provider1,^0.*:provider2
+INBOUND_ROUTES=+49301234567:1001,+49301234568:1002,*:1000
+```
+
+Полный список: [.env.example](.env.example)
+
+---
+
+## 🎯 Примеры
+
+### Простой офис
+
+3 пользователя, 1 провайдер:
+
+```bash
+FS_DOMAIN=office.local
+EXTERNAL_SIP_IP=203.0.113.50
+EXTERNAL_RTP_IP=203.0.113.50
+USERS=alice:Pass123:1001,bob:Pass456:1002,carol:Pass789:1003
+GATEWAYS=provider:sip.provider.com:5060:account:secret:true:udp
+DEFAULT_GATEWAY=provider
+DEFAULT_EXTENSION=1001
+```
+
+### Multi-provider
+
+Разные провайдеры для разных направлений:
+
+```bash
+FS_DOMAIN=pbx.company.com
+EXTERNAL_SIP_IP=203.0.113.100
+EXTERNAL_RTP_IP=203.0.113.100
+USERS=user1:Pass1:1001,user2:Pass2:1002
+GATEWAYS=provider_de:sip.de.com:5060:user_de:pass_de:true:udp,provider_us:sip.us.com:5060:user_us:pass_us:true:udp
+OUTBOUND_ROUTES=^\+49.*:provider_de,^\+1.*:provider_us
+INBOUND_ROUTES=+4930111111:1001,+4930222222:1002
+```
+
+### SIP Trunk (без auth)
+
+IP-based trunk:
+
+```bash
+FS_DOMAIN=trunk.example.com
+EXTERNAL_SIP_IP=203.0.113.200
+EXTERNAL_RTP_IP=203.0.113.200
+ACL_USERS=trunk:198.51.100.50:9000
+GATEWAYS=provider:sip.provider.net:5060:::false:udp
+DEFAULT_GATEWAY=provider
+DEFAULT_EXTENSION=9000
+```
+
+---
+
+## ✅ Проверка
+
+### В Coolify Terminal
+
+```bash
+# Статус FreeSWITCH
+fs_cli -x "status"
+
+# Статус профилей (должны быть UP)
+fs_cli -x "sofia status"
+
+# Статус гатвеев (должны быть REGED)
+fs_cli -x "sofia status gateway"
+
+# Зарегистрированные пользователи
+fs_cli -x "show registrations"
+
+# Активные звонки
+fs_cli -x "show channels"
+```
+
+### Настройка SIP клиента
+
+```
+Сервер: your EXTERNAL_SIP_IP
+Порт: 5060
+Username: alice (из USERS)
+Password: SecretPass123
+Domain: FS_DOMAIN (или пустое)
+Transport: UDP
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### Gateway не регистрируется
+
+```bash
+fs_cli -x "sofia status gateway provider"
+```
+
+**Решения:**
+1. Проверьте credentials в `GATEWAYS`
+2. Проверьте firewall открыт для UDP 5060, 5080
+3. Включите debug: `SIP_DEBUG=9` в ENV
+
+### Пользователи не могут регистрироваться
+
+1. `EXTERNAL_SIP_IP` должен быть **публичный IP** сервера
+2. Firewall открыт для UDP 5060
+3. Проверьте пароли в `USERS`
+
+### Нет звука
+
+1. `EXTERNAL_RTP_IP` = публичный IP
+2. Firewall открыт для UDP **16384-32768**
+3. `network_mode: host` используется (уже настроено)
+
+**Полное руководство:** [COOLIFY.md](COOLIFY.md#troubleshooting)
+
+---
+
+## 🏗️ Архитектура
+
+```
+┌─────────────────────────────────────┐
+│       FreeSWITCH Server             │
+│                                     │
+│  Internal Profile (5060)            │
+│  └─ Users (auth required)           │
+│                                     │
+│  External Profile (5080)            │
+│  └─ Gateways (no auth)              │
+│                                     │
+│  Outbound: User → Gateway → Provider│
+│  Inbound:  Provider → Gateway → User│
+└─────────────────────────────────────┘
+```
+
+---
+
+## 📋 Файлы проекта
+
+### Для Coolify:
+- `docker-compose.coolify.yml` - Главный файл для Coolify
+- `Dockerfile.coolify` - Dockerfile (альтернатива)
+- `.env.example` - Примеры ENV переменных
+
+### Для production:
+- `docker-compose.production.yml` - Production Docker Compose
+- `Dockerfile.production` - Production Dockerfile
+- `install.sh` - Установка на Linux
+- `provision.sh` - Генерация конфигурации
+- `docker-entrypoint.sh` - Docker entrypoint
+
+### Документация:
+- `README.md` - Этот файл
+- `COOLIFY_QUICKSTART.md` - Быстрый старт Coolify
+- `COOLIFY.md` - Полное руководство Coolify
+- `QUICKSTART.md` - Быстрый старт Docker/Linux
+- `DEPLOYMENT.md` - Детальное руководство
+- `README.production.md` - Полная техническая документация
+- `SUMMARY.md` - Итоговая сводка
+
+---
+
+## ✨ Особенности
+
+- ✅ Официальная установка FreeSWITCH из SignalWire
+- ✅ Без demo/example конфигураций
+- ✅ 100% автоматизация через ENV
+- ✅ Multiple users (password + IP-based)
+- ✅ Multiple gateways/providers
+- ✅ Гибкая маршрутизация inbound/outbound
+- ✅ NAT traversal
+- ✅ **Coolify-ready за 2 минуты**
+- ✅ Production-ready
+- ✅ Docker, Kubernetes, Bare Metal
+
+---
+
+## 📝 Production Checklist
+
+- [ ] `EXTERNAL_SIP_IP` = публичный IP сервера
+- [ ] `EXTERNAL_RTP_IP` = публичный IP сервера
+- [ ] Сильные пароли в `USERS`
+- [ ] Firewall открыт: 5060, 5080, 16384-32768 UDP
+- [ ] Gateway credentials правильные
+- [ ] Протестированы inbound calls
+- [ ] Протестированы outbound calls
+- [ ] Протестирован звук
+- [ ] Health check работает
+- [ ] Backup volume настроен
+
+---
+
+## 🤝 Support
+
+- **Issues:** [GitHub Issues](https://github.com/insidedynamic-de/sip_wrapper/issues)
+- **Docs:** [COOLIFY.md](COOLIFY.md) | [DEPLOYMENT.md](DEPLOYMENT.md)
+- **FreeSWITCH:** https://freeswitch.org
+
+---
+
+## 📄 License
+
+Provided as-is for production use.
+
+---
+
+**Made for DevOps/VoIP Engineers** 🚀 | Deploy to Coolify in 2 minutes!
