@@ -54,9 +54,27 @@ VARS_XML="$FS_CONF_DIR/vars.xml"
 echo "[DEBUG] VARS_XML set to '$VARS_XML'"
 VARS_LOCAL="$FS_CONF_DIR/vars_local.xml"
 echo "[DEBUG] VARS_LOCAL set to '$VARS_LOCAL'"
+DIALPLAN_CONF="$FS_CONF_DIR/dialplan.conf.xml"
+echo "[DEBUG] DIALPLAN_CONF set to '$DIALPLAN_CONF'"
 echo "[DEBUG] Creating config directories if not exist..."
 mkdir -p "$DIR_DEFAULT" "$DP_DEFAULT" "$GW_DIR"
 echo "[DEBUG] Directory setup complete."
+
+# Create dialplan.conf.xml if missing
+if [ ! -f "$DIALPLAN_CONF" ]; then
+  cat > "$DIALPLAN_CONF" <<EOF
+<configuration name="dialplan.conf" description="Dialplan Configuration">
+  <settings>
+    <param name="default_dialplan" value="XML"/>
+    <param name="dialplan_directory" value="dialplan"/>
+  </settings>
+  <contexts>
+    <X-PRE-PROCESS cmd="include" data="default/*.xml"/>
+  </contexts>
+</configuration>
+EOF
+  echo "[STEP] dialplan.conf.xml created."
+fi
 
 # --- CLEANUP SECTION ---
 echo "[CLEANUP] Removing all existing users, dialplans, and gateways..."
@@ -123,14 +141,15 @@ echo "[STEP] Provider Gateway block done."
 DP_XML="$DP_DEFAULT/forward_${SIP_USER}.xml"
 cat > "$DP_XML" <<EOF
 <include>
-  <extension name="forward_${SIP_USER}_to_provider">
-    <condition field="destination_number" expression="^${SIP_USER}\$">
-      <!-- Проброс caller id и номера как есть -->
-      <action application="set" data="hangup_after_bridge=true"/>
-      <action application="set" data="continue_on_fail=true"/>
-      <action application="bridge" data="sofia/gateway/provider/\${destination_number}"/>
-    </condition>
-  </extension>
+  <context name="default">
+    <extension name="forward_${SIP_USER}_to_provider">
+      <condition field="destination_number" expression="^${SIP_USER}\$">
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="set" data="continue_on_fail=true"/>
+        <action application="bridge" data="sofia/gateway/provider/\${destination_number}"/>
+      </condition>
+    </extension>
+  </context>
 </include>
 EOF
 echo "[STEP] Dialplan block done."
