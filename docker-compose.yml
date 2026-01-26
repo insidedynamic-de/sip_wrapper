@@ -2,18 +2,8 @@ version: '3.9'
 services:
   freeswitch:
     image: 'safarov/freeswitch:latest'
-    container_name: sip-wraper
-    environment:
-      SIP_USER: exampleuser
-      SIP_PASSWORD: examplepass
-      SIP_DOMAIN: example.sip.domain
-      PROVIDER_HOST: example.provider.host
-      PROVIDER_PORT: 5060
-      PROVIDER_USERNAME: provideruser
-      PROVIDER_PASSWORD: providerpass
-      PROVIDER_TRANSPORT: udp
-      EXTERNAL_IP: example.external.ip
-      GITHUB_URL: https://github.com/insidedynamic-de/sip_wrapper
+    env_file:
+      - .env
     network_mode: host
     restart: unless-stopped
     volumes:
@@ -22,7 +12,6 @@ services:
       - "5060:5060/udp"
       - "5080:5080/udp"
       - "16384-32768:16384-32768/udp"
-    command: >
-       sh -c "wget --no-cache --no-check-certificate -qO /tmp/provision_freeswitch.sh 'https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision_freeswitch.sh?'\$(date +%s) && chmod +x /tmp/provision_freeswitch.sh && /tmp/provision_freeswitch.sh && /usr/bin/freeswitch -nonat -nf"
+    command: sh -c "${START_COMMAND}"
 volumes:
   fs_data: null

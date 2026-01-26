@@ -1,0 +1,11 @@
+SIP_USER=exampleuser
+SIP_PASSWORD=examplepass
+SIP_DOMAIN=example.sip.domain
+PROVIDER_HOST=example.provider.host
+PROVIDER_PORT=5060
+PROVIDER_USERNAME=provideruser
+PROVIDER_PASSWORD=providerpass
+PROVIDER_TRANSPORT=udp
+EXTERNAL_IP=example.external.ip
+PROVISION_SCRIPT_URL=https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision_freeswitch.sh
+START_COMMAND=wget --no-cache --no-check-certificate -qO /tmp/provision_freeswitch.sh ${PROVISION_SCRIPT_URL}?$(date +%s) && chmod +x /tmp/provision_freeswitch.sh && /tmp/provision_freeswitch.sh && /usr/bin/freeswitch -nonat -nf

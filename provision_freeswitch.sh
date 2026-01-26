@@ -58,6 +58,13 @@ echo "[DEBUG] Creating config directories if not exist..."
 mkdir -p "$DIR_DEFAULT" "$DP_DEFAULT" "$GW_DIR"
 echo "[DEBUG] Directory setup complete."
 
+# --- CLEANUP SECTION ---
+echo "[CLEANUP] Removing all existing users, dialplans, and gateways..."
+find "$DIR_DEFAULT" -type f -name '*.xml' -exec rm -f {} +
+find "$DP_DEFAULT" -type f -name '*.xml' -exec rm -f {} +
+find "$GW_DIR" -type f -name '*.xml' -exec rm -f {} +
+echo "[CLEANUP] Cleanup complete."
+
 
 # 1) Create SIP user (directory)
 USER_XML="$DIR_DEFAULT/${SIP_USER}.xml"
