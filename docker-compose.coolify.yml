@@ -14,10 +14,10 @@ version: '3.9'
 
 services:
   freeswitch:
-    # Build from Dockerfile in same repo
+    # Build from Dockerfile.coolify (optimized for Coolify deployment)
     build:
       context: .
-      dockerfile: Dockerfile.production
+      dockerfile: Dockerfile.coolify
 
     container_name: freeswitch
 

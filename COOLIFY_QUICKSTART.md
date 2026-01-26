@@ -82,6 +82,23 @@ Transport: UDP
 
 ## Troubleshooting
 
+### Build failed: "no such file or directory"
+
+Если вы видите ошибку:
+```
+failed to solve: failed to read dockerfile: open Dockerfile.production: no such file or directory
+```
+
+**Решение:**
+Убедитесь, что файлы закоммичены в Git:
+```bash
+git add Dockerfile.coolify provision.sh docker-entrypoint.sh docker-compose.coolify.yml
+git commit -m "Add Coolify deployment files"
+git push origin main
+```
+
+Затем в Coolify нажмите "Redeploy".
+
 ### Gateway не регистрируется
 
 В Coolify Terminal:
