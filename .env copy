@@ -1,17 +1,32 @@
+### ===== SIP USER (softphone / internal) =====
+SIP_DOMAIN=apps.linkify.cloud
 SIP_USER=exampleuser
 SIP_PASSWORD=examplepass
-SIP_DOMAIN=example.sip.domain
-PROVIDER_HOST=example.provider.host
+
+### ===== PROVIDER (outbound trunk) =====
+PROVIDER_NAME=provider
+PROVIDER_HOST=fpbx.de
 PROVIDER_PORT=5060
-PROVIDER_USERNAME=provideruser
-PROVIDER_PASSWORD=providerpass
+PROVIDER_USERNAME=777z9uovpu
+PROVIDER_PASSWORD=4UMtPyXw8Qss
 PROVIDER_TRANSPORT=udp
-EXTERNAL_IP=example.external.ip
+CALLER_ID=032221803986
+
+### ===== VAPI (inbound target) =====
+VAPI_NAME=vapi
 VAPI_HOST=example.external.ip
 VAPI_PORT=5060
 VAPI_USERNAME=provideruser
 VAPI_PASSWORD=providerpass
 VAPI_TRANSPORT=udp
 
+### ===== NETWORK / NAT =====
+EXTERNAL_IP=example.external.ip
+
+### ===== PROVISIONING =====
 PROVISION_SCRIPT_URL=https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision_freeswitch.sh
-START_COMMAND=wget --no-cache --no-check-certificate -qO /tmp/provision_freeswitch.sh ${PROVISION_SCRIPT_URL}?$(date +%s) && chmod +x /tmp/provision_freeswitch.sh && /tmp/provision_freeswitch.sh && /usr/bin/freeswitch -nonat -nf
+
+START_COMMAND=wget --no-cache --no-check-certificate -qO /tmp/provision_freeswitch.sh ${PROVISION_SCRIPT_URL}?$(date +%s) \
+  && chmod +x /tmp/provision_freeswitch.sh \
+  && /tmp/provision_freeswitch.sh \
+  && /usr/bin/freeswitch -nonat -nf
