@@ -61,7 +61,8 @@ echo "[DEBUG] Directory setup complete."
 # --- CLEANUP SECTION ---
 echo "[CLEANUP] Removing all existing users, dialplans, and gateways..."
 find "$DIR_DEFAULT" -type f -name '*.xml' -exec rm -f {} +
-find "$DP_DEFAULT" -type f -name '*.xml' -exec rm -f {} +
+# Clean all dialplan XMLs in all subdirs (not just default)
+find "$FS_CONF_DIR/dialplan" -type f -name '*.xml' -exec rm -f {} +
 find "$GW_DIR" -type f -name '*.xml' -exec rm -f {} +
 echo "[CLEANUP] Cleanup complete."
 
