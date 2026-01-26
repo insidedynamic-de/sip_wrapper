@@ -1,0 +1,123 @@
+################################################################################
+# FreeSWITCH Production Docker Compose
+#
+# Usage:
+#   1. Copy .env.example to .env and configure
+#   2. docker-compose -f docker-compose.production.yml up -d
+#   3. docker-compose -f docker-compose.production.yml logs -f
+#
+# Management:
+#   - View status: docker-compose exec freeswitch fs_cli -x "sofia status"
+#   - View logs: docker-compose logs -f freeswitch
+#   - Restart: docker-compose restart freeswitch
+#   - Reprovision: docker-compose restart freeswitch
+################################################################################
+
+version: '3.9'
+
+services:
+  freeswitch:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+
+    container_name: freeswitch-production
+
+    # Load environment from .env file
+    env_file:
+      - .env
+
+    # Use host network for better SIP/RTP compatibility
+    # Alternative: use bridge mode with port mapping (see below)
+    network_mode: host
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Volumes
+    volumes:
+      # Backup storage (optional but recommended)
+      - freeswitch_backups:/var/backups/freeswitch
+
+      # Persist FreeSWITCH data (optional)
+      # - freeswitch_data:/var/lib/freeswitch
+
+      # Custom sounds (optional)
+      # - ./sounds:/usr/share/freeswitch/sounds/custom
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "fs_cli", "-x", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Resource limits (optional)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '2'
+    #       memory: 2G
+    #     reservations:
+    #       cpus: '1'
+    #       memory: 512M
+
+# If you prefer bridge networking instead of host mode, uncomment below
+# and comment out "network_mode: host" above:
+
+#   freeswitch:
+#     # ... (keep all settings above except network_mode)
+#
+#     ports:
+#       # SIP
+#       - "5060:5060/udp"
+#       - "5060:5060/tcp"
+#       - "5080:5080/udp"
+#       - "5080:5080/tcp"
+#
+#       # RTP (adjust range based on your RTP_START_PORT and RTP_END_PORT)
+#       - "16384-32768:16384-32768/udp"
+#
+#       # Event Socket (for management, optional)
+#       - "8021:8021/tcp"
+#
+#     networks:
+#       - freeswitch_net
+
+# networks:
+#   freeswitch_net:
+#     driver: bridge
+
+volumes:
+  freeswitch_backups:
+    driver: local
+
+  # freeswitch_data:
+  #   driver: local
+
+################################################################################
+# Alternative Configuration for Coolify
+#
+# For Coolify, you can simplify to:
+#
+# version: '3.9'
+# services:
+#   freeswitch:
+#     image: your-registry/freeswitch-prod:latest
+#     env_file: .env
+#     network_mode: host
+#     restart: unless-stopped
+#     volumes:
+#       - freeswitch_backups:/var/backups/freeswitch
+# volumes:
+#   freeswitch_backups:
+#
+################################################################################
