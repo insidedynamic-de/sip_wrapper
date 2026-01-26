@@ -1,0 +1,112 @@
+################################################################################
+# FreeSWITCH for Coolify - Simple Version (Using Pre-built Image)
+# Самый простой вариант - использует готовый FreeSWITCH image
+#
+# ПРЕИМУЩЕСТВА:
+# - Нет необходимости в Dockerfile
+# - Быстрый deployment
+# - Меньше ошибок при сборке
+# - Provision.sh загружается из GitHub автоматически
+#
+# ИСПОЛЬЗОВАНИЕ В COOLIFY:
+# 1. Coolify → Add New Service → Docker Compose
+# 2. Repository: https://github.com/insidedynamic-de/sip_wrapper
+# 3. Docker Compose file: docker-compose.coolify-simple.yml
+# 4. Set ENV variables in Coolify UI
+# 5. Deploy
+################################################################################
+
+version: '3.9'
+
+services:
+  freeswitch:
+    # Using official FreeSWITCH image from PatrickBaus
+    # Alternative: use debian and install on-the-fly
+    image: ghcr.io/patrickbaus/freeswitch-docker:latest
+
+    container_name: freeswitch
+
+    # Override entrypoint to run our provision script first
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "[$(date)] Downloading provision script..."
+
+        # Install curl if not available
+        apk add --no-cache curl bash || apt-get update && apt-get install -y curl bash
+
+        # Download provision script from GitHub
+        curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh -o /tmp/provision.sh
+        chmod +x /tmp/provision.sh
+
+        echo "[$(date)] Running provision..."
+        bash /tmp/provision.sh
+
+        echo "[$(date)] Starting FreeSWITCH..."
+        exec /usr/bin/freeswitch -nonat -nf
+
+    # Environment variables (set in Coolify UI)
+    environment:
+      # REQUIRED
+      FS_DOMAIN: ${FS_DOMAIN}
+      EXTERNAL_SIP_IP: ${EXTERNAL_SIP_IP}
+      EXTERNAL_RTP_IP: ${EXTERNAL_RTP_IP}
+      USERS: ${USERS}
+      GATEWAYS: ${GATEWAYS}
+
+      # ROUTING (choose one)
+      DEFAULT_GATEWAY: ${DEFAULT_GATEWAY:-}
+      DEFAULT_EXTENSION: ${DEFAULT_EXTENSION:-}
+      OUTBOUND_ROUTES: ${OUTBOUND_ROUTES:-}
+      INBOUND_ROUTES: ${INBOUND_ROUTES:-}
+
+      # OPTIONAL
+      ACL_USERS: ${ACL_USERS:-}
+      INTERNAL_SIP_PORT: ${INTERNAL_SIP_PORT:-5060}
+      EXTERNAL_SIP_PORT: ${EXTERNAL_SIP_PORT:-5080}
+      RTP_START_PORT: ${RTP_START_PORT:-16384}
+      RTP_END_PORT: ${RTP_END_PORT:-32768}
+      CODEC_PREFS: ${CODEC_PREFS:-PCMU,PCMA,G729,opus}
+      SIP_DEBUG: ${SIP_DEBUG:-0}
+      SIP_TRACE: ${SIP_TRACE:-no}
+
+    # Host network for SIP/RTP
+    network_mode: host
+
+    # Capabilities for real-time performance
+    cap_add:
+      - SYS_NICE
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Volumes
+    volumes:
+      - freeswitch_backups:/var/backups/freeswitch
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "sh", "-c", "command -v fs_cli && fs_cli -x 'status' | grep -q 'UP' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+volumes:
+  freeswitch_backups:
+    driver: local
+
+################################################################################
+# ПРИМЕР ПЕРЕМЕННЫХ ДЛЯ COOLIFY UI
+################################################################################
+#
+# FS_DOMAIN=apps.linkify.cloud
+# EXTERNAL_SIP_IP=203.0.113.10
+# EXTERNAL_RTP_IP=203.0.113.10
+# USERS=exampleuser:examplepass:1001
+# GATEWAYS=provider:fpbx.de:5060:777z9uovpu:4UMtPyXw8Qss:true:udp
+# DEFAULT_GATEWAY=provider
+# DEFAULT_EXTENSION=1001
+#
+################################################################################

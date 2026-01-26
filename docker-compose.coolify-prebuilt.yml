@@ -1,0 +1,134 @@
+################################################################################
+# FreeSWITCH for Coolify - Pre-built Image Version
+# Uses pre-built FreeSWITCH image instead of building from Dockerfile
+#
+# Преимущества:
+# - Быстрый deployment (нет необходимости собирать образ)
+# - Надежность (проверенный образ)
+# - Меньше проблем с зависимостями
+#
+# Использование в Coolify:
+# 1. Create new service: "Docker Compose"
+# 2. Connect your Git repository
+# 3. Set docker-compose file path: docker-compose.coolify-prebuilt.yml
+# 4. Configure environment variables in Coolify UI
+# 5. Deploy
+################################################################################
+
+version: '3.9'
+
+services:
+  freeswitch:
+    # Using debian-based FreeSWITCH image
+    image: debian:bookworm-slim
+
+    container_name: freeswitch
+
+    # Run provision and freeswitch on startup
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        set -e
+        echo "Installing FreeSWITCH..."
+        apt-get update && apt-get install -y --no-install-recommends \
+          ca-certificates gnupg2 wget lsb-release curl \
+          && wget -O- https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | \
+             gpg --dearmor -o /usr/share/keyrings/signalwire-freeswitch-repo.gpg \
+          && echo "deb [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://files.freeswitch.org/repo/deb/debian-release/ $$(lsb_release -sc) main" \
+             > /etc/apt/sources.list.d/freeswitch.list \
+          && apt-get update \
+          && apt-get install -y --no-install-recommends freeswitch-meta-all freeswitch-all-dbg \
+          && rm -rf /var/lib/apt/lists/*
+
+        echo "Cleaning default config..."
+        if [ -d /etc/freeswitch ]; then
+          find /etc/freeswitch/dialplan -type f -name "*.xml" -delete 2>/dev/null || true
+          find /etc/freeswitch/directory -type f -name "*.xml" -delete 2>/dev/null || true
+          mkdir -p /etc/freeswitch/{dialplan/{default,public},directory/default,sip_profiles/{internal,external}}
+        fi
+
+        echo "Downloading provision script..."
+        curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh -o /tmp/provision.sh
+        chmod +x /tmp/provision.sh
+
+        echo "Running provision..."
+        /tmp/provision.sh
+
+        echo "Starting FreeSWITCH..."
+        exec /usr/bin/freeswitch -nonat -nf
+
+    # Environment variables (set these in Coolify UI)
+    environment:
+      # REQUIRED
+      - FS_DOMAIN=${FS_DOMAIN}
+      - EXTERNAL_SIP_IP=${EXTERNAL_SIP_IP}
+      - EXTERNAL_RTP_IP=${EXTERNAL_RTP_IP}
+      - USERS=${USERS}
+      - GATEWAYS=${GATEWAYS}
+
+      # ROUTING
+      - OUTBOUND_ROUTES=${OUTBOUND_ROUTES:-}
+      - DEFAULT_GATEWAY=${DEFAULT_GATEWAY:-}
+      - INBOUND_ROUTES=${INBOUND_ROUTES:-}
+      - DEFAULT_EXTENSION=${DEFAULT_EXTENSION:-}
+
+      # OPTIONAL
+      - ACL_USERS=${ACL_USERS:-}
+      - INTERNAL_SIP_PORT=${INTERNAL_SIP_PORT:-5060}
+      - EXTERNAL_SIP_PORT=${EXTERNAL_SIP_PORT:-5080}
+      - RTP_START_PORT=${RTP_START_PORT:-16384}
+      - RTP_END_PORT=${RTP_END_PORT:-32768}
+      - CODEC_PREFS=${CODEC_PREFS:-PCMU,PCMA,G729,opus}
+      - SIP_DEBUG=${SIP_DEBUG:-0}
+      - SIP_TRACE=${SIP_TRACE:-no}
+
+    # Use host network for best SIP/RTP compatibility
+    network_mode: host
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Volume for backups
+    volumes:
+      - freeswitch_backups:/var/backups/freeswitch
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "bash", "-c", "command -v fs_cli && fs_cli -x 'status' | grep -q 'UP' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+volumes:
+  freeswitch_backups:
+    driver: local
+
+################################################################################
+# COOLIFY ENVIRONMENT VARIABLES (set in Coolify UI)
+################################################################################
+#
+# REQUIRED:
+# ---------
+# FS_DOMAIN=apps.linkify.cloud
+# EXTERNAL_SIP_IP=your.server.ip
+# EXTERNAL_RTP_IP=your.server.ip
+# USERS=exampleuser:examplepass:1001
+# GATEWAYS=provider:fpbx.de:5060:777z9uovpu:4UMtPyXw8Qss:true:udp
+# DEFAULT_GATEWAY=provider
+# DEFAULT_EXTENSION=1001
+#
+# OPTIONAL:
+# ---------
+# ACL_USERS=trunk:192.168.1.100:9000
+# OUTBOUND_ROUTES=^00.*:provider1,^0.*:provider2
+# INBOUND_ROUTES=+49301234567:1001,*:1000
+# INTERNAL_SIP_PORT=5060
+# EXTERNAL_SIP_PORT=5080
+# RTP_START_PORT=16384
+# RTP_END_PORT=32768
+# CODEC_PREFS=PCMU,PCMA,G729
+# SIP_DEBUG=0
+# SIP_TRACE=no
+#
+################################################################################
