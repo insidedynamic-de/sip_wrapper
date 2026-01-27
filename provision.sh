@@ -337,7 +337,7 @@ generate_users() {
 </include>
 EOF
 
-    ((user_count++))
+    user_count=$((user_count + 1))
   done
 
   echo_log "Generated $user_count authenticated users"
@@ -407,7 +407,7 @@ EOF
 </include>
 EOF
 
-    ((acl_count++))
+    acl_count=$((acl_count + 1))
   done
 
   # Close ACL configuration
@@ -523,7 +523,7 @@ EOF
 </include>
 EOF
 
-    ((gw_count++))
+    gw_count=$((gw_count + 1))
   done
 
   echo_log "Generated $gw_count gateways"
@@ -591,7 +591,7 @@ EOF
     </extension>
 EOF
 
-      ((route_count++))
+      route_count=$((route_count + 1))
     done
 
     echo_log "Generated $route_count outbound routes"
@@ -676,7 +676,7 @@ EOF
     </extension>
 EOF
 
-      ((route_count++))
+      route_count=$((route_count + 1))
     done
 
     echo_log "Generated $route_count inbound routes"
