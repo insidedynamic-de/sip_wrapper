@@ -550,6 +550,30 @@ EOF
 }
 
 ################################################################################
+# Generate Local Extensions Dialplan (calls to local users)
+# Matches extensions 1000-1999 and routes to registered users
+################################################################################
+
+generate_local_extensions_dialplan() {
+  echo_log "Generating local extensions dialplan..."
+
+  cat > "$FS_CONF/dialplan/default/00_local_extensions.xml" <<'EOF'
+<!-- Local extension routing - included by default.xml wrapper -->
+
+    <!-- Route calls to local extensions (1000-1999) -->
+    <extension name="local_extensions">
+      <condition field="destination_number" expression="^(1[0-9]{3})$">
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="set" data="continue_on_fail=true"/>
+        <action application="bridge" data="sofia/internal/${destination_number}@${domain_name}"/>
+      </condition>
+    </extension>
+EOF
+
+  echo_log "Local extensions dialplan generated"
+}
+
+################################################################################
 # Generate Outbound Dialplan (user -> gateway)
 # Format: OUTBOUND_ROUTES="pattern1:gateway1:prepend1,pattern2:gateway2:prepend2"
 ################################################################################
@@ -907,6 +931,7 @@ main() {
   generate_users
   generate_acl_users
   generate_gateways
+  generate_local_extensions_dialplan
   generate_outbound_dialplan
   generate_inbound_dialplan
   create_dialplan_wrappers
