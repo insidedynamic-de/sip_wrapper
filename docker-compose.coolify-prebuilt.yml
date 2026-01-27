@@ -110,7 +110,7 @@ services:
         # Download and run provision
         echo ""
         echo "[STEP 5/6] Running provision script..."
-        wget -qO /tmp/provision.sh https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh
+        wget --no-cache -qO /tmp/provision.sh https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh
         chmod +x /tmp/provision.sh
 
         # Run with verbose mode if DEBUG=true

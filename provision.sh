@@ -633,6 +633,16 @@ EOF
       </condition>
     </extension>
 
+    <!-- Numbers already with country code: 49123... → +49123... -->
+    <extension name="outbound_with_country_code">
+      <condition field="destination_number" expression="^($country_code[1-9][0-9]+)\$">
+        <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
+        <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+\$1"/>
+      </condition>
+    </extension>
+
     <!-- Normalize national format: 0123... → +49123... -->
     <extension name="outbound_national">
       <condition field="destination_number" expression="^0([1-9][0-9]+)\$">
