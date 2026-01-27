@@ -150,6 +150,13 @@ EOF
 generate_internal_profile() {
   echo_log "Generating internal SIP profile..."
 
+  # Determine ACL list based on whether ACL_USERS is defined
+  if [ -n "$ACL_USERS" ]; then
+    local inbound_acl="domains,acl_users"
+  else
+    local inbound_acl="domains"
+  fi
+
   cat > "$FS_CONF/sip_profiles/internal.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <profile name="internal">
@@ -173,7 +180,7 @@ generate_internal_profile() {
 
     <!-- NAT -->
     <param name="apply-nat-acl" value="rfc1918.auto"/>
-    <param name="apply-inbound-acl" value="domains"/>
+    <param name="apply-inbound-acl" value="$inbound_acl"/>
     <param name="local-network-acl" value="localnet.auto"/>
 
     <!-- Registration -->
@@ -364,6 +371,8 @@ generate_acl_users() {
     <list name="domains" default="deny">
       <node type="allow" domain="$${domain}"/>
     </list>
+    <!-- ACL for IP-based authentication (no password required) -->
+    <list name="acl_users" default="deny">
 EOF
 
   local acl_count=0
@@ -381,11 +390,17 @@ EOF
 
     echo_log "Creating ACL user: $username (IP: $ip, extension: $extension)"
 
-    # Add to ACL
+    # Add to ACL (support both single IP and CIDR notation)
+    # If IP already contains /, use as-is (CIDR). Otherwise add /32 (single IP)
+    if [[ "$ip" == *"/"* ]]; then
+      local cidr="$ip"
+    else
+      local cidr="$ip/32"
+    fi
+
+    # Add IP to common ACL list
     cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<EOF
-    <list name="acl_$username" default="deny">
-      <node type="allow" cidr="$ip/32"/>
-    </list>
+      <node type="allow" cidr="$cidr"/>
 EOF
 
     # Create user directory entry without password
@@ -410,8 +425,9 @@ EOF
     acl_count=$((acl_count + 1))
   done
 
-  # Close ACL configuration
+  # Close ACL users list and configuration
   cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<'EOF'
+    </list>
   </network-lists>
 </configuration>
 EOF
