@@ -598,15 +598,38 @@ EOF
     if [ -n "$DEFAULT_GATEWAY" ]; then
       echo_log "Creating default outbound route via $DEFAULT_GATEWAY"
 
+      # Get default country code (default: 49 for Germany)
+      local country_code="${DEFAULT_COUNTRY_CODE:-49}"
+
       cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
 
-    <!-- Default outbound route -->
-    <extension name="outbound_default">
-      <condition field="destination_number" expression="^(.+)\$">
+    <!-- Normalize international format: +49... or 00... -->
+    <extension name="outbound_international">
+      <condition field="destination_number" expression="^(\+|00)(.+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
         <action application="set" data="hangup_after_bridge=true"/>
-        <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/\$1"/>
+        <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/\$1\$2"/>
+      </condition>
+    </extension>
+
+    <!-- Normalize national format: 0123... → +49123... -->
+    <extension name="outbound_national">
+      <condition field="destination_number" expression="^0([1-9][0-9]+)\$">
+        <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
+        <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+$country_code\$1"/>
+      </condition>
+    </extension>
+
+    <!-- Fallback: no prefix, add country code -->
+    <extension name="outbound_default">
+      <condition field="destination_number" expression="^([1-9][0-9]+)\$">
+        <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
+        <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+$country_code\$1"/>
       </condition>
     </extension>
 EOF
