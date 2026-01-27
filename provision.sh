@@ -678,9 +678,27 @@ EOF
         local ext_name="inbound_${did}"
       fi
 
-      cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
+      # Check if extension is a gateway reference (format: gateway@gateway_name)
+      if [[ "$extension" =~ ^gateway@(.+)$ ]]; then
+        local gateway_name="${BASH_REMATCH[1]}"
+        echo_log "  Routing to gateway: $gateway_name"
 
-    <!-- Inbound: $did -> $extension -->
+        cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
+
+    <!-- Inbound: $did -> gateway $gateway_name -->
+    <extension name="$ext_name">
+      <condition field="$condition_field" expression="$condition_expr">
+        <action application="set" data="domain_name=\$\${domain}"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="bridge" data="sofia/gateway/$gateway_name/\$1"/>
+      </condition>
+    </extension>
+EOF
+      else
+        # Regular extension transfer
+        cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
+
+    <!-- Inbound: $did -> extension $extension -->
     <extension name="$ext_name">
       <condition field="$condition_field" expression="$condition_expr">
         <action application="set" data="domain_name=\$\${domain}"/>
@@ -688,6 +706,7 @@ EOF
       </condition>
     </extension>
 EOF
+      fi
 
       route_count=$((route_count + 1))
     done
@@ -696,9 +715,26 @@ EOF
   else
     # Default: forward all inbound to default extension
     if [ -n "$DEFAULT_EXTENSION" ]; then
-      echo_log "Creating default inbound route to extension $DEFAULT_EXTENSION"
+      # Check if DEFAULT_EXTENSION is a gateway reference (format: gateway@gateway_name)
+      if [[ "$DEFAULT_EXTENSION" =~ ^gateway@(.+)$ ]]; then
+        local gateway_name="${BASH_REMATCH[1]}"
+        echo_log "Creating default inbound route to gateway $gateway_name"
 
-      cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
+        cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
+
+    <!-- Default inbound route to gateway -->
+    <extension name="inbound_default">
+      <condition field="destination_number" expression="^(.+)\$">
+        <action application="set" data="domain_name=\$\${domain}"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="bridge" data="sofia/gateway/$gateway_name/\$1"/>
+      </condition>
+    </extension>
+EOF
+      else
+        echo_log "Creating default inbound route to extension $DEFAULT_EXTENSION"
+
+        cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
 
     <!-- Default inbound route -->
     <extension name="inbound_default">
@@ -708,6 +744,7 @@ EOF
       </condition>
     </extension>
 EOF
+      fi
     else
       echo_log "WARNING: No inbound routes or default extension defined"
     fi
