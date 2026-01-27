@@ -627,9 +627,7 @@ generate_inbound_dialplan() {
   echo_log "Generating inbound dialplan..."
 
   cat > "$FS_CONF/dialplan/public/00_inbound.xml" <<'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<include>
-  <context name="public">
+<!-- Inbound dialplan rules - included by public.xml wrapper -->
 EOF
 
   if [ -n "$INBOUND_ROUTES" ]; then
@@ -691,12 +689,6 @@ EOF
       echo_log "WARNING: No inbound routes or default extension defined"
     fi
   fi
-
-  cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<'EOF'
-
-  </context>
-</include>
-EOF
 
   echo_log "Inbound dialplan generated"
 }
