@@ -8,6 +8,12 @@
 
 set -e
 
+# Enable verbose mode if DEBUG=true
+if [ "${DEBUG:-false}" = "true" ]; then
+  set -x
+  echo "[DEBUG MODE ENABLED]"
+fi
+
 ################################################################################
 # Configuration
 ################################################################################

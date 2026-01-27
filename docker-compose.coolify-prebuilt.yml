@@ -24,10 +24,19 @@ services:
       - |
         set -e
 
-        echo "=========================================="
-        echo "FreeSWITCH Coolify - Pre-built Image"
-        echo "Start time: $$(date)"
-        echo "=========================================="
+        # Enable verbose mode if DEBUG=true
+        if [ "$DEBUG" = "true" ]; then
+          set -x
+          echo "=========================================="
+          echo "FreeSWITCH Coolify - Pre-built Image (DEBUG MODE)"
+          echo "Start time: $$(date)"
+          echo "=========================================="
+        else
+          echo "=========================================="
+          echo "FreeSWITCH Coolify - Pre-built Image"
+          echo "Start time: $$(date)"
+          echo "=========================================="
+        fi
 
         # Validate ENV
         echo "[STEP 1/6] Validating environment variables..."
@@ -104,15 +113,24 @@ services:
         wget -qO /tmp/provision.sh https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh
         chmod +x /tmp/provision.sh
 
-        # Run with explicit bash path and capture full error output
-        echo "Running provision.sh with /bin/bash..."
-        /bin/bash -x /tmp/provision.sh 2>&1 || {
-          EXIT_CODE=$$?
-          echo ""
-          echo "ERROR: Provision failed with exit code $$EXIT_CODE"
-          echo "Last lines of execution shown above"
-          exit 1
-        }
+        # Run with verbose mode if DEBUG=true
+        if [ "$DEBUG" = "true" ]; then
+          echo "Running provision.sh with DEBUG mode..."
+          /bin/bash -x /tmp/provision.sh 2>&1 || {
+            EXIT_CODE=$$?
+            echo ""
+            echo "ERROR: Provision failed with exit code $$EXIT_CODE"
+            exit 1
+          }
+        else
+          /bin/bash /tmp/provision.sh || {
+            EXIT_CODE=$$?
+            echo ""
+            echo "ERROR: Provision failed with exit code $$EXIT_CODE"
+            echo "Set DEBUG=true in environment to see detailed output"
+            exit 1
+          }
+        fi
         echo "✓ Provision completed"
 
         # Start FreeSWITCH
@@ -146,6 +164,9 @@ services:
       CODEC_PREFS: ${CODEC_PREFS:-PCMU,PCMA,G729,opus}
       SIP_DEBUG: ${SIP_DEBUG:-0}
       SIP_TRACE: ${SIP_TRACE:-no}
+
+      # DEBUG
+      DEBUG: ${DEBUG:-false}
 
     network_mode: host
     restart: unless-stopped
