@@ -150,11 +150,15 @@ EOF
 generate_internal_profile() {
   echo_log "Generating internal SIP profile..."
 
-  # Determine ACL list based on whether ACL_USERS is defined
+  # Determine ACL list and blind auth based on whether ACL_USERS is defined
   if [ -n "$ACL_USERS" ]; then
     local inbound_acl="domains,acl_users"
+    local blind_auth="true"
+    local blind_reg="true"
   else
     local inbound_acl="domains"
+    local blind_auth="false"
+    local blind_reg="false"
   fi
 
   cat > "$FS_CONF/sip_profiles/internal.xml" <<EOF
@@ -175,8 +179,8 @@ generate_internal_profile() {
     <!-- Security -->
     <param name="auth-calls" value="true"/>
     <param name="auth-all-packets" value="false"/>
-    <param name="accept-blind-auth" value="false"/>
-    <param name="accept-blind-reg" value="false"/>
+    <param name="accept-blind-auth" value="$blind_auth"/>
+    <param name="accept-blind-reg" value="$blind_reg"/>
 
     <!-- NAT -->
     <param name="apply-nat-acl" value="rfc1918.auto"/>
