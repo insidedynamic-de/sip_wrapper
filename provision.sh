@@ -538,9 +538,7 @@ generate_outbound_dialplan() {
   echo_log "Generating outbound dialplan..."
 
   cat > "$FS_CONF/dialplan/default/00_outbound.xml" <<'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<include>
-  <context name="default">
+<!-- Outbound dialplan rules - included by default.xml wrapper -->
 EOF
 
   if [ -n "$OUTBOUND_ROUTES" ]; then
@@ -616,12 +614,6 @@ EOF
       echo_log "WARNING: No outbound routes or default gateway defined"
     fi
   fi
-
-  cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<'EOF'
-
-  </context>
-</include>
-EOF
 
   echo_log "Outbound dialplan generated"
 }
