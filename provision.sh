@@ -710,6 +710,39 @@ EOF
 }
 
 ################################################################################
+# Create Dialplan Wrapper Files
+################################################################################
+
+create_dialplan_wrappers() {
+  echo_log "Creating dialplan wrapper files..."
+
+  # Create default.xml wrapper to include default/*.xml
+  cat > "$FS_CONF/dialplan/default.xml" <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<include>
+  <context name="default">
+    <X-PRE-PROCESS cmd="include" data="default/*.xml"/>
+  </context>
+</include>
+EOF
+
+  echo_log "Created /etc/freeswitch/dialplan/default.xml"
+
+  # Create public.xml wrapper to include public/*.xml
+  cat > "$FS_CONF/dialplan/public.xml" <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<include>
+  <context name="public">
+    <X-PRE-PROCESS cmd="include" data="public/*.xml"/>
+  </context>
+</include>
+EOF
+
+  echo_log "Created /etc/freeswitch/dialplan/public.xml"
+  echo_log "Dialplan wrapper files created successfully"
+}
+
+################################################################################
 # Apply Configuration
 ################################################################################
 
@@ -802,6 +835,7 @@ main() {
   generate_gateways
   generate_outbound_dialplan
   generate_inbound_dialplan
+  create_dialplan_wrappers
 
   apply_config
   show_summary
