@@ -89,6 +89,13 @@ services:
             exit 1
           }
         }
+
+        # Create /bin/bash symlink if it doesn't exist (Alpine installs to /usr/bin/bash)
+        if [ ! -e /bin/bash ] && [ -x /usr/bin/bash ]; then
+          ln -sf /usr/bin/bash /bin/bash
+          echo "✓ Created /bin/bash symlink"
+        fi
+
         echo "✓ Bash installed"
 
         # Download and run provision
