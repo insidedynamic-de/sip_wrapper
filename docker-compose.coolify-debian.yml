@@ -69,8 +69,13 @@ services:
 
         echo "[$$(date)] Installing dependencies..."
         apt-get update -qq || { echo "ERROR: apt-get update failed"; exit 1; }
-        apt-get install -y -qq --no-install-recommends \
-          ca-certificates gnupg2 wget lsb-release curl bash procps || { echo "ERROR: Failed to install dependencies"; exit 1; }
+
+        # Install in stages for better error tracking
+        echo "[$$(date)] Installing essential tools..."
+        apt-get install -y -qq --no-install-recommends curl wget gnupg2 ca-certificates || { echo "ERROR: Failed to install essential tools"; exit 1; }
+
+        echo "[$$(date)] Installing additional tools..."
+        apt-get install -y -qq --no-install-recommends lsb-release procps || { echo "ERROR: Failed to install additional tools"; exit 1; }
 
         echo "[$$(date)] Adding SignalWire repository..."
         wget -qO- https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc 2>/dev/null | \

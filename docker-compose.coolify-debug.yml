@@ -93,11 +93,20 @@ services:
 
         # Install dependencies
         echo ""
-        echo "[STEP 2/8] Installing system dependencies..."
+        echo "[STEP 2/8] Installing minimal system dependencies..."
+
+        # Step 2a: Install only essential tools first
+        echo "Installing essential tools (curl, wget, gnupg)..."
         apt-get update -qq
         apt-get install -y -qq --no-install-recommends \
-          ca-certificates gnupg2 wget lsb-release curl bash procps net-tools
-        echo "✓ Dependencies installed"
+          curl wget gnupg2 ca-certificates
+        echo "✓ Essential tools installed"
+
+        # Step 2b: Install additional tools
+        echo "Installing additional tools (lsb-release, procps)..."
+        apt-get install -y -qq --no-install-recommends \
+          lsb-release procps
+        echo "✓ All dependencies installed"
 
         # Add SignalWire repository
         echo ""
