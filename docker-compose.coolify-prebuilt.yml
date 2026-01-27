@@ -1,134 +1,164 @@
 ################################################################################
 # FreeSWITCH for Coolify - Pre-built Image Version
-# Uses pre-built FreeSWITCH image instead of building from Dockerfile
+# Использует готовый Docker образ вместо установки из репозитория
 #
-# Преимущества:
-# - Быстрый deployment (нет необходимости собирать образ)
-# - Надежность (проверенный образ)
-# - Меньше проблем с зависимостями
-#
-# Использование в Coolify:
-# 1. Create new service: "Docker Compose"
-# 2. Connect your Git repository
-# 3. Set docker-compose file path: docker-compose.coolify-prebuilt.yml
-# 4. Configure environment variables in Coolify UI
-# 5. Deploy
+# ИСПОЛЬЗУЙТЕ ЭТУ ВЕРСИЮ ЕСЛИ:
+# - Проблемы с загрузкой GPG ключа SignalWire
+# - Firewall блокирует доступ к files.freeswitch.org
+# - Нужен быстрый запуск без компиляции
 ################################################################################
 
 version: '3.9'
 
 services:
   freeswitch:
-    # Using debian-based FreeSWITCH image
-    image: debian:bookworm-slim
+    # Используем готовый образ FreeSWITCH
+    # Alternative: ghcr.io/patrickbaus/freeswitch-docker:latest
+    image: ghcr.io/patrickbaus/freeswitch-docker:latest
 
     container_name: freeswitch
 
-    # Run provision and freeswitch on startup
-    entrypoint: ["/bin/bash", "-c"]
+    # Run provision and start (using /bin/sh for Alpine compatibility)
+    entrypoint: ["/bin/sh", "-c"]
     command:
       - |
         set -e
-        echo "Installing FreeSWITCH..."
-        apt-get update && apt-get install -y --no-install-recommends \
-          ca-certificates gnupg2 wget lsb-release curl \
-          && wget -O- https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | \
-             gpg --dearmor -o /usr/share/keyrings/signalwire-freeswitch-repo.gpg \
-          && echo "deb [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://files.freeswitch.org/repo/deb/debian-release/ $$(lsb_release -sc) main" \
-             > /etc/apt/sources.list.d/freeswitch.list \
-          && apt-get update \
-          && apt-get install -y --no-install-recommends freeswitch-meta-all freeswitch-all-dbg \
-          && rm -rf /var/lib/apt/lists/*
 
-        echo "Cleaning default config..."
+        echo "=========================================="
+        echo "FreeSWITCH Coolify - Pre-built Image"
+        echo "Start time: $$(date)"
+        echo "=========================================="
+
+        # Validate ENV
+        echo "[STEP 1/6] Validating environment variables..."
+        if [ -z "$FS_DOMAIN" ] || [ -z "$EXTERNAL_SIP_IP" ] || [ -z "$EXTERNAL_RTP_IP" ] || [ -z "$USERS" ] || [ -z "$GATEWAYS" ]; then
+          echo "ERROR: Missing required environment variables!"
+          exit 1
+        fi
+
+        # Auto-detect IP if placeholder
+        if [ "$EXTERNAL_SIP_IP" = "your-server-ip" ] || [ "$EXTERNAL_RTP_IP" = "your-server-ip" ]; then
+          echo "Auto-detecting public IP..."
+          DETECTED_IP=$$(wget -qO- --timeout=5 ifconfig.me 2>/dev/null || wget -qO- --timeout=5 ipinfo.io/ip 2>/dev/null || echo "")
+          if [ -n "$$DETECTED_IP" ]; then
+            echo "✓ Auto-detected IP: $$DETECTED_IP"
+            export EXTERNAL_SIP_IP="$$DETECTED_IP"
+            export EXTERNAL_RTP_IP="$$DETECTED_IP"
+          else
+            echo "ERROR: Could not auto-detect IP"
+            exit 1
+          fi
+        fi
+
+        echo "✓ Environment validated"
+        echo "  EXTERNAL_SIP_IP: $$EXTERNAL_SIP_IP"
+        echo "  EXTERNAL_RTP_IP: $$EXTERNAL_RTP_IP"
+
+        # Check if FreeSWITCH is installed
+        echo ""
+        echo "[STEP 2/6] Checking FreeSWITCH installation..."
+        if [ -x /usr/bin/freeswitch ]; then
+          echo "✓ FreeSWITCH found"
+        else
+          echo "ERROR: FreeSWITCH not found in this image!"
+          echo "Image: ghcr.io/patrickbaus/freeswitch-docker:latest"
+          exit 1
+        fi
+
+        # Clean default config
+        echo ""
+        echo "[STEP 3/6] Preparing configuration..."
         if [ -d /etc/freeswitch ]; then
           find /etc/freeswitch/dialplan -type f -name "*.xml" -delete 2>/dev/null || true
           find /etc/freeswitch/directory -type f -name "*.xml" -delete 2>/dev/null || true
-          mkdir -p /etc/freeswitch/{dialplan/{default,public},directory/default,sip_profiles/{internal,external}}
+          rm -f /etc/freeswitch/sip_profiles/*.xml 2>/dev/null || true
+          mkdir -p /etc/freeswitch/dialplan/default /etc/freeswitch/dialplan/public
+          mkdir -p /etc/freeswitch/directory/default
+          mkdir -p /etc/freeswitch/sip_profiles/internal /etc/freeswitch/sip_profiles/external
+          echo "✓ Config directories prepared"
         fi
 
-        echo "Downloading provision script..."
-        curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh -o /tmp/provision.sh
+        # Install bash (needed for provision script)
+        echo ""
+        echo "[STEP 4/6] Installing bash..."
+        apk add --no-cache bash >/dev/null 2>&1 || {
+          echo "ERROR: Failed to install bash"
+          echo "Trying with apt-get..."
+          apt-get update -qq && apt-get install -y -qq bash || {
+            echo "ERROR: Cannot install bash on this system"
+            exit 1
+          }
+        }
+        echo "✓ Bash installed"
+
+        # Download and run provision
+        echo ""
+        echo "[STEP 5/6] Running provision script..."
+        wget -qO /tmp/provision.sh https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh
         chmod +x /tmp/provision.sh
+        bash /tmp/provision.sh || { echo "ERROR: Provision failed"; exit 1; }
+        echo "✓ Provision completed"
 
-        echo "Running provision..."
-        /tmp/provision.sh
+        # Start FreeSWITCH
+        echo ""
+        echo "[STEP 6/6] Starting FreeSWITCH..."
+        echo "=========================================="
+        echo "FreeSWITCH is starting..."
+        echo "=========================================="
+        exec /usr/bin/freeswitch -nonat -nf -nc
 
-        echo "Starting FreeSWITCH..."
-        exec /usr/bin/freeswitch -nonat -nf
-
-    # Environment variables (set these in Coolify UI)
     environment:
       # REQUIRED
-      - FS_DOMAIN=${FS_DOMAIN}
-      - EXTERNAL_SIP_IP=${EXTERNAL_SIP_IP}
-      - EXTERNAL_RTP_IP=${EXTERNAL_RTP_IP}
-      - USERS=${USERS}
-      - GATEWAYS=${GATEWAYS}
+      FS_DOMAIN: ${FS_DOMAIN}
+      EXTERNAL_SIP_IP: ${EXTERNAL_SIP_IP}
+      EXTERNAL_RTP_IP: ${EXTERNAL_RTP_IP}
+      USERS: ${USERS}
+      GATEWAYS: ${GATEWAYS}
 
       # ROUTING
-      - OUTBOUND_ROUTES=${OUTBOUND_ROUTES:-}
-      - DEFAULT_GATEWAY=${DEFAULT_GATEWAY:-}
-      - INBOUND_ROUTES=${INBOUND_ROUTES:-}
-      - DEFAULT_EXTENSION=${DEFAULT_EXTENSION:-}
+      DEFAULT_GATEWAY: ${DEFAULT_GATEWAY:-}
+      DEFAULT_EXTENSION: ${DEFAULT_EXTENSION:-}
+      OUTBOUND_ROUTES: ${OUTBOUND_ROUTES:-}
+      INBOUND_ROUTES: ${INBOUND_ROUTES:-}
 
       # OPTIONAL
-      - ACL_USERS=${ACL_USERS:-}
-      - INTERNAL_SIP_PORT=${INTERNAL_SIP_PORT:-5060}
-      - EXTERNAL_SIP_PORT=${EXTERNAL_SIP_PORT:-5080}
-      - RTP_START_PORT=${RTP_START_PORT:-16384}
-      - RTP_END_PORT=${RTP_END_PORT:-32768}
-      - CODEC_PREFS=${CODEC_PREFS:-PCMU,PCMA,G729,opus}
-      - SIP_DEBUG=${SIP_DEBUG:-0}
-      - SIP_TRACE=${SIP_TRACE:-no}
+      ACL_USERS: ${ACL_USERS:-}
+      INTERNAL_SIP_PORT: ${INTERNAL_SIP_PORT:-5060}
+      EXTERNAL_SIP_PORT: ${EXTERNAL_SIP_PORT:-5080}
+      RTP_START_PORT: ${RTP_START_PORT:-16384}
+      RTP_END_PORT: ${RTP_END_PORT:-32768}
+      CODEC_PREFS: ${CODEC_PREFS:-PCMU,PCMA,G729,opus}
+      SIP_DEBUG: ${SIP_DEBUG:-0}
+      SIP_TRACE: ${SIP_TRACE:-no}
 
-    # Use host network for best SIP/RTP compatibility
     network_mode: host
-
-    # Restart policy
     restart: unless-stopped
 
-    # Volume for backups
     volumes:
       - freeswitch_backups:/var/backups/freeswitch
 
-    # Health check
     healthcheck:
-      test: ["CMD", "bash", "-c", "command -v fs_cli && fs_cli -x 'status' | grep -q 'UP' || exit 1"]
+      test: ["CMD", "sh", "-c", "pgrep -x freeswitch > /dev/null || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 120s
+      start_period: 180s
 
 volumes:
   freeswitch_backups:
     driver: local
 
 ################################################################################
-# COOLIFY ENVIRONMENT VARIABLES (set in Coolify UI)
+# ПРЕИМУЩЕСТВА ЭТОЙ ВЕРСИИ:
 ################################################################################
+# ✅ Не нужно скачивать GPG ключи
+# ✅ Не нужно устанавливать пакеты из SignalWire репозитория
+# ✅ Быстрый запуск (образ уже скомпилирован)
+# ✅ Меньше точек отказа
+# ✅ Работает даже если files.freeswitch.org недоступен
 #
-# REQUIRED:
-# ---------
-# FS_DOMAIN=apps.linkify.cloud
-# EXTERNAL_SIP_IP=your.server.ip
-# EXTERNAL_RTP_IP=your.server.ip
-# USERS=exampleuser:examplepass:1001
-# GATEWAYS=provider:fpbx.de:5060:777z9uovpu:4UMtPyXw8Qss:true:udp
-# DEFAULT_GATEWAY=provider
-# DEFAULT_EXTENSION=1001
-#
-# OPTIONAL:
-# ---------
-# ACL_USERS=trunk:192.168.1.100:9000
-# OUTBOUND_ROUTES=^00.*:provider1,^0.*:provider2
-# INBOUND_ROUTES=+49301234567:1001,*:1000
-# INTERNAL_SIP_PORT=5060
-# EXTERNAL_SIP_PORT=5080
-# RTP_START_PORT=16384
-# RTP_END_PORT=32768
-# CODEC_PREFS=PCMU,PCMA,G729
-# SIP_DEBUG=0
-# SIP_TRACE=no
-#
+# ИСПОЛЬЗОВАНИЕ В COOLIFY:
+# 1. Docker Compose file: docker-compose.coolify-prebuilt.yml
+# 2. Установите ENV переменные
+# 3. Deploy
 ################################################################################

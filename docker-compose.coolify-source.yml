@@ -1,0 +1,196 @@
+################################################################################
+# FreeSWITCH for Coolify - Build from Source
+# Компилирует FreeSWITCH из исходников (без SignalWire репозитория)
+#
+# ИСПОЛЬЗУЙТЕ ЭТУ ВЕРСИЮ ЕСЛИ:
+# - Docker образы недоступны
+# - Нужна полная независимость от SignalWire
+# - Требуется кастомизация сборки
+#
+# ВНИМАНИЕ: Сборка занимает ~15-20 минут!
+################################################################################
+
+version: '3.9'
+
+services:
+  freeswitch:
+    image: debian:bookworm-slim
+    container_name: freeswitch
+
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        set -e
+
+        echo "=========================================="
+        echo "FreeSWITCH Coolify - Build from Source"
+        echo "Start time: $$(date)"
+        echo "This will take ~15-20 minutes to compile"
+        echo "=========================================="
+
+        # Validate ENV
+        echo "[STEP 1/6] Validating environment variables..."
+        if [ -z "$FS_DOMAIN" ] || [ -z "$EXTERNAL_SIP_IP" ] || [ -z "$EXTERNAL_RTP_IP" ] || [ -z "$USERS" ] || [ -z "$GATEWAYS" ]; then
+          echo "ERROR: Missing required environment variables!"
+          exit 1
+        fi
+
+        # Auto-detect IP if placeholder
+        if [ "$EXTERNAL_SIP_IP" = "your-server-ip" ] || [ "$EXTERNAL_RTP_IP" = "your-server-ip" ]; then
+          echo "Auto-detecting public IP..."
+          DETECTED_IP=$$(curl -s --max-time 5 ifconfig.me 2>/dev/null || curl -s --max-time 5 ipinfo.io/ip 2>/dev/null || echo "")
+          if [ -n "$$DETECTED_IP" ]; then
+            echo "✓ Auto-detected IP: $$DETECTED_IP"
+            export EXTERNAL_SIP_IP="$$DETECTED_IP"
+            export EXTERNAL_RTP_IP="$$DETECTED_IP"
+          else
+            echo "ERROR: Could not auto-detect IP"
+            exit 1
+          fi
+        fi
+
+        echo "✓ Environment validated"
+        echo "  EXTERNAL_SIP_IP: $$EXTERNAL_SIP_IP"
+        echo "  EXTERNAL_RTP_IP: $$EXTERNAL_RTP_IP"
+
+        # Install build dependencies
+        echo ""
+        echo "[STEP 2/6] Installing build dependencies..."
+        echo "This may take a few minutes..."
+
+        apt-get update -qq
+        apt-get install -y -qq --no-install-recommends \
+          build-essential cmake automake autoconf libtool pkg-config \
+          ca-certificates curl git \
+          libssl-dev zlib1g-dev libdb-dev unixodbc-dev libncurses5-dev \
+          libexpat1-dev libgdbm-dev bison erlang-dev libtpl-dev libtiff5-dev \
+          uuid-dev libpcre3-dev libedit-dev libsqlite3-dev libcurl4-openssl-dev \
+          nasm libogg-dev libspeex-dev libspeexdsp-dev \
+          libldns-dev libjpeg-dev libopus-dev libsndfile1-dev libavformat-dev \
+          libswscale-dev libavresample-dev
+
+        echo "✓ Build dependencies installed"
+
+        # Download FreeSWITCH source
+        echo ""
+        echo "[STEP 3/6] Downloading FreeSWITCH source code..."
+        cd /usr/src
+        git clone -b v1.10 --depth 1 https://github.com/signalwire/freeswitch.git
+        cd freeswitch
+        echo "✓ Source code downloaded"
+
+        # Build FreeSWITCH
+        echo ""
+        echo "[STEP 4/6] Building FreeSWITCH from source..."
+        echo "This will take 15-20 minutes. Please be patient..."
+
+        ./bootstrap.sh -j
+
+        ./configure \
+          --prefix=/usr \
+          --sysconfdir=/etc/freeswitch \
+          --with-logfiledir=/var/log/freeswitch \
+          --enable-core-pgsql-support=no \
+          --enable-static-v8=no \
+          --disable-libvpx
+
+        make -j$$(nproc)
+        make install
+        make cd-sounds-install cd-moh-install
+
+        echo "✓ FreeSWITCH compiled and installed"
+
+        # Clean up build files
+        echo ""
+        echo "[STEP 5/6] Cleaning up build files..."
+        cd /
+        rm -rf /usr/src/freeswitch
+        apt-get purge -y build-essential cmake automake autoconf git
+        apt-get autoremove -y
+        rm -rf /var/lib/apt/lists/*
+        echo "✓ Cleanup completed"
+
+        # Prepare configuration
+        echo ""
+        echo "[STEP 6/6] Preparing configuration..."
+
+        # Clean default config
+        if [ -d /etc/freeswitch ]; then
+          find /etc/freeswitch/dialplan -type f -name "*.xml" -delete 2>/dev/null || true
+          find /etc/freeswitch/directory -type f -name "*.xml" -delete 2>/dev/null || true
+          rm -f /etc/freeswitch/sip_profiles/*.xml 2>/dev/null || true
+          mkdir -p /etc/freeswitch/{dialplan/{default,public},directory/default,sip_profiles/{internal,external}}
+        fi
+
+        # Download and run provision
+        curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh -o /tmp/provision.sh
+        chmod +x /tmp/provision.sh
+        bash /tmp/provision.sh || { echo "ERROR: Provision failed"; exit 1; }
+        echo "✓ Configuration generated"
+
+        # Start FreeSWITCH
+        echo ""
+        echo "=========================================="
+        echo "Starting FreeSWITCH..."
+        echo "Total build time: ~15-20 minutes"
+        echo "=========================================="
+        exec /usr/bin/freeswitch -nonat -nf -nc
+
+    environment:
+      # REQUIRED
+      FS_DOMAIN: ${FS_DOMAIN}
+      EXTERNAL_SIP_IP: ${EXTERNAL_SIP_IP}
+      EXTERNAL_RTP_IP: ${EXTERNAL_RTP_IP}
+      USERS: ${USERS}
+      GATEWAYS: ${GATEWAYS}
+
+      # ROUTING
+      DEFAULT_GATEWAY: ${DEFAULT_GATEWAY:-}
+      DEFAULT_EXTENSION: ${DEFAULT_EXTENSION:-}
+      OUTBOUND_ROUTES: ${OUTBOUND_ROUTES:-}
+      INBOUND_ROUTES: ${INBOUND_ROUTES:-}
+
+      # OPTIONAL
+      ACL_USERS: ${ACL_USERS:-}
+      INTERNAL_SIP_PORT: ${INTERNAL_SIP_PORT:-5060}
+      EXTERNAL_SIP_PORT: ${EXTERNAL_SIP_PORT:-5080}
+      RTP_START_PORT: ${RTP_START_PORT:-16384}
+      RTP_END_PORT: ${RTP_END_PORT:-32768}
+      CODEC_PREFS: ${CODEC_PREFS:-PCMU,PCMA,G729,opus}
+      SIP_DEBUG: ${SIP_DEBUG:-0}
+      SIP_TRACE: ${SIP_TRACE:-no}
+
+    network_mode: host
+    restart: unless-stopped
+
+    volumes:
+      - freeswitch_backups:/var/backups/freeswitch
+
+    healthcheck:
+      test: ["CMD", "bash", "-c", "pgrep -x freeswitch > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 1200s  # 20 minutes for compilation
+
+volumes:
+  freeswitch_backups:
+    driver: local
+
+################################################################################
+# ПРЕИМУЩЕСТВА:
+################################################################################
+# ✅ Полная независимость от SignalWire репозитория
+# ✅ Полная независимость от Docker образов
+# ✅ Возможность кастомизации сборки
+# ✅ Свежая версия из GitHub
+#
+# НЕДОСТАТКИ:
+# ❌ Долгая первая сборка (~15-20 минут)
+# ❌ Требует много ресурсов для компиляции
+#
+# ИСПОЛЬЗОВАНИЕ В COOLIFY:
+# 1. Docker Compose file: docker-compose.coolify-source.yml
+# 2. Установите ENV переменные
+# 3. Deploy (дождитесь окончания сборки ~20 минут)
+################################################################################

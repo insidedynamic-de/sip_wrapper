@@ -78,8 +78,28 @@ services:
         apt-get install -y -qq --no-install-recommends lsb-release procps || { echo "ERROR: Failed to install additional tools"; exit 1; }
 
         echo "[$$(date)] Adding SignalWire repository..."
-        wget -qO- https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc 2>/dev/null | \
-          gpg --dearmor -o /usr/share/keyrings/signalwire-freeswitch-repo.gpg 2>/dev/null || { echo "ERROR: Failed to add GPG key"; exit 1; }
+
+        # Try multiple GPG key sources
+        GPG_SUCCESS=0
+        for GPG_URL in \
+          "https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc" \
+          "https://freeswitch.signalwire.com/repo/deb/debian-release/fsstretch-archive-keyring.asc" \
+          "https://files.freeswitch.org/repo/deb/freeswitch-1.10/fsstretch-archive-keyring.asc"; do
+
+          echo "[$$(date)] Trying: $$GPG_URL"
+          if wget --timeout=30 --tries=2 -qO- "$$GPG_URL" 2>/dev/null | \
+             gpg --dearmor -o /usr/share/keyrings/signalwire-freeswitch-repo.gpg 2>/dev/null; then
+            echo "[$$(date)] ✓ GPG key downloaded from $$GPG_URL"
+            GPG_SUCCESS=1
+            break
+          fi
+          sleep 3
+        done
+
+        if [ $$GPG_SUCCESS -eq 0 ]; then
+          echo "ERROR: Failed to download GPG key from all sources. Check network connectivity."
+          exit 1
+        fi
 
         echo "deb [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://files.freeswitch.org/repo/deb/debian-release/ $$(lsb_release -sc) main" \
           > /etc/apt/sources.list.d/freeswitch.list || { echo "ERROR: Failed to add FreeSWITCH repository"; exit 1; }
