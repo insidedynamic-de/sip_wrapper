@@ -1,0 +1,275 @@
+################################################################################
+# FreeSWITCH for Coolify - DEBUG Version
+# This version includes extensive logging to diagnose deployment issues
+#
+# Use this version to troubleshoot if the standard version keeps restarting
+################################################################################
+
+version: '3.9'
+
+services:
+  freeswitch:
+    image: debian:bookworm-slim
+    container_name: freeswitch-debug
+
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        # Debug mode - verbose output
+        set -ex  # -e exits on error, -x prints each command
+
+        echo "=========================================="
+        echo "FreeSWITCH Coolify Deployment - DEBUG MODE"
+        echo "Start time: $$(date)"
+        echo "=========================================="
+
+        # Function to check and print ENV variables
+        check_env() {
+          echo ""
+          echo "=== Environment Variables Check ==="
+          echo "FS_DOMAIN: ${FS_DOMAIN:-NOT SET}"
+          echo "EXTERNAL_SIP_IP: ${EXTERNAL_SIP_IP:-NOT SET}"
+          echo "EXTERNAL_RTP_IP: ${EXTERNAL_RTP_IP:-NOT SET}"
+          echo "USERS: ${USERS:+SET (hidden)}"
+          echo "GATEWAYS: ${GATEWAYS:+SET (hidden)}"
+          echo "DEFAULT_GATEWAY: ${DEFAULT_GATEWAY:-NOT SET}"
+          echo "DEFAULT_EXTENSION: ${DEFAULT_EXTENSION:-NOT SET}"
+          echo "===================================="
+          echo ""
+        }
+
+        # Check environment
+        check_env
+
+        # Validate required variables
+        echo "[STEP 1/8] Validating environment variables..."
+        if [ -z "$FS_DOMAIN" ] || [ -z "$EXTERNAL_SIP_IP" ] || [ -z "$EXTERNAL_RTP_IP" ] || [ -z "$USERS" ] || [ -z "$GATEWAYS" ]; then
+          echo "ERROR: Missing required environment variables!"
+          echo "Required: FS_DOMAIN, EXTERNAL_SIP_IP, EXTERNAL_RTP_IP, USERS, GATEWAYS"
+          echo "Please set these in Coolify UI and redeploy."
+          sleep 30  # Give time to read logs before restart
+          exit 1
+        fi
+
+        # Check for placeholder values and auto-detect IP if needed
+        if [ "$EXTERNAL_SIP_IP" = "your-server-ip" ] || [ "$EXTERNAL_RTP_IP" = "your-server-ip" ]; then
+          echo "WARNING: EXTERNAL_SIP_IP/EXTERNAL_RTP_IP are set to placeholder values!"
+          echo "Attempting to auto-detect server public IP address..."
+
+          # Try multiple methods to get public IP
+          DETECTED_IP=""
+
+          # Method 1: ifconfig.me
+          DETECTED_IP=$$(curl -s --max-time 5 ifconfig.me 2>/dev/null || echo "")
+
+          # Method 2: ipinfo.io if first failed
+          if [ -z "$$DETECTED_IP" ]; then
+            DETECTED_IP=$$(curl -s --max-time 5 ipinfo.io/ip 2>/dev/null || echo "")
+          fi
+
+          # Method 3: icanhazip.com if both failed
+          if [ -z "$$DETECTED_IP" ]; then
+            DETECTED_IP=$$(curl -s --max-time 5 icanhazip.com 2>/dev/null || echo "")
+          fi
+
+          if [ -n "$$DETECTED_IP" ]; then
+            echo "✓ Auto-detected public IP: $$DETECTED_IP"
+            export EXTERNAL_SIP_IP="$$DETECTED_IP"
+            export EXTERNAL_RTP_IP="$$DETECTED_IP"
+            echo "Using auto-detected IP for EXTERNAL_SIP_IP and EXTERNAL_RTP_IP"
+          else
+            echo "ERROR: Could not auto-detect public IP address!"
+            echo "Please set EXTERNAL_SIP_IP and EXTERNAL_RTP_IP manually in Coolify UI."
+            echo "Find your IP with: curl ifconfig.me"
+            sleep 30
+            exit 1
+          fi
+        fi
+
+        echo "✓ Environment validation passed"
+        echo "Final configuration:"
+        echo "  EXTERNAL_SIP_IP: $$EXTERNAL_SIP_IP"
+        echo "  EXTERNAL_RTP_IP: $$EXTERNAL_RTP_IP"
+
+        # Install dependencies
+        echo ""
+        echo "[STEP 2/8] Installing system dependencies..."
+        apt-get update -qq
+        apt-get install -y -qq --no-install-recommends \
+          ca-certificates gnupg2 wget lsb-release curl bash procps net-tools
+        echo "✓ Dependencies installed"
+
+        # Add SignalWire repository
+        echo ""
+        echo "[STEP 3/8] Adding SignalWire FreeSWITCH repository..."
+        echo "Downloading GPG key from SignalWire..."
+
+        # Download with timeout and retry
+        MAX_ATTEMPTS=3
+        ATTEMPT=1
+        while [ $$ATTEMPT -le $$MAX_ATTEMPTS ]; do
+          echo "Attempt $$ATTEMPT of $$MAX_ATTEMPTS..."
+
+          if wget --timeout=30 --tries=1 -qO- https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc 2>/dev/null | \
+             gpg --dearmor -o /usr/share/keyrings/signalwire-freeswitch-repo.gpg 2>/dev/null; then
+            echo "✓ GPG key downloaded successfully"
+            break
+          else
+            echo "Failed to download GPG key (attempt $$ATTEMPT/$$MAX_ATTEMPTS)"
+            if [ $$ATTEMPT -eq $$MAX_ATTEMPTS ]; then
+              echo "ERROR: Could not download SignalWire GPG key after $$MAX_ATTEMPTS attempts"
+              echo "This might be a network issue or SignalWire repository is unavailable"
+              exit 1
+            fi
+            ATTEMPT=$$((ATTEMPT + 1))
+            sleep 5
+          fi
+        done
+
+        CODENAME=$$(lsb_release -sc)
+        echo "Adding repository for $$CODENAME..."
+        echo "deb [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://files.freeswitch.org/repo/deb/debian-release/ $$CODENAME main" \
+          > /etc/apt/sources.list.d/freeswitch.list
+        echo "✓ Repository added for $$CODENAME"
+
+        # Install FreeSWITCH
+        echo ""
+        echo "[STEP 4/8] Installing FreeSWITCH packages..."
+        apt-get update -qq
+        apt-get install -y -qq --no-install-recommends \
+          freeswitch-meta-bare \
+          freeswitch-mod-commands \
+          freeswitch-mod-console \
+          freeswitch-mod-logfile \
+          freeswitch-mod-event-socket \
+          freeswitch-mod-sofia \
+          freeswitch-mod-dialplan-xml \
+          freeswitch-mod-dptools \
+          freeswitch-mod-db \
+          freeswitch-mod-sndfile \
+          freeswitch-mod-native-file \
+          freeswitch-mod-tone-stream
+
+        rm -rf /var/lib/apt/lists/*
+
+        # Verify installation
+        if [ ! -x /usr/bin/freeswitch ]; then
+          echo "ERROR: FreeSWITCH binary not found at /usr/bin/freeswitch"
+          exit 1
+        fi
+
+        FREESWITCH_VERSION=$$(/usr/bin/freeswitch -version 2>&1 | head -1)
+        echo "✓ FreeSWITCH installed: $$FREESWITCH_VERSION"
+
+        # Clean default config
+        echo ""
+        echo "[STEP 5/8] Cleaning default configuration..."
+        if [ -d /etc/freeswitch ]; then
+          echo "Backing up original config..."
+          cp -a /etc/freeswitch /etc/freeswitch.orig 2>/dev/null || true
+
+          echo "Removing default dialplan and directory files..."
+          find /etc/freeswitch/dialplan -type f -name "*.xml" -delete 2>/dev/null || true
+          find /etc/freeswitch/directory -type f -name "*.xml" -delete 2>/dev/null || true
+          rm -f /etc/freeswitch/sip_profiles/*.xml 2>/dev/null || true
+
+          echo "Creating directory structure..."
+          mkdir -p /etc/freeswitch/{dialplan/{default,public},directory/default,sip_profiles/{internal,external}}
+          echo "✓ Configuration cleaned"
+        else
+          echo "WARNING: /etc/freeswitch directory not found!"
+        fi
+
+        # Download provision script
+        echo ""
+        echo "[STEP 6/8] Downloading provision script..."
+        curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh -o /tmp/provision.sh
+        chmod +x /tmp/provision.sh
+
+        if [ ! -f /tmp/provision.sh ]; then
+          echo "ERROR: Failed to download provision.sh"
+          exit 1
+        fi
+
+        PROVISION_SIZE=$$(wc -c < /tmp/provision.sh)
+        echo "✓ Provision script downloaded ($$PROVISION_SIZE bytes)"
+
+        # Run provision
+        echo ""
+        echo "[STEP 7/8] Running provision script..."
+        echo "This will generate FreeSWITCH configuration from environment variables"
+        bash /tmp/provision.sh
+        PROVISION_EXIT=$$?
+
+        if [ $$PROVISION_EXIT -ne 0 ]; then
+          echo "ERROR: Provision script failed with exit code $$PROVISION_EXIT"
+          exit 1
+        fi
+        echo "✓ Provision completed successfully"
+
+        # Verify generated config
+        echo ""
+        echo "Configuration files generated:"
+        ls -lh /etc/freeswitch/sip_profiles/internal.xml 2>/dev/null && echo "  ✓ internal.xml"
+        ls -lh /etc/freeswitch/sip_profiles/external.xml 2>/dev/null && echo "  ✓ external.xml"
+        ls -lh /etc/freeswitch/directory/default/*.xml 2>/dev/null | wc -l | xargs echo "  ✓ Users:"
+        ls -lh /etc/freeswitch/sip_profiles/external/*.xml 2>/dev/null | wc -l | xargs echo "  ✓ Gateways:"
+
+        # Start FreeSWITCH
+        echo ""
+        echo "[STEP 8/8] Starting FreeSWITCH..."
+        echo "Command: /usr/bin/freeswitch -nonat -nf -nc"
+        echo ""
+        echo "=========================================="
+        echo "If you see this message, FreeSWITCH is starting..."
+        echo "Check logs for FreeSWITCH startup messages"
+        echo "=========================================="
+        echo ""
+
+        exec /usr/bin/freeswitch -nonat -nf -nc
+
+    # Environment variables
+    environment:
+      FS_DOMAIN: ${FS_DOMAIN}
+      EXTERNAL_SIP_IP: ${EXTERNAL_SIP_IP}
+      EXTERNAL_RTP_IP: ${EXTERNAL_RTP_IP}
+      USERS: ${USERS}
+      GATEWAYS: ${GATEWAYS}
+      DEFAULT_GATEWAY: ${DEFAULT_GATEWAY:-}
+      DEFAULT_EXTENSION: ${DEFAULT_EXTENSION:-}
+      OUTBOUND_ROUTES: ${OUTBOUND_ROUTES:-}
+      INBOUND_ROUTES: ${INBOUND_ROUTES:-}
+      ACL_USERS: ${ACL_USERS:-}
+      INTERNAL_SIP_PORT: ${INTERNAL_SIP_PORT:-5060}
+      EXTERNAL_SIP_PORT: ${EXTERNAL_SIP_PORT:-5080}
+      RTP_START_PORT: ${RTP_START_PORT:-16384}
+      RTP_END_PORT: ${RTP_END_PORT:-32768}
+      CODEC_PREFS: ${CODEC_PREFS:-PCMU,PCMA,G729,opus}
+      SIP_DEBUG: ${SIP_DEBUG:-0}
+      SIP_TRACE: ${SIP_TRACE:-no}
+
+    network_mode: host
+    restart: unless-stopped
+
+    volumes:
+      - freeswitch_backups:/var/backups/freeswitch
+
+    healthcheck:
+      test: ["CMD", "bash", "-c", "pgrep -x freeswitch > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 300s  # 5 minutes for debug mode
+
+volumes:
+  freeswitch_backups:
+    driver: local
+
+################################################################################
+# USAGE
+################################################################################
+# 1. Deploy this in Coolify with the same ENV variables
+# 2. Check logs to see which step fails
+# 3. Each step has a number [STEP X/8] and checkmark ✓ when successful
+# 4. If container restarts, you'll see where it stopped
+################################################################################

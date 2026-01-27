@@ -82,6 +82,18 @@ Transport: UDP
 
 ## Troubleshooting
 
+⚠️ **Если возникают проблемы**, смотрите полное руководство по устранению неполадок:
+📖 **[COOLIFY_TROUBLESHOOTING.md](COOLIFY_TROUBLESHOOTING.md)**
+
+### Container keeps restarting?
+
+Используйте debug версию для диагностики:
+
+1. В Coolify измените Docker Compose file на: `docker-compose.coolify-debug.yml`
+2. Deploy
+3. Смотрите логи - увидите на каком шаге происходит ошибка ([STEP X/8])
+4. Следуйте инструкциям в [COOLIFY_TROUBLESHOOTING.md](COOLIFY_TROUBLESHOOTING.md)
+
 ### Build failed: "no such file or directory"
 
 Если вы видите ошибку:

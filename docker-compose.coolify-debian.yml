@@ -25,20 +25,62 @@ services:
       - |
         set -e
 
-        echo "[$(date)] Installing dependencies..."
-        apt-get update -qq
+        # Validation function
+        validate_env() {
+          echo "[$$(date)] Validating environment variables..."
+          local missing=""
+          [ -z "$FS_DOMAIN" ] && missing="$$missing FS_DOMAIN"
+          [ -z "$EXTERNAL_SIP_IP" ] && missing="$$missing EXTERNAL_SIP_IP"
+          [ -z "$EXTERNAL_RTP_IP" ] && missing="$$missing EXTERNAL_RTP_IP"
+          [ -z "$USERS" ] && missing="$$missing USERS"
+          [ -z "$GATEWAYS" ] && missing="$$missing GATEWAYS"
+
+          if [ -n "$$missing" ]; then
+            echo "ERROR: Missing required environment variables:$$missing"
+            echo "Please set these variables in Coolify UI before deployment."
+            exit 1
+          fi
+
+          # Check for placeholder values and auto-detect IP if needed
+          if [ "$EXTERNAL_SIP_IP" = "your-server-ip" ] || [ "$EXTERNAL_RTP_IP" = "your-server-ip" ]; then
+            echo "WARNING: Placeholder IP detected. Auto-detecting public IP..."
+
+            # Try to detect public IP
+            DETECTED_IP=$$(curl -s --max-time 5 ifconfig.me 2>/dev/null || curl -s --max-time 5 ipinfo.io/ip 2>/dev/null || curl -s --max-time 5 icanhazip.com 2>/dev/null || echo "")
+
+            if [ -n "$$DETECTED_IP" ]; then
+              echo "✓ Auto-detected IP: $$DETECTED_IP"
+              export EXTERNAL_SIP_IP="$$DETECTED_IP"
+              export EXTERNAL_RTP_IP="$$DETECTED_IP"
+            else
+              echo "ERROR: Could not auto-detect IP. Please set EXTERNAL_SIP_IP and EXTERNAL_RTP_IP manually."
+              exit 1
+            fi
+          fi
+
+          echo "[$$(date)] Environment validation passed."
+          echo "Using IPs: EXTERNAL_SIP_IP=$$EXTERNAL_SIP_IP, EXTERNAL_RTP_IP=$$EXTERNAL_RTP_IP"
+        }
+
+        echo "[$$(date)] Starting FreeSWITCH deployment..."
+
+        # Validate ENV variables first
+        validate_env
+
+        echo "[$$(date)] Installing dependencies..."
+        apt-get update -qq || { echo "ERROR: apt-get update failed"; exit 1; }
         apt-get install -y -qq --no-install-recommends \
-          ca-certificates gnupg2 wget lsb-release curl bash procps
+          ca-certificates gnupg2 wget lsb-release curl bash procps || { echo "ERROR: Failed to install dependencies"; exit 1; }
 
-        echo "[$(date)] Adding SignalWire repository..."
-        wget -qO- https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | \
-          gpg --dearmor -o /usr/share/keyrings/signalwire-freeswitch-repo.gpg
+        echo "[$$(date)] Adding SignalWire repository..."
+        wget -qO- https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc 2>/dev/null | \
+          gpg --dearmor -o /usr/share/keyrings/signalwire-freeswitch-repo.gpg 2>/dev/null || { echo "ERROR: Failed to add GPG key"; exit 1; }
 
-        echo "deb [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://files.freeswitch.org/repo/deb/debian-release/ $(lsb_release -sc) main" \
-          > /etc/apt/sources.list.d/freeswitch.list
+        echo "deb [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://files.freeswitch.org/repo/deb/debian-release/ $$(lsb_release -sc) main" \
+          > /etc/apt/sources.list.d/freeswitch.list || { echo "ERROR: Failed to add FreeSWITCH repository"; exit 1; }
 
-        echo "[$(date)] Installing FreeSWITCH..."
-        apt-get update -qq
+        echo "[$$(date)] Installing FreeSWITCH packages..."
+        apt-get update -qq || { echo "ERROR: apt-get update failed after adding repo"; exit 1; }
         apt-get install -y -qq --no-install-recommends \
           freeswitch-meta-bare \
           freeswitch-mod-commands \
@@ -51,27 +93,33 @@ services:
           freeswitch-mod-db \
           freeswitch-mod-sndfile \
           freeswitch-mod-native-file \
-          freeswitch-mod-tone-stream
+          freeswitch-mod-tone-stream || { echo "ERROR: Failed to install FreeSWITCH packages"; exit 1; }
 
         rm -rf /var/lib/apt/lists/*
+        echo "[$$(date)] FreeSWITCH installation completed."
 
-        echo "[$(date)] Cleaning default config..."
+        echo "[$$(date)] Cleaning default config..."
         if [ -d /etc/freeswitch ]; then
           cp -a /etc/freeswitch /etc/freeswitch.orig 2>/dev/null || true
           find /etc/freeswitch/dialplan -type f -name "*.xml" -delete 2>/dev/null || true
           find /etc/freeswitch/directory -type f -name "*.xml" -delete 2>/dev/null || true
           rm -f /etc/freeswitch/sip_profiles/*.xml 2>/dev/null || true
           mkdir -p /etc/freeswitch/{dialplan/{default,public},directory/default,sip_profiles/{internal,external}}
+          echo "[$$(date)] Default config cleaned."
+        else
+          echo "WARNING: /etc/freeswitch directory not found"
         fi
 
-        echo "[$(date)] Downloading provision script..."
-        curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh -o /tmp/provision.sh
+        echo "[$$(date)] Downloading provision script..."
+        curl -fsSL https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh -o /tmp/provision.sh || { echo "ERROR: Failed to download provision.sh"; exit 1; }
         chmod +x /tmp/provision.sh
 
-        echo "[$(date)] Running provision..."
-        bash /tmp/provision.sh
+        echo "[$$(date)] Running provision script..."
+        bash /tmp/provision.sh || { echo "ERROR: Provision script failed"; exit 1; }
+        echo "[$$(date)] Provision completed successfully."
 
-        echo "[$(date)] Starting FreeSWITCH..."
+        echo "[$$(date)] Starting FreeSWITCH..."
+        echo "[$$(date)] Command: /usr/bin/freeswitch -nonat -nf -nc"
         exec /usr/bin/freeswitch -nonat -nf -nc
 
     # Environment variables
@@ -111,11 +159,11 @@ services:
 
     # Health check
     healthcheck:
-      test: ["CMD", "bash", "-c", "fs_cli -x 'status' | grep -q 'UP' || exit 1"]
+      test: ["CMD", "bash", "-c", "pgrep -x freeswitch > /dev/null || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 120s
+      start_period: 180s
 
 volumes:
   freeswitch_backups:
