@@ -67,6 +67,8 @@ Moderne KI-Telefonie-Plattformen (VAPI, Retell, Bland AI) haben Schwierigkeiten,
 |----------|-----|--------|
 | **Placetel** | SIP Trunk | Getestet |
 | **Placetel** | Nebenstelle | Getestet |
+| **Easybell** | SIP Trunk | Getestet |
+| **Easybell** | Nebenstelle | Getestet |
 | **Sipgate** | SIP Trunk | Getestet |
 
 ### Telefonanlagen
