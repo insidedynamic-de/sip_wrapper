@@ -628,7 +628,7 @@ EOF
 
     <!-- International format: +49... or 00... -->
     <extension name="user_${username}_international">
-      <condition field="\${sip_from_user}" expression="^${username}\$"/>
+      <condition field="username" expression="^${username}\$"/>
       <condition field="destination_number" expression="^(\+|00)(.+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
@@ -639,7 +639,7 @@ EOF
 
     <!-- Country code format: 49... → +49... -->
     <extension name="user_${username}_with_country_code">
-      <condition field="\${sip_from_user}" expression="^${username}\$"/>
+      <condition field="username" expression="^${username}\$"/>
       <condition field="destination_number" expression="^($country_code[1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
@@ -650,7 +650,7 @@ EOF
 
     <!-- National format: 0123... → +49123... -->
     <extension name="user_${username}_national">
-      <condition field="\${sip_from_user}" expression="^${username}\$"/>
+      <condition field="username" expression="^${username}\$"/>
       <condition field="destination_number" expression="^0([1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
@@ -661,7 +661,7 @@ EOF
 
     <!-- Default: add country code -->
     <extension name="user_${username}_default">
-      <condition field="\${sip_from_user}" expression="^${username}\$"/>
+      <condition field="username" expression="^${username}\$"/>
       <condition field="destination_number" expression="^([1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
