@@ -121,18 +121,30 @@ OUTBOUND_ROUTES=^00.*:provider1,^0[1-9].*:provider2
 
 ---
 
-### 3. User-based Outbound Routing (будущая фича)
+### 3. User-based Outbound Routing ✅ РЕАЛИЗОВАНО
 
-**Пока не реализовано.** Планируется:
+Маршрутизация по **источнику звонка** (кто звонит):
+
+**Формат:** `username:gateway,username2:gateway2`
 
 ```bash
-# Формат: username:gateway
-OUTBOUND_USER_ROUTES=alice:provider1,vapi1:provider2,vapi2:provider2
+# Пример: alice через provider1, bob через provider2
+OUTBOUND_USER_ROUTES=alice:provider1,bob:provider2
+
+# Пример: alice и VAPI через разные gateways
+OUTBOUND_USER_ROUTES=alice:provider1,vapi1:provider2,vapi2:provider2,vapi3:provider2
 ```
 
-**Что это даст:**
+**Что это даёт:**
 - `alice` звонит → через provider1
+- `bob` звонит → через provider2
 - `vapi1`, `vapi2`, `vapi3` звонят → через provider2
+- Если пользователь не в списке → используется DEFAULT_GATEWAY
+
+**Приоритет:**
+1. **OUTBOUND_USER_ROUTES** (самый высокий) - проверяется первым
+2. **OUTBOUND_ROUTES** (средний) - проверяется если user routing не сработал
+3. **DEFAULT_GATEWAY** (fallback) - если ничего не подошло
 
 ---
 
@@ -343,6 +355,84 @@ DEFAULT_EXTENSION=1001
 
 ---
 
+### Пример 5: User-based Routing (alice + bob через разные providers)
+
+**Сценарий:** Alice звонит через provider1, bob звонит через provider2.
+
+```bash
+FS_DOMAIN=apps.linkify.cloud
+EXTERNAL_SIP_IP=46.224.205.100
+EXTERNAL_RTP_IP=46.224.205.100
+
+# Users с Caller ID
+USERS=alice:SecretPass:1001:+4932221803986,bob:Pass456:1002:+4932221803987
+
+# Gateways
+GATEWAYS=provider1:fpbx.de:5060:user1:pass1:true:udp,provider2:other-provider.com:5060:user2:pass2:true:udp
+
+# User-based outbound routing
+OUTBOUND_USER_ROUTES=alice:provider1,bob:provider2
+
+# Fallback (если кто-то не в списке)
+DEFAULT_GATEWAY=provider1
+
+# Inbound
+DEFAULT_EXTENSION=1001
+
+# Fallback Caller ID
+OUTBOUND_CALLER_ID=+4932221803986
+```
+
+**Call flow:**
+- **Outbound:**
+  - `alice` звонит → через provider1 (Caller ID: +4932221803986)
+  - `bob` звонит → через provider2 (Caller ID: +4932221803987)
+  - Другие пользователи → через provider1 (fallback)
+- **Inbound:** provider1/provider2 → alice (extension 1001)
+
+---
+
+### Пример 6: VAPI через отдельный provider
+
+**Сценарий:** Alice через provider1, все VAPI через provider2.
+
+```bash
+FS_DOMAIN=apps.linkify.cloud
+EXTERNAL_SIP_IP=46.224.205.100
+EXTERNAL_RTP_IP=46.224.205.100
+
+# Users
+USERS=alice:SecretPass:1001:+4932221803986
+
+# ACL Users (VAPI)
+ACL_USERS=vapi1:34.213.129.25:9000:+4932221803987,vapi2:44.238.177.138:9000:+4932221803988,vapi3:44.229.228.186:9000:+4932221803989
+
+# Gateways
+GATEWAYS=provider1:fpbx.de:5060:user1:pass1:true:udp,provider2:vapi-provider.com:5060:user2:pass2:true:udp
+
+# User-based outbound routing
+OUTBOUND_USER_ROUTES=alice:provider1,vapi1:provider2,vapi2:provider2,vapi3:provider2
+
+# Fallback
+DEFAULT_GATEWAY=provider1
+
+# Inbound
+DEFAULT_EXTENSION=1001
+
+# Fallback Caller ID
+OUTBOUND_CALLER_ID=+4932221803986
+```
+
+**Call flow:**
+- **Outbound:**
+  - `alice` → provider1 (Caller ID: +4932221803986)
+  - `vapi1` → provider2 (Caller ID: +4932221803987)
+  - `vapi2` → provider2 (Caller ID: +4932221803988)
+  - `vapi3` → provider2 (Caller ID: +4932221803989)
+- **Inbound:** provider1/provider2 → alice
+
+---
+
 ## Примечания о Provider
 
 ### Caller ID Support
@@ -417,15 +507,30 @@ fs_cli -x "user_data alice var outbound_caller_id_number"
 
 ---
 
-## Следующие шаги
+## Реализованные фичи ✅
 
-### Планируемые фичи:
+1. **Per-User Caller ID** - каждый пользователь может иметь свой Caller ID
+2. **User-based Outbound Routing** - маршрутизация по источнику звонка (кто звонит)
+3. **DID-based Inbound Routing** - маршрутизация входящих по номеру
+4. **Pattern-based Outbound Routing** - маршрутизация по паттернам номера
+5. **ACL Users** - пользователи без пароля (по IP)
 
-1. **User-based Outbound Routing** - маршрутизация по источнику звонка (кто звонит)
-2. **Gateway-based Inbound Routing** - маршрутизация по source gateway (откуда звонят)
-3. **Per-Gateway Caller ID** - установка Caller ID на уровне gateway
+## Планируемые фичи
 
-Эти фичи будут добавлены в следующих версиях.
+1. **Gateway-based Inbound Routing** - автоматическая маршрутизация по source gateway
+   ```bash
+   INBOUND_GATEWAY_ROUTES=provider1:1001,provider2:gateway@vapi
+   ```
+
+2. **Time-based Routing** - маршрутизация по времени суток
+   ```bash
+   ROUTING_SCHEDULE=working_hours:08:00-18:00:alice,after_hours:*:gateway@vapi
+   ```
+
+3. **Load Balancing** - распределение нагрузки между несколькими gateways
+   ```bash
+   OUTBOUND_LOAD_BALANCE=provider1:provider2:provider3
+   ```
 
 ---
 

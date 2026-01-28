@@ -589,6 +589,95 @@ EOF
 }
 
 ################################################################################
+# Generate User-based Outbound Routing
+# Routes calls based on WHO is calling (not destination number)
+# Format: OUTBOUND_USER_ROUTES="alice:provider1,bob:provider2,vapi1:provider3"
+################################################################################
+
+generate_user_outbound_routing() {
+  if [ -z "$OUTBOUND_USER_ROUTES" ]; then
+    echo_log "No user-based outbound routes defined, skipping..."
+    return
+  fi
+
+  echo_log "Generating user-based outbound routing..."
+
+  cat > "$FS_CONF/dialplan/default/00_user_routing.xml" <<'EOF'
+<!-- User-based outbound routing - included by default.xml wrapper -->
+EOF
+
+  local route_count=0
+  IFS=',' read -ra ROUTE_ARRAY <<< "$OUTBOUND_USER_ROUTES"
+
+  for route_entry in "${ROUTE_ARRAY[@]}"; do
+    IFS=':' read -r username gateway <<< "$route_entry"
+
+    if [ -z "$username" ] || [ -z "$gateway" ]; then
+      echo_log "WARNING: Invalid user route entry: $route_entry (skipping)"
+      continue
+    fi
+
+    echo_log "Creating user route: $username -> $gateway"
+
+    # Get default country code for number normalization
+    local country_code="${DEFAULT_COUNTRY_CODE:-49}"
+
+    cat >> "$FS_CONF/dialplan/default/00_user_routing.xml" <<EOF
+
+    <!-- User $username routes to gateway $gateway -->
+
+    <!-- International format: +49... or 00... -->
+    <extension name="user_${username}_international">
+      <condition field="\${sip_from_user}" expression="^${username}\$"/>
+      <condition field="destination_number" expression="^(\+|00)(.+)\$">
+        <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
+        <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="bridge" data="sofia/gateway/$gateway/\$1\$2"/>
+      </condition>
+    </extension>
+
+    <!-- Country code format: 49... → +49... -->
+    <extension name="user_${username}_with_country_code">
+      <condition field="\${sip_from_user}" expression="^${username}\$"/>
+      <condition field="destination_number" expression="^($country_code[1-9][0-9]+)\$">
+        <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
+        <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="bridge" data="sofia/gateway/$gateway/+\$1"/>
+      </condition>
+    </extension>
+
+    <!-- National format: 0123... → +49123... -->
+    <extension name="user_${username}_national">
+      <condition field="\${sip_from_user}" expression="^${username}\$"/>
+      <condition field="destination_number" expression="^0([1-9][0-9]+)\$">
+        <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
+        <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="bridge" data="sofia/gateway/$gateway/+$country_code\$1"/>
+      </condition>
+    </extension>
+
+    <!-- Default: add country code -->
+    <extension name="user_${username}_default">
+      <condition field="\${sip_from_user}" expression="^${username}\$"/>
+      <condition field="destination_number" expression="^([1-9][0-9]+)\$">
+        <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
+        <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="bridge" data="sofia/gateway/$gateway/+$country_code\$1"/>
+      </condition>
+    </extension>
+EOF
+
+    route_count=$((route_count + 1))
+  done
+
+  echo_log "Generated $route_count user-based outbound routes"
+}
+
+################################################################################
 # Generate Outbound Dialplan (user -> gateway)
 # Format: OUTBOUND_ROUTES="pattern1:gateway1:prepend1,pattern2:gateway2:prepend2"
 ################################################################################
@@ -947,6 +1036,7 @@ main() {
   generate_acl_users
   generate_gateways
   generate_local_extensions_dialplan
+  generate_user_outbound_routing
   generate_outbound_dialplan
   generate_inbound_dialplan
   create_dialplan_wrappers
