@@ -317,7 +317,7 @@ generate_users() {
   IFS=',' read -ra USER_ARRAY <<< "$USERS"
 
   for user_entry in "${USER_ARRAY[@]}"; do
-    IFS=':' read -r username password extension <<< "$user_entry"
+    IFS=':' read -r username password extension caller_id <<< "$user_entry"
 
     if [ -z "$username" ] || [ -z "$password" ]; then
       echo_log "WARNING: Invalid user entry: $user_entry (skipping)"
@@ -327,7 +327,12 @@ generate_users() {
     # Default extension to username if not provided
     extension="${extension:-$username}"
 
-    echo_log "Creating user: $username (extension: $extension)"
+    # Default caller_id to OUTBOUND_CALLER_ID or extension
+    if [ -z "$caller_id" ]; then
+      caller_id="${OUTBOUND_CALLER_ID:-$extension}"
+    fi
+
+    echo_log "Creating user: $username (extension: $extension, caller_id: $caller_id)"
 
     cat > "$FS_CONF/directory/default/$username.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -339,9 +344,9 @@ generate_users() {
     </params>
     <variables>
       <variable name="user_context" value="default"/>
-      <variable name="effective_caller_id_number" value="$extension"/>
+      <variable name="effective_caller_id_number" value="$caller_id"/>
       <variable name="effective_caller_id_name" value="$username"/>
-      <variable name="outbound_caller_id_number" value="$extension"/>
+      <variable name="outbound_caller_id_number" value="$caller_id"/>
       <variable name="outbound_caller_id_name" value="$username"/>
     </variables>
   </user>
@@ -356,7 +361,8 @@ EOF
 
 ################################################################################
 # Generate ACL Users (no authentication, IP-based)
-# Format: ACL_USERS="user1:192.168.1.100:1001,user2:192.168.1.101:1002"
+# Format: ACL_USERS="user1:192.168.1.100:1001:+4932221803986,user2:192.168.1.101:1002"
+# Caller ID is optional
 ################################################################################
 
 generate_acl_users() {
@@ -383,7 +389,7 @@ EOF
   IFS=',' read -ra ACL_ARRAY <<< "$ACL_USERS"
 
   for acl_entry in "${ACL_ARRAY[@]}"; do
-    IFS=':' read -r username ip extension <<< "$acl_entry"
+    IFS=':' read -r username ip extension caller_id <<< "$acl_entry"
 
     if [ -z "$username" ] || [ -z "$ip" ]; then
       echo_log "WARNING: Invalid ACL entry: $acl_entry (skipping)"
@@ -392,7 +398,12 @@ EOF
 
     extension="${extension:-$username}"
 
-    echo_log "Creating ACL user: $username (IP: $ip, extension: $extension)"
+    # Default caller_id to OUTBOUND_CALLER_ID or extension
+    if [ -z "$caller_id" ]; then
+      caller_id="${OUTBOUND_CALLER_ID:-$extension}"
+    fi
+
+    echo_log "Creating ACL user: $username (IP: $ip, extension: $extension, caller_id: $caller_id)"
 
     # Add to ACL (support both single IP and CIDR notation)
     # If IP already contains /, use as-is (CIDR). Otherwise add /32 (single IP)
@@ -417,9 +428,9 @@ EOF
     </params>
     <variables>
       <variable name="user_context" value="default"/>
-      <variable name="effective_caller_id_number" value="$extension"/>
+      <variable name="effective_caller_id_number" value="$caller_id"/>
       <variable name="effective_caller_id_name" value="$username"/>
-      <variable name="outbound_caller_id_number" value="$extension"/>
+      <variable name="outbound_caller_id_number" value="$caller_id"/>
       <variable name="outbound_caller_id_name" value="$username"/>
     </variables>
   </user>
@@ -478,8 +489,8 @@ EOF
 
 ################################################################################
 # Generate Gateways
-# Format: GATEWAYS="gw1:provider.com:5060:username:password:true:udp,gw2:..."
-# Fields: name:host:port:username:password:register:transport
+# Format: GATEWAYS="gw1:provider.com:5060:username:password:true:udp:+4932221803986,gw2:..."
+# Fields: name:host:port:username:password:register:transport:caller_id (caller_id is optional)
 ################################################################################
 
 generate_gateways() {
@@ -494,7 +505,7 @@ generate_gateways() {
   IFS=',' read -ra GW_ARRAY <<< "$GATEWAYS"
 
   for gw_entry in "${GW_ARRAY[@]}"; do
-    IFS=':' read -r gw_name gw_host gw_port gw_user gw_pass gw_register gw_transport <<< "$gw_entry"
+    IFS=':' read -r gw_name gw_host gw_port gw_user gw_pass gw_register gw_transport gw_caller_id <<< "$gw_entry"
 
     if [ -z "$gw_name" ] || [ -z "$gw_host" ]; then
       echo_log "WARNING: Invalid gateway entry: $gw_entry (skipping)"
@@ -506,7 +517,11 @@ generate_gateways() {
     gw_register="${gw_register:-true}"
     gw_transport="${gw_transport:-udp}"
 
-    echo_log "Creating gateway: $gw_name ($gw_host:$gw_port, register: $gw_register)"
+    if [ -n "$gw_caller_id" ]; then
+      echo_log "Creating gateway: $gw_name ($gw_host:$gw_port, register: $gw_register, caller_id: $gw_caller_id)"
+    else
+      echo_log "Creating gateway: $gw_name ($gw_host:$gw_port, register: $gw_register)"
+    fi
 
     cat > "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
