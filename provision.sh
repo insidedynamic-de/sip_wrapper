@@ -505,7 +505,7 @@ generate_gateways() {
   IFS=',' read -ra GW_ARRAY <<< "$GATEWAYS"
 
   for gw_entry in "${GW_ARRAY[@]}"; do
-    IFS=':' read -r gw_name gw_host gw_port gw_user gw_pass gw_register gw_transport gw_caller_id <<< "$gw_entry"
+    IFS=':' read -r gw_name gw_host gw_port gw_user gw_pass gw_register gw_transport gw_auth_user <<< "$gw_entry"
 
     if [ -z "$gw_name" ] || [ -z "$gw_host" ]; then
       echo_log "WARNING: Invalid gateway entry: $gw_entry (skipping)"
@@ -517,8 +517,13 @@ generate_gateways() {
     gw_register="${gw_register:-true}"
     gw_transport="${gw_transport:-udp}"
 
-    if [ -n "$gw_caller_id" ]; then
-      echo_log "Creating gateway: $gw_name ($gw_host:$gw_port, register: $gw_register, caller_id: $gw_caller_id)"
+    # If auth_user not provided, use username as auth_user (default behavior)
+    if [ -z "$gw_auth_user" ]; then
+      gw_auth_user="$gw_user"
+    fi
+
+    if [ -n "$gw_auth_user" ] && [ "$gw_auth_user" != "$gw_user" ]; then
+      echo_log "Creating gateway: $gw_name ($gw_host:$gw_port, user: $gw_user, auth: $gw_auth_user, register: $gw_register)"
     else
       echo_log "Creating gateway: $gw_name ($gw_host:$gw_port, register: $gw_register)"
     fi
@@ -534,6 +539,13 @@ EOF
       cat >> "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
     <param name="username" value="$gw_user"/>
     <param name="from-user" value="$gw_user"/>
+EOF
+    fi
+
+    # Add auth-username if different from username (for providers like 3CX)
+    if [ -n "$gw_auth_user" ] && [ "$gw_auth_user" != "$gw_user" ]; then
+      cat >> "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
+    <param name="auth-username" value="$gw_auth_user"/>
 EOF
     fi
 
