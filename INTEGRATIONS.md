@@ -44,8 +44,8 @@ Sie haben eine KI-Telefonie-Lösung (VAPI, Retell, Bland AI) und möchten deutsc
 
 | Name | Beschreibung | Wrapper Outbound | Provider Outbound | Wrapper Inbound | Provider Inbound |
 |------|--------------|:----------------:|:-----------------:|:---------------:|:----------------:|
-| **Placetel** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ | ✓ |
-| **Placetel** Nebenstelle | Cloud PBX Nebenstelle | ✓ | ✓ | ✓ | ✓ |
+| **Placetel** SIP Trunk | Business SIP Trunk | ✓ | ✓ | A | A |
+| **Placetel** Nebenstelle | Cloud PBX Nebenstelle | ✓ | ✓ | A | A |
 | **Easybell** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ | ✓ |
 | **Easybell** Nebenstelle | Cloud Nebenstelle | ✓ | ✓ | ✓ | ✓ |
 | **Sipgate** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ | ✓ |
@@ -55,19 +55,19 @@ Sie haben eine KI-Telefonie-Lösung (VAPI, Retell, Bland AI) und möchten deutsc
 | **3CX** | Cloud / On-Premise PBX | ✓ | ✓ | + | + |
 | **Agfeo** Cloud | Cloud Telefonanlage | A | A | A | A |
 | **Agfeo** On-Premise | On-Premise Telefonanlage | A | A | A | A |
-| **FreePBX** | Open Source PBX | A | A | A | A |
-| **Starface** | Business PBX | A | A | A | A |
-| **Asterisk** | Open Source PBX | A | A | A | A |
-| **Tengo** CentraFlex | Cloud PBX | A | A | A | A |
-| **Plusnet** SIP Trunk | Business SIP Trunk | A | A | A | A |
-| **Telekom** DeutschlandLAN | Business SIP Trunk | A | A | A | A |
-| **Telekom** Company Flex | Cloud PBX | A | A | A | A |
-| **Telekom** Cloud PBX | Cloud Telefonanlage | A | A | A | A |
-| **Gamma** (ehem. HFO) | Business SIP Trunk | A | A | A | A |
-| **Crown** Centrex | Cloud PBX | A | A | A | A |
-| **NFON** | Cloud PBX | A | A | A | A |
-| **Fonial** Nebenstelle | Cloud Nebenstelle | A | A | A | A |
-| **Fonial** SIP Trunk | Business SIP Trunk | A | A | A | A |
+| **FreePBX** | Open Source PBX | - | - | - | - |
+| **Starface** | Business PBX | - | - | - | - |
+| **Asterisk** | Open Source PBX | - | - | - | - |
+| **Tengo** CentraFlex | Cloud PBX | - | - | - | - |
+| **Plusnet** SIP Trunk | Business SIP Trunk | - | - | - | - |
+| **Telekom** DeutschlandLAN | Business SIP Trunk | - | - | - | - |
+| **Telekom** Company Flex | Cloud PBX | - | - | - | - |
+| **Telekom** Cloud PBX | Cloud Telefonanlage | - | - | - | - |
+| **Gamma** (ehem. HFO) | Business SIP Trunk | - | - | - | - |
+| **Crown** Centrex | Cloud PBX | - | - | - | - |
+| **NFON** | Cloud PBX | - | - | - | - |
+| **Fonial** Nebenstelle | Cloud Nebenstelle | - | - | - | - |
+| **Fonial** SIP Trunk | Business SIP Trunk | - | - | - | - |
 
 **Legende:** ✓ = Produktiv | + = Im Test | A = Aktuell in Arbeit | - = Noch nicht getestet
 
