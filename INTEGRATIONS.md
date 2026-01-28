@@ -42,34 +42,34 @@ Sie haben eine KI-Telefonie-Lösung (VAPI, Retell, Bland AI) und möchten deutsc
 
 ## Integrationen
 
-| Name | Beschreibung | Getestet | Outbound | Inbound |
-|------|--------------|:--------:|:--------:|:-------:|
-| **Placetel** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ |
-| **Placetel** Nebenstelle | Cloud PBX Nebenstelle | ✓ | ✓ | ✓ |
-| **Easybell** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ |
-| **Easybell** Nebenstelle | Cloud Nebenstelle | ✓ | ✓ | ✓ |
-| **Sipgate** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ |
-| **Zadarma** SIP Trunk | Internationaler SIP Trunk | ✓ | ✓ | ✓ |
-| **Zadarma** Nebenstelle | Cloud Nebenstelle | ✓ | ✓ | ✓ |
-| **Fritzbox** | Vodafone Cable Business | ✓ | ✓ | ✓ |
-| **3CX** | Cloud / On-Premise PBX | ✓ | ✓ | ~ |
-| **Agfeo** Cloud | Cloud Telefonanlage | ✗ | - | - |
-| **Agfeo** On-Premise | On-Premise Telefonanlage | ✗ | - | - |
-| **FreePBX** | Open Source PBX | ✗ | - | - |
-| **Starface** | Business PBX | ✗ | - | - |
-| **Asterisk** | Open Source PBX | ✗ | - | - |
-| **Tengo** CentraFlex | Cloud PBX | ✗ | - | - |
-| **Plusnet** SIP Trunk | Business SIP Trunk | ✗ | - | - |
-| **Telekom** DeutschlandLAN | Business SIP Trunk | ✗ | - | - |
-| **Telekom** Company Flex | Cloud PBX | ✗ | - | - |
-| **Telekom** Cloud PBX | Cloud Telefonanlage | ✗ | - | - |
-| **Gamma** (ehem. HFO) | Business SIP Trunk | ✗ | - | - |
-| **Crown** Centrex | Cloud PBX | ✗ | - | - |
-| **NFON** | Cloud PBX | ✗ | - | - |
-| **Fonial** Nebenstelle | Cloud Nebenstelle | ✗ | - | - |
-| **Fonial** SIP Trunk | Business SIP Trunk | ✗ | - | - |
+| Name | Beschreibung | Wrapper Outbound | Provider Outbound | Wrapper Inbound | Provider Inbound |
+|------|--------------|:----------------:|:-----------------:|:---------------:|:----------------:|
+| **Placetel** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ | ✓ |
+| **Placetel** Nebenstelle | Cloud PBX Nebenstelle | ✓ | ✓ | ✓ | ✓ |
+| **Easybell** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ | ✓ |
+| **Easybell** Nebenstelle | Cloud Nebenstelle | ✓ | ✓ | ✓ | ✓ |
+| **Sipgate** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ | ✓ |
+| **Zadarma** SIP Trunk | Internationaler SIP Trunk | ✓ | ✓ | ✓ | ✓ |
+| **Zadarma** Nebenstelle | Cloud Nebenstelle | ✓ | ✓ | ✓ | ✓ |
+| **Fritzbox** | Vodafone Cable Business | ✓ | ✓ | ✓ | ✓ |
+| **3CX** | Cloud / On-Premise PBX | ✓ | ✓ | ~ | ~ |
+| **Agfeo** Cloud | Cloud Telefonanlage | - | - | - | - |
+| **Agfeo** On-Premise | On-Premise Telefonanlage | - | - | - | - |
+| **FreePBX** | Open Source PBX | - | - | - | - |
+| **Starface** | Business PBX | - | - | - | - |
+| **Asterisk** | Open Source PBX | - | - | - | - |
+| **Tengo** CentraFlex | Cloud PBX | - | - | - | - |
+| **Plusnet** SIP Trunk | Business SIP Trunk | - | - | - | - |
+| **Telekom** DeutschlandLAN | Business SIP Trunk | - | - | - | - |
+| **Telekom** Company Flex | Cloud PBX | - | - | - | - |
+| **Telekom** Cloud PBX | Cloud Telefonanlage | - | - | - | - |
+| **Gamma** (ehem. HFO) | Business SIP Trunk | - | - | - | - |
+| **Crown** Centrex | Cloud PBX | - | - | - | - |
+| **NFON** | Cloud PBX | - | - | - | - |
+| **Fonial** Nebenstelle | Cloud Nebenstelle | - | - | - | - |
+| **Fonial** SIP Trunk | Business SIP Trunk | - | - | - | - |
 
-**Legende:** ✓ = Produktiv | ~ = Im Test | ✗ = In Entwicklung | - = Noch nicht getestet
+**Legende:** ✓ = Produktiv | ~ = Im Test | - = Noch nicht getestet
 
 **Ihr System fehlt?** Kontaktieren Sie uns - wir integrieren es.
 
@@ -77,11 +77,11 @@ Sie haben eine KI-Telefonie-Lösung (VAPI, Retell, Bland AI) und möchten deutsc
 
 ## KI-Plattformen
 
-| Name | Beschreibung | Getestet | Outbound | Inbound |
-|------|--------------|:--------:|:--------:|:-------:|
-| **VAPI** | KI-Telefonie Plattform | ✓ | ✓ | ✓ |
-| **Retell** | KI-Telefonie Plattform | ✓ | ✓ | ✓ |
-| **Bland AI** | KI-Telefonie Plattform | ✓ | ✓ | ✓ |
+| Name | Beschreibung | KI Outbound | Wrapper Outbound | Provider Outbound | Provider Inbound | Wrapper Inbound | KI Inbound |
+|------|--------------|:-----------:|:----------------:|:-----------------:|:----------------:|:---------------:|:----------:|
+| **VAPI** | KI-Telefonie Plattform | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| **Retell** | KI-Telefonie Plattform | - | - | - | - | - | - |
+| **Bland AI** | KI-Telefonie Plattform | - | - | - | - | - | - |
 
 ---
 
