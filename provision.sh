@@ -602,8 +602,8 @@ generate_user_outbound_routing() {
 
   echo_log "Generating user-based outbound routing..."
 
-  cat > "$FS_CONF/dialplan/default/00_user_routing.xml" <<'EOF'
-<!-- User-based outbound routing - included by default.xml wrapper -->
+  cat > "$FS_CONF/dialplan/default/000_user_routing.xml" <<'EOF'
+<!-- User-based outbound routing - HIGHEST PRIORITY (processed before default gateway) -->
 EOF
 
   local route_count=0
@@ -622,7 +622,7 @@ EOF
     # Get default country code for number normalization
     local country_code="${DEFAULT_COUNTRY_CODE:-49}"
 
-    cat >> "$FS_CONF/dialplan/default/00_user_routing.xml" <<EOF
+    cat >> "$FS_CONF/dialplan/default/000_user_routing.xml" <<EOF
 
     <!-- User $username routes to gateway $gateway -->
 
