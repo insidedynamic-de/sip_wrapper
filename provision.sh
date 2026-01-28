@@ -536,9 +536,16 @@ EOF
 
     # Add username and password only if provided
     if [ -n "$gw_user" ]; then
+      # For 3CX and similar: if auth-username differs, use it in from-user
+      # This ensures the From header matches the authentication username
+      local from_user="$gw_user"
+      if [ -n "$gw_auth_user" ] && [ "$gw_auth_user" != "$gw_user" ]; then
+        from_user="$gw_auth_user"
+      fi
+
       cat >> "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
     <param name="username" value="$gw_user"/>
-    <param name="from-user" value="$gw_user"/>
+    <param name="from-user" value="$from_user"/>
 EOF
     fi
 
