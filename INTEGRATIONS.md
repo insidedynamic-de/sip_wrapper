@@ -40,59 +40,46 @@ Sie haben eine KI-Telefonie-Lösung (VAPI, Retell, Bland AI) und möchten deutsc
 
 ---
 
-## Bereits verbunden
+## Integrationen
 
-Diese Systeme wurden erfolgreich getestet und funktionieren:
+| Pos | Name | Beschreibung | Getestet | Outbound | Inbound |
+|-----|------|--------------|:--------:|:--------:|:-------:|
+| 1 | **Placetel** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ |
+| 2 | **Placetel** Nebenstelle | Cloud PBX Nebenstelle | ✓ | ✓ | ✓ |
+| 3 | **Easybell** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ |
+| 4 | **Easybell** Nebenstelle | Cloud Nebenstelle | ✓ | ✓ | ✓ |
+| 5 | **Sipgate** SIP Trunk | Business SIP Trunk | ✓ | ✓ | ✓ |
+| 6 | **Zadarma** SIP Trunk | Internationaler SIP Trunk | ✓ | ✓ | ✓ |
+| 7 | **Zadarma** Nebenstelle | Cloud Nebenstelle | ✓ | ✓ | ✓ |
+| 8 | **Fritzbox** | Vodafone Cable Business | ✓ | ✓ | ✓ |
+| 9 | **3CX** | Cloud / On-Premise PBX | ✓ | ✓ | ✓ |
+| 10 | **Agfeo** Cloud | Cloud Telefonanlage | ✗ | - | - |
+| 11 | **Agfeo** On-Premise | On-Premise Telefonanlage | ✗ | - | - |
+| 12 | **FreePBX** | Open Source PBX | ✗ | - | - |
+| 13 | **Starface** | Business PBX | ✗ | - | - |
+| 14 | **Asterisk** | Open Source PBX | ✗ | - | - |
+| 15 | **Tengo** CentraFlex | Cloud PBX | ✗ | - | - |
+| 16 | **Plusnet** SIP Trunk | Business SIP Trunk | ✗ | - | - |
+| 17 | **Telekom** DeutschlandLAN | Business SIP Trunk | ✗ | - | - |
+| 18 | **Telekom** Company Flex | Cloud PBX | ✗ | - | - |
+| 19 | **Telekom** Cloud PBX | Cloud Telefonanlage | ✗ | - | - |
+| 20 | **Gamma** (ehem. HFO) | Business SIP Trunk | ✗ | - | - |
+| 21 | **Crown** Centrex | Cloud PBX | ✗ | - | - |
+| 22 | **NFON** | Cloud PBX | ✗ | - | - |
+| 23 | **Fonial** Nebenstelle | Cloud Nebenstelle | ✗ | - | - |
+| 24 | **Fonial** SIP Trunk | Business SIP Trunk | ✗ | - | - |
 
-| System | Status |
-|--------|--------|
-| **Placetel** SIP Trunk | Produktiv |
-| **Placetel** Nebenstelle | Produktiv |
-| **Easybell** SIP Trunk | Produktiv |
-| **Easybell** Nebenstelle | Produktiv |
-| **Sipgate** SIP Trunk | Produktiv |
-| **Zadarma** SIP Trunk | Produktiv |
-| **Zadarma** Nebenstelle | Produktiv |
-| **Fritzbox** (Vodafone Cable Business) | Produktiv |
-| **3CX** Cloud / On-Premise | Produktiv |
+**Ihr System fehlt?** Kontaktieren Sie uns - wir integrieren es.
 
 ---
 
 ## KI-Plattformen
 
-Folgende KI-Telefonie-Plattformen werden unterstützt:
-
-| Plattform | Anbindung | Status |
-|-----------|-----------|--------|
-| **VAPI** | IP-basiert (ACL) | Produktiv |
-| **Retell** | IP-basiert (ACL) | Produktiv |
-| **Bland AI** | IP-basiert (ACL) | Produktiv |
-
----
-
-## In Entwicklung
-
-An diesen Integrationen arbeiten wir aktuell:
-
-| System | Status |
-|--------|--------|
-| **Agfeo** Cloud | In Arbeit |
-| **Agfeo** On-Premise | In Arbeit |
-| **FreePBX** | In Arbeit |
-| **Starface** | In Arbeit |
-| **Asterisk** | In Arbeit |
-| **Tengo** CentraFlex | In Arbeit |
-| **Plusnet** SIP Trunk | In Arbeit |
-| **Telekom** DeutschlandLAN SIP-Trunk | In Arbeit |
-| **Telekom** Company Flex | In Arbeit |
-| **Telekom** Cloud PBX | In Arbeit |
-| **Gamma Communication** (ehem. HFO Telekom) | In Arbeit |
-| **Crown** Centrex | In Arbeit |
-| **NFON** Cloud PBX | In Arbeit |
-| **Fonial** Nebenstelle | In Arbeit |
-| **Fonial** SIP Trunk | In Arbeit |
-
-**Ihr System fehlt?** Kontaktieren Sie uns - wir integrieren es.
+| Pos | Name | Beschreibung | Getestet | Outbound | Inbound |
+|-----|------|--------------|:--------:|:--------:|:-------:|
+| 1 | **VAPI** | KI-Telefonie Plattform | ✓ | ✓ | ✓ |
+| 2 | **Retell** | KI-Telefonie Plattform | ✓ | ✓ | ✓ |
+| 3 | **Bland AI** | KI-Telefonie Plattform | ✓ | ✓ | ✓ |
 
 ---
 
