@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIP Wrapper - KI-Telefonie Bridge | InsideDynamic GmbH</title>
+    <meta name="description" content="Verbinden Sie Ihre KI-Telefonie mit deutschen Providern und Telefonanlagen. Multi-Provider SIP Bridge von InsideDynamic GmbH.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--dark);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 160px 0 80px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            color: var(--dark);
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--gray);
+            margin-bottom: 32px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .hero-visual {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .flow-box {
+            background: var(--light);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .flow-box.highlight {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .flow-box h4 {
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+        }
+
+        .flow-box ul {
+            list-style: none;
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .flow-box.highlight ul {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        /* Problem Section */
+        .problem {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .problem-card {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .problem-card .icon {
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+
+        .problem-card h4 {
+            margin-bottom: 8px;
+            color: #991b1b;
+        }
+
+        .problem-card p {
+            font-size: 0.875rem;
+            color: #7f1d1d;
+        }
+
+        /* Solution Section */
+        .solution {
+            padding: 80px 0;
+            background: var(--dark);
+            color: white;
+        }
+
+        .solution .section-title h2 {
+            color: white;
+        }
+
+        .solution .section-title p {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .benefit-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .benefit-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .benefit-card h4 {
+            margin-bottom: 8px;
+            color: var(--secondary);
+        }
+
+        .benefit-card p {
+            font-size: 0.875rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Integrations */
+        .integrations {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .integration-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .integration-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+
+        .integration-table th {
+            background: var(--light);
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .integration-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .integration-table tr:hover {
+            background: var(--light);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-ok {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-test {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-wip {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-pending {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            text-align: center;
+            color: white;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .cta p {
+            font-size: 1.25rem;
+            margin-bottom: 32px;
+            opacity: 0.9;
+        }
+
+        .cta .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border-color: white;
+        }
+
+        .cta .btn-secondary:hover {
+            background: transparent;
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 48px 0 24px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand h3 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand p {
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 16px;
+        }
+
+        .footer-col h4 {
+            margin-bottom: 16px;
+            color: var(--secondary);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: 8px;
+        }
+
+        .footer-col a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-col a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+            }
+
+            .problem-grid, .benefits-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .problem-grid, .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-diagram {
+                flex-direction: column;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .integration-table {
+                font-size: 0.875rem;
+            }
+
+            .integration-table th, .integration-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="#" class="logo">Inside<span>Dynamic</span></a>
+            <ul class="nav-links">
+                <li><a href="#problem">Problem</a></li>
+                <li><a href="#solution">Lösung</a></li>
+                <li><a href="#integrations">Integrationen</a></li>
+                <li><a href="#contact">Kontakt</a></li>
+            </ul>
+            <a href="#contact" class="btn btn-primary">Demo anfragen</a>
+        </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div>
+                    <h1>Verbinden Sie <span>KI-Telefonie</span> mit deutschen Providern</h1>
+                    <p>SIP Wrapper ist die Multi-Provider Bridge, die Ihre KI-Plattform mit jedem deutschen SIP-Provider und jeder Telefonanlage verbindet.</p>
+                    <div class="hero-buttons">
+                        <a href="#contact" class="btn btn-primary">Jetzt starten</a>
+                        <a href="#integrations" class="btn btn-secondary">Integrationen ansehen</a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="flow-diagram">
+                        <div class="flow-box">
+                            <h4>KI-Plattform</h4>
+                            <ul>
+                                <li>VAPI</li>
+                                <li>Retell</li>
+                                <li>Bland AI</li>
+                            </ul>
+                        </div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-box highlight">
+                            <h4>SIP Wrapper</h4>
+                            <ul>
+                                <li>Bridge</li>
+                                <li>Routing</li>
+                                <li>NAT</li>
+                            </ul>
+                        </div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-box">
+                            <h4>Provider</h4>
+                            <ul>
+                                <li>Placetel</li>
+                                <li>Sipgate</li>
+                                <li>3CX</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem -->
+    <section class="problem" id="problem">
+        <div class="container">
+            <div class="section-title">
+                <h2>Das Problem</h2>
+                <p>KI-Telefonie-Plattformen haben Schwierigkeiten mit deutschen Providern</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="icon">🔐</div>
+                    <h4>Authentifizierung</h4>
+                    <p>Inkompatible Auth-Methoden zwischen KI und Provider</p>
+                </div>
+                <div class="problem-card">
+                    <div class="icon">🔊</div>
+                    <h4>Codecs</h4>
+                    <p>Fehlende Codec-Unterstützung führt zu Tonproblemen</p>
+                </div>
+                <div class="problem-card">
+                    <div class="icon">🌐</div>
+                    <h4>NAT/Firewall</h4>
+                    <p>Komplexe Netzwerkkonfiguration blockiert Verbindungen</p>
+                </div>
+                <div class="problem-card">
+                    <div class="icon">⏰</div>
+                    <h4>Zeitverlust</h4>
+                    <p>Wochen an Debugging ohne funktionierendes Ergebnis</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution -->
+    <section class="solution" id="solution">
+        <div class="container">
+            <div class="section-title">
+                <h2>Die Lösung</h2>
+                <p>SIP Wrapper verbindet verschiedene Telefonie-Welten</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="icon">⚡</div>
+                    <h4>2 Minuten Deploy</h4>
+                    <p>Einfache Konfiguration über Umgebungsvariablen, keine XML-Dateien</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">💾</div>
+                    <h4>~50 MB RAM</h4>
+                    <p>Minimaler Ressourcenverbrauch, läuft auf kleinsten Servern</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">🔄</div>
+                    <h4>Multi-Provider</h4>
+                    <p>Beliebig viele Provider und Benutzer gleichzeitig</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">✅</div>
+                    <h4>Produktionsreif</h4>
+                    <p>Stabile Verbindungen mit automatischer Wiederverbindung</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Integrations -->
+    <section class="integrations" id="integrations">
+        <div class="container">
+            <div class="section-title">
+                <h2>Integrationen</h2>
+                <p>Getestete und geplante Verbindungen</p>
+            </div>
+
+            <h3 style="margin-bottom: 24px;">SIP Provider & Telefonanlagen</h3>
+            <table class="integration-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Beschreibung</th>
+                        <th>Outbound</th>
+                        <th>Inbound</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Placetel</strong> SIP Trunk</td>
+                        <td>Business SIP Trunk</td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                        <td><span class="status status-wip">In Arbeit</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Placetel</strong> Nebenstelle</td>
+                        <td>Cloud PBX Nebenstelle</td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                        <td><span class="status status-wip">In Arbeit</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Easybell</strong> SIP Trunk</td>
+                        <td>Business SIP Trunk</td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Easybell</strong> Nebenstelle</td>
+                        <td>Cloud Nebenstelle</td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sipgate</strong> SIP Trunk</td>
+                        <td>Business SIP Trunk</td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Zadarma</strong> SIP Trunk</td>
+                        <td>Internationaler SIP Trunk</td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fritzbox</strong></td>
+                        <td>Vodafone Cable Business</td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>3CX</strong></td>
+                        <td>Cloud / On-Premise PBX</td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                        <td><span class="status status-test">Im Test</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Agfeo</strong></td>
+                        <td>Cloud / On-Premise</td>
+                        <td><span class="status status-wip">In Arbeit</span></td>
+                        <td><span class="status status-wip">In Arbeit</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>NFON</strong></td>
+                        <td>Cloud PBX</td>
+                        <td><span class="status status-pending">Geplant</span></td>
+                        <td><span class="status status-pending">Geplant</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Telekom</strong></td>
+                        <td>DeutschlandLAN / Company Flex</td>
+                        <td><span class="status status-pending">Geplant</span></td>
+                        <td><span class="status status-pending">Geplant</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin: 48px 0 24px;">KI-Plattformen</h3>
+            <table class="integration-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Beschreibung</th>
+                        <th>Outbound</th>
+                        <th>Inbound</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>VAPI</strong></td>
+                        <td>KI-Telefonie Plattform</td>
+                        <td><span class="status status-ok">Produktiv</span></td>
+                        <td><span class="status status-wip">In Arbeit</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Retell</strong></td>
+                        <td>KI-Telefonie Plattform</td>
+                        <td><span class="status status-wip">In Arbeit</span></td>
+                        <td><span class="status status-wip">In Arbeit</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bland AI</strong></td>
+                        <td>KI-Telefonie Plattform</td>
+                        <td><span class="status status-wip">In Arbeit</span></td>
+                        <td><span class="status status-wip">In Arbeit</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="legend">
+                <div class="legend-item"><span class="status status-ok">Produktiv</span> Getestet & stabil</div>
+                <div class="legend-item"><span class="status status-test">Im Test</span> In Testphase</div>
+                <div class="legend-item"><span class="status status-wip">In Arbeit</span> Aktuell in Entwicklung</div>
+                <div class="legend-item"><span class="status status-pending">Geplant</span> Auf der Roadmap</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta" id="contact">
+        <div class="container">
+            <h2>Bereit für KI-Telefonie?</h2>
+            <p>Kontaktieren Sie uns für eine Demo oder individuelle Beratung</p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px;">
+                <a href="tel:+4962149088100" class="btn btn-secondary">+49 621 49088100</a>
+                <a href="mailto:kontakt@insidedynamic.de" class="btn btn-secondary">kontakt@insidedynamic.de</a>
+                <a href="https://github.com/insidedynamic-de/sip_wrapper" class="btn btn-secondary" target="_blank">GitHub Repository</a>
+            </div>
+            <p style="opacity: 0.8; font-size: 0.875rem;">
+                InsideDynamic GmbH &bull; Augustaanlage 67 &bull; 68165 Mannheim
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>InsideDynamic GmbH</h3>
+                    <p>Verbindet Telefonie-Welten. Spezialisiert auf KI-Telefonie-Integration und SIP-Lösungen für den deutschen Markt.</p>
+                    <p>Made in Germany</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Produkt</h4>
+                    <ul>
+                        <li><a href="#solution">Features</a></li>
+                        <li><a href="#integrations">Integrationen</a></li>
+                        <li><a href="https://github.com/insidedynamic-de/sip_wrapper">Dokumentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Integrationen</h4>
+                    <ul>
+                        <li><a href="#integrations">VAPI</a></li>
+                        <li><a href="#integrations">Placetel</a></li>
+                        <li><a href="#integrations">Easybell</a></li>
+                        <li><a href="#integrations">3CX</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Kontakt</h4>
+                    <ul>
+                        <li><a href="mailto:info@insidedynamic.de">E-Mail</a></li>
+                        <li><a href="https://github.com/insidedynamic-de">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2025 InsideDynamic GmbH. Alle Rechte vorbehalten.</span>
+                <span>
+                    <a href="#">Impressum</a> &bull;
+                    <a href="#">Datenschutz</a>
+                </span>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
