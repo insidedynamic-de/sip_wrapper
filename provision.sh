@@ -182,10 +182,20 @@ generate_internal_profile() {
     <param name="accept-blind-auth" value="$blind_auth"/>
     <param name="accept-blind-reg" value="$blind_reg"/>
 
-    <!-- NAT -->
+    <!-- NAT Handling -->
     <param name="apply-nat-acl" value="rfc1918.auto"/>
     <param name="apply-inbound-acl" value="$inbound_acl"/>
     <param name="local-network-acl" value="localnet.auto"/>
+
+    <!-- NAT Traversal - CRITICAL: Fix audio for clients behind NAT -->
+    <!-- Force rport: always use source IP/port from packet, not SIP headers -->
+    <param name="NDLB-force-rport" value="safe"/>
+    <!-- Store actual received IP in registration contact -->
+    <param name="NDLB-received-in-nat-reg-contact" value="true"/>
+    <!-- Fix RTP going to wrong IP: rewrite SDP with detected public IP -->
+    <param name="NDLB-sendrecv-in-session" value="true"/>
+    <!-- Force media through FreeSWITCH - required for NAT traversal -->
+    <param name="inbound-bypass-media" value="false"/>
 
     <!-- Registration -->
     <param name="force-register-domain" value="\$\${domain}"/>
@@ -216,6 +226,12 @@ generate_internal_profile() {
     <!-- Media -->
     <param name="inbound-late-negotiation" value="true"/>
     <param name="inbound-zrtp-passthru" value="true"/>
+
+    <!-- RTP NAT Fix: Handle clients behind NAT properly -->
+    <param name="rtp-autoflush-during-bridge" value="true"/>
+    <param name="rtp-rewrite-timestamps" value="true"/>
+    <param name="rtp-timeout-sec" value="300"/>
+    <param name="rtp-hold-timeout-sec" value="1800"/>
 
     <!-- Debug -->
     <param name="debug" value="${SIP_DEBUG:-0}"/>
