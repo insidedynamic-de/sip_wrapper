@@ -26,6 +26,20 @@ else
 fi
 
 ################################################################################
+# Start Admin Portal
+################################################################################
+
+if [ "$SKIP_ADMIN" != "true" ] && [ -d "/opt/admin" ]; then
+  echo_log "Starting Admin Portal on port ${ADMIN_PORT:-8888}..."
+  cd /opt/admin
+  /opt/admin/venv/bin/python app.py &
+  ADMIN_PID=$!
+  echo_log "Admin Portal started (PID: $ADMIN_PID)"
+else
+  echo_log "Admin Portal skipped"
+fi
+
+################################################################################
 # Start FreeSWITCH
 ################################################################################
 

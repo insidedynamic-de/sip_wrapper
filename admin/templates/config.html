@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">{{ t('config') }}</h4>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-gear me-2"></i>{{ t('environment') }}
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            Diese Werte werden beim Container-Start aus Umgebungsvariablen gelesen.
+            Um Änderungen vorzunehmen, aktualisieren Sie die ENV-Variablen in Coolify und starten Sie den Container neu.
+        </div>
+
+        <form id="config-form">
+            <h6 class="text-muted mb-3">{{ t('license') }}</h6>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">LICENSE_KEY</label>
+                    <input type="text" class="form-control" name="LICENSE_KEY" value="{{ env_vars.LICENSE_KEY }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">CLIENT_NAME</label>
+                    <input type="text" class="form-control" name="CLIENT_NAME" value="{{ env_vars.CLIENT_NAME }}" readonly>
+                </div>
+            </div>
+
+            <h6 class="text-muted mb-3">Netzwerk</h6>
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">FS_DOMAIN</label>
+                    <input type="text" class="form-control" name="FS_DOMAIN" value="{{ env_vars.FS_DOMAIN }}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">EXTERNAL_SIP_IP</label>
+                    <input type="text" class="form-control" name="EXTERNAL_SIP_IP" value="{{ env_vars.EXTERNAL_SIP_IP }}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">EXTERNAL_RTP_IP</label>
+                    <input type="text" class="form-control" name="EXTERNAL_RTP_IP" value="{{ env_vars.EXTERNAL_RTP_IP }}" readonly>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">INTERNAL_SIP_PORT</label>
+                    <input type="text" class="form-control" name="INTERNAL_SIP_PORT" value="{{ env_vars.INTERNAL_SIP_PORT }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">EXTERNAL_SIP_PORT</label>
+                    <input type="text" class="form-control" name="EXTERNAL_SIP_PORT" value="{{ env_vars.EXTERNAL_SIP_PORT }}" readonly>
+                </div>
+            </div>
+
+            <h6 class="text-muted mb-3">{{ t('codecs') }}</h6>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">CODEC_PREFS (Inbound)</label>
+                    <input type="text" class="form-control" name="CODEC_PREFS" value="{{ env_vars.CODEC_PREFS }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">OUTBOUND_CODEC_PREFS</label>
+                    <input type="text" class="form-control" name="OUTBOUND_CODEC_PREFS" value="{{ env_vars.OUTBOUND_CODEC_PREFS }}" readonly>
+                </div>
+            </div>
+
+            <h6 class="text-muted mb-3">{{ t('users') }}</h6>
+            <div class="mb-4">
+                <label class="form-label">USERS</label>
+                <textarea class="form-control" name="USERS" rows="2" readonly>{{ env_vars.USERS }}</textarea>
+                <small class="text-muted">Format: username:password:extension,...</small>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">ACL_USERS</label>
+                <textarea class="form-control" name="ACL_USERS" rows="2" readonly>{{ env_vars.ACL_USERS }}</textarea>
+                <small class="text-muted">Format: username:ip|ip2:extension:callerid,...</small>
+            </div>
+
+            <h6 class="text-muted mb-3">{{ t('gateways') }}</h6>
+            <div class="mb-4">
+                <label class="form-label">GATEWAYS</label>
+                <textarea class="form-control" name="GATEWAYS" rows="2" readonly>{{ env_vars.GATEWAYS }}</textarea>
+                <small class="text-muted">Format: name:host:port:user:pass:register:transport,...</small>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">DEFAULT_GATEWAY</label>
+                    <input type="text" class="form-control" name="DEFAULT_GATEWAY" value="{{ env_vars.DEFAULT_GATEWAY }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">DEFAULT_EXTENSION</label>
+                    <input type="text" class="form-control" name="DEFAULT_EXTENSION" value="{{ env_vars.DEFAULT_EXTENSION }}" readonly>
+                </div>
+            </div>
+        </form>
+
+        <hr>
+
+        <h6 class="text-muted mb-3">FreeSWITCH Befehle</h6>
+        <div class="btn-group">
+            <button class="btn btn-outline-primary" onclick="reloadConfig()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Reload XML
+            </button>
+            <button class="btn btn-outline-secondary" onclick="runCommand('sofia status')">
+                <i class="bi bi-terminal me-1"></i>Sofia Status
+            </button>
+            <button class="btn btn-outline-secondary" onclick="runCommand('show channels')">
+                <i class="bi bi-telephone me-1"></i>Show Channels
+            </button>
+        </div>
+
+        <div id="command-output" class="mt-3 d-none">
+            <label class="form-label">Output:</label>
+            <pre class="bg-dark text-light p-3 rounded" style="max-height: 300px; overflow: auto;"></pre>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function reloadConfig() {
+    fetch('/api/reload', {method: 'POST'})
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                alert('Configuration reloaded successfully!');
+            } else {
+                alert('Error: ' + data.error);
+            }
+        });
+}
+
+function runCommand(cmd) {
+    fetch('/api/fs-cli', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({command: cmd})
+    })
+    .then(r => r.json())
+    .then(data => {
+        const outputDiv = document.getElementById('command-output');
+        const pre = outputDiv.querySelector('pre');
+        if (data.success) {
+            pre.textContent = data.output || 'No output';
+            outputDiv.classList.remove('d-none');
+        } else {
+            pre.textContent = 'Error: ' + data.error;
+            outputDiv.classList.remove('d-none');
+        }
+    });
+}
+</script>
+{% endblock %}

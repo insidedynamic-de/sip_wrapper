@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('title') }} - {{ t('login') }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --dark: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, #334155 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header .icon {
+            width: 64px;
+            height: 64px;
+            background: var(--primary);
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .login-header .icon i {
+            font-size: 28px;
+            color: white;
+        }
+
+        .login-header h4 {
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .login-header p {
+            color: #64748b;
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .alert {
+            border-radius: 8px;
+        }
+
+        .lang-switch {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+        }
+
+        .lang-switch .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <div class="icon">
+                <i class="bi bi-telephone-fill"></i>
+            </div>
+            <h4>InsideDynamic Wrapper</h4>
+            <p>Admin Portal</p>
+        </div>
+
+        <div id="error-alert" class="alert alert-danger d-none"></div>
+
+        <form id="login-form">
+            <div class="mb-3">
+                <label class="form-label">{{ t('username') }}</label>
+                <input type="text" class="form-control" name="username" required autofocus>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">{{ t('password') }}</label>
+                <input type="password" class="form-control" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-box-arrow-in-right me-2"></i>{{ t('login') }}
+            </button>
+        </form>
+
+        <div class="footer-text">
+            &copy; 2025 InsideDynamic GmbH
+        </div>
+    </div>
+
+    <div class="lang-switch btn-group">
+        <button type="button" class="btn btn-sm {% if lang == 'de' %}btn-light{% else %}btn-outline-light{% endif %}" onclick="setLang('de')">DE</button>
+        <button type="button" class="btn btn-sm {% if lang == 'en' %}btn-light{% else %}btn-outline-light{% endif %}" onclick="setLang('en')">EN</button>
+    </div>
+
+    <script>
+        function setLang(lang) {
+            fetch('/api/set-lang', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({lang: lang})
+            }).then(() => location.reload());
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('/login', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    const alert = document.getElementById('error-alert');
+                    alert.textContent = data.error || 'Login failed';
+                    alert.classList.remove('d-none');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

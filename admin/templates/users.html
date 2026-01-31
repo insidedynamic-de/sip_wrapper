@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">{{ t('users') }}</h4>
+    <button class="btn btn-outline-primary btn-sm" onclick="location.reload()">
+        <i class="bi bi-arrow-clockwise me-1"></i>{{ t('reload') }}
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-people me-2"></i>{{ t('user_registrations') }}
+    </div>
+    <div class="card-body p-0">
+        {% if registrations %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>{{ t('contact') }}</th>
+                        <th>{{ t('user_agent') }}</th>
+                        <th>{{ t('status') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in registrations %}
+                    <tr>
+                        <td>
+                            <strong>{{ reg.user or '-' }}</strong>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ reg.contact or '-' }}</small>
+                        </td>
+                        <td>
+                            <small>{{ reg.agent or '-' }}</small>
+                        </td>
+                        <td>
+                            <span class="status-badge status-online">
+                                <i class="bi bi-check-circle me-1"></i>{{ t('registered') }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-5 text-center text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+            <h5>Keine Benutzer registriert</h5>
+            <p class="mb-0">SIP-Clients können sich über das Internal Profile (Port 5060) registrieren.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="bi bi-info-circle me-2"></i>Benutzer Konfiguration
+    </div>
+    <div class="card-body">
+        <h6 class="mb-3">Authentifizierte Benutzer (USERS)</h6>
+        <pre class="bg-light p-3 rounded"><code>USERS=alice:SecretPass123:1001,bob:SecretPass456:1002</code></pre>
+        <p class="text-muted">Format: <code>username:password:extension</code></p>
+
+        <hr>
+
+        <h6 class="mb-3">IP-basierte Benutzer (ACL_USERS)</h6>
+        <pre class="bg-light p-3 rounded"><code>ACL_USERS=vapi:192.168.1.100|10.0.0.5:9000:+4932221803986</code></pre>
+        <p class="text-muted mb-0">Format: <code>username:ip|ip2:extension:callerid</code></p>
+    </div>
+</div>
+{% endblock %}

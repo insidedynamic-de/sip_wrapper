@@ -60,6 +60,12 @@ services:
       - SIP_DEBUG=${SIP_DEBUG:-0}
       - SIP_TRACE=${SIP_TRACE:-no}
 
+      # ADMIN PORTAL
+      - ADMIN_PORT=${ADMIN_PORT:-8888}
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASS=${ADMIN_PASS:-admin}
+      - SKIP_ADMIN=${SKIP_ADMIN:-false}
+
     # Use host network for best SIP/RTP compatibility
     network_mode: host
 
@@ -127,5 +133,12 @@ volumes:
 # SIP_USER_AGENT=InsideDynamic-Wrapper
 # SIP_DEBUG=0
 # SIP_TRACE=no
+#
+# ADMIN PORTAL:
+# -------------
+# ADMIN_PORT=8888
+# ADMIN_USER=admin
+# ADMIN_PASS=changeme
+# SKIP_ADMIN=false
 #
 ################################################################################

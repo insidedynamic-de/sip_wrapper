@@ -26,6 +26,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     lsb-release \
     curl \
+    python3 \
+    python3-pip \
+    python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 # Add SignalWire repository and install FreeSWITCH
@@ -63,6 +66,15 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/provision.sh /usr/local/bin/docker-entrypoint.sh
 
 ################################################################################
+# Install Admin Portal
+################################################################################
+
+COPY admin /opt/admin
+
+RUN python3 -m venv /opt/admin/venv && \
+    /opt/admin/venv/bin/pip install --no-cache-dir -r /opt/admin/requirements.txt
+
+################################################################################
 # Ports (documented for Coolify)
 ################################################################################
 
@@ -75,6 +87,9 @@ EXPOSE 16384-32768/udp
 
 # Event Socket (optional, for management)
 EXPOSE 8021/tcp
+
+# Admin Portal
+EXPOSE 8888/tcp
 
 ################################################################################
 # Health check
