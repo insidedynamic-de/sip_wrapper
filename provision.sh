@@ -614,7 +614,8 @@ generate_local_extensions_dialplan() {
     <!-- Route calls to local extensions (1000-1999) -->
     <extension name="local_extensions">
       <condition field="destination_number" expression="^(1[0-9]{3})$">
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="set" data="continue_on_fail=true"/>
         <action application="bridge" data="sofia/internal/${destination_number}@${domain_name}"/>
@@ -669,7 +670,8 @@ EOF
       <condition field="destination_number" expression="^(\+|00)(.+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway/\$1\$2"/>
       </condition>
@@ -681,7 +683,8 @@ EOF
       <condition field="destination_number" expression="^($country_code[1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway/+\$1"/>
       </condition>
@@ -693,7 +696,8 @@ EOF
       <condition field="destination_number" expression="^0([1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway/+$country_code\$1"/>
       </condition>
@@ -705,7 +709,8 @@ EOF
       <condition field="destination_number" expression="^([1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway/+$country_code\$1"/>
       </condition>
@@ -772,7 +777,8 @@ EOF
       fi
 
       cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway/$dial_number"/>
       </condition>
@@ -798,7 +804,8 @@ EOF
       <condition field="destination_number" expression="^(\+|00)(.+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/\$1\$2"/>
       </condition>
@@ -809,7 +816,8 @@ EOF
       <condition field="destination_number" expression="^($country_code[1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+\$1"/>
       </condition>
@@ -820,7 +828,8 @@ EOF
       <condition field="destination_number" expression="^0([1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+$country_code\$1"/>
       </condition>
@@ -831,7 +840,8 @@ EOF
       <condition field="destination_number" expression="^([1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+$country_code\$1"/>
       </condition>
@@ -893,7 +903,8 @@ EOF
     <extension name="$ext_name">
       <condition field="$condition_field" expression="$condition_expr">
         <action application="set" data="domain_name=\$\${domain}"/>
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway_name/\$1"/>
       </condition>
@@ -931,7 +942,8 @@ EOF
     <extension name="inbound_default">
       <condition field="destination_number" expression="^(.+)\$">
         <action application="set" data="domain_name=\$\${domain}"/>
-        <action application="set" data="rtp_auto_adjust=true"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway_name/\$1"/>
       </condition>
