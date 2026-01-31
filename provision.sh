@@ -223,6 +223,12 @@ generate_internal_profile() {
     <param name="disable-register" value="false"/>
     <param name="disable-transfer" value="false"/>
     <param name="manual-redirect" value="false"/>
+    <!-- Custom User-Agent: hide FreeSWITCH identity -->
+    <param name="user-agent-string" value="${SIP_USER_AGENT:-SIP-Gateway}"/>
+
+    <!-- Caller ID Passthrough - show original client info -->
+    <param name="pass-callee-id" value="true"/>
+    <param name="caller-id-type" value="rpid"/>
 
     <!-- Media -->
     <param name="inbound-late-negotiation" value="true"/>
@@ -301,10 +307,16 @@ generate_external_profile() {
     <param name="disable-register" value="false"/>
     <param name="disable-transfer" value="false"/>
     <param name="manual-redirect" value="false"/>
+    <!-- Custom User-Agent: hide FreeSWITCH identity -->
+    <param name="user-agent-string" value="${SIP_USER_AGENT:-SIP-Gateway}"/>
 
     <!-- Media -->
     <param name="inbound-late-negotiation" value="true"/>
     <param name="inbound-zrtp-passthru" value="true"/>
+
+    <!-- Caller ID Passthrough - show original client info, not FreeSWITCH -->
+    <param name="pass-callee-id" value="true"/>
+    <param name="caller-id-type" value="rpid"/>
 
     <!-- Debug -->
     <param name="debug" value="${SIP_DEBUG:-0}"/>
