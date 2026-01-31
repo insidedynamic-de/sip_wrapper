@@ -195,6 +195,8 @@ generate_internal_profile() {
     <param name="NDLB-received-in-nat-reg-contact" value="true"/>
     <!-- Fix RTP going to wrong IP: rewrite SDP with detected public IP -->
     <param name="NDLB-sendrecv-in-session" value="true"/>
+    <!-- Force symmetric RTP: always send to where packets come from -->
+    <param name="NDLB-connectile-dysfunction" value="true"/>
     <!-- Force media through FreeSWITCH - required for NAT traversal -->
     <param name="inbound-bypass-media" value="false"/>
 
