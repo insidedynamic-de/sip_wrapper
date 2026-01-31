@@ -395,6 +395,7 @@ EOF
 ################################################################################
 # Generate ACL Users (no authentication, IP-based)
 # Format: ACL_USERS="user1:192.168.1.100:1001:+4932221803986,user2:192.168.1.101:1002"
+# Multiple IPs: ACL_USERS="user1:192.168.1.100|192.168.1.101|10.0.0.5:1001:+4932221803986"
 # Caller ID is optional
 ################################################################################
 
@@ -422,9 +423,9 @@ EOF
   IFS=',' read -ra ACL_ARRAY <<< "$ACL_USERS"
 
   for acl_entry in "${ACL_ARRAY[@]}"; do
-    IFS=':' read -r username ip extension caller_id <<< "$acl_entry"
+    IFS=':' read -r username ip_list extension caller_id <<< "$acl_entry"
 
-    if [ -z "$username" ] || [ -z "$ip" ]; then
+    if [ -z "$username" ] || [ -z "$ip_list" ]; then
       echo_log "WARNING: Invalid ACL entry: $acl_entry (skipping)"
       continue
     fi
@@ -436,22 +437,34 @@ EOF
       caller_id="${OUTBOUND_CALLER_ID:-$extension}"
     fi
 
-    echo_log "Creating ACL user: $username (IP: $ip, extension: $extension, caller_id: $caller_id)"
+    # Parse multiple IPs separated by | (pipe)
+    IFS='|' read -ra IP_ARRAY <<< "$ip_list"
+    local ip_count=${#IP_ARRAY[@]}
 
-    # Add to ACL (support both single IP and CIDR notation)
-    # If IP already contains /, use as-is (CIDR). Otherwise add /32 (single IP)
-    if [[ "$ip" == *"/"* ]]; then
-      local cidr="$ip"
+    if [ $ip_count -gt 1 ]; then
+      echo_log "Creating ACL user: $username ($ip_count IPs, extension: $extension, caller_id: $caller_id)"
     else
-      local cidr="$ip/32"
+      echo_log "Creating ACL user: $username (IP: $ip_list, extension: $extension, caller_id: $caller_id)"
     fi
 
-    # Add IP to common ACL list
-    cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<EOF
+    # Add each IP to ACL (support both single IP and CIDR notation)
+    for ip in "${IP_ARRAY[@]}"; do
+      # If IP already contains /, use as-is (CIDR). Otherwise add /32 (single IP)
+      if [[ "$ip" == *"/"* ]]; then
+        local cidr="$ip"
+      else
+        local cidr="$ip/32"
+      fi
+
+      echo_log "  Adding IP to ACL: $cidr"
+
+      # Add IP to common ACL list
+      cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<EOF
       <node type="allow" cidr="$cidr"/>
 EOF
+    done
 
-    # Create user directory entry without password
+    # Create user directory entry without password (one user for all IPs)
     cat > "$FS_CONF/directory/default/$username.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <include>
