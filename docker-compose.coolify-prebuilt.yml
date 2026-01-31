@@ -27,16 +27,21 @@ services:
         # Enable verbose mode if DEBUG=true
         if [ "$DEBUG" = "true" ]; then
           set -x
-          echo "=========================================="
-          echo "FreeSWITCH Coolify - Pre-built Image (DEBUG MODE)"
-          echo "Start time: $$(date)"
-          echo "=========================================="
-        else
-          echo "=========================================="
-          echo "FreeSWITCH Coolify - Pre-built Image"
-          echo "Start time: $$(date)"
-          echo "=========================================="
         fi
+
+        # Show banner
+        echo ""
+        echo "================================================================================"
+        if [ -n "$CLIENT_NAME" ]; then
+          echo "  InsideDynamic Wrapper - ($LICENSE_KEY) für $CLIENT_NAME"
+        else
+          echo "  InsideDynamic Wrapper - ($LICENSE_KEY)"
+        fi
+        echo "================================================================================"
+        echo "  https://github.com/insidedynamic-de/sip_wrapper"
+        echo "  (c) 2025 InsideDynamic GmbH - Mannheim, Germany"
+        echo "================================================================================"
+        echo ""
 
         # Validate ENV
         echo "[STEP 1/6] Validating environment variables..."
@@ -142,6 +147,10 @@ services:
         exec /usr/bin/freeswitch -nonat -nf -nc
 
     environment:
+      # LICENSE
+      LICENSE_KEY: ${LICENSE_KEY:-UNLICENSED}
+      CLIENT_NAME: ${CLIENT_NAME:-}
+
       # REQUIRED
       FS_DOMAIN: ${FS_DOMAIN}
       EXTERNAL_SIP_IP: ${EXTERNAL_SIP_IP}
@@ -162,6 +171,8 @@ services:
       RTP_START_PORT: ${RTP_START_PORT:-16384}
       RTP_END_PORT: ${RTP_END_PORT:-32768}
       CODEC_PREFS: ${CODEC_PREFS:-PCMU,PCMA,G729,opus}
+      OUTBOUND_CODEC_PREFS: ${OUTBOUND_CODEC_PREFS:-}
+      SIP_USER_AGENT: ${SIP_USER_AGENT:-InsideDynamic-Wrapper}
       SIP_DEBUG: ${SIP_DEBUG:-0}
       SIP_TRACE: ${SIP_TRACE:-no}
 
