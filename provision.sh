@@ -234,9 +234,11 @@ generate_internal_profile() {
     <param name="pass-callee-id" value="true"/>
     <param name="caller-id-type" value="rpid"/>
 
-    <!-- Media -->
-    <param name="inbound-late-negotiation" value="true"/>
+    <!-- Media - disable late negotiation to establish RTP earlier -->
+    <param name="inbound-late-negotiation" value="false"/>
     <param name="inbound-zrtp-passthru" value="true"/>
+    <!-- Force symmetric RTP for NAT -->
+    <param name="enable-soa" value="true"/>
 
     <!-- RTP NAT Fix: Handle clients behind NAT properly -->
     <param name="rtp-autoflush-during-bridge" value="true"/>
@@ -381,6 +383,11 @@ generate_users() {
       <variable name="effective_caller_id_name" value="$username"/>
       <variable name="outbound_caller_id_number" value="$caller_id"/>
       <variable name="outbound_caller_id_name" value="$username"/>
+      <!-- NAT Traversal - applied to ALL calls from this user -->
+      <variable name="rtp_auto_adjust" value="true"/>
+      <variable name="sip_comedia" value="true"/>
+      <variable name="bypass_media" value="false"/>
+      <variable name="sip_nat_detected" value="true"/>
     </variables>
   </user>
 </include>
