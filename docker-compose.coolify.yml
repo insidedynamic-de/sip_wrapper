@@ -23,6 +23,10 @@ services:
 
     # Environment variables (set these in Coolify UI)
     environment:
+      # LICENSE - InsideDynamic Wrapper license info
+      - LICENSE_KEY=${LICENSE_KEY:-UNLICENSED}
+      - CLIENT_NAME=${CLIENT_NAME:-}
+
       # REQUIRED - set in Coolify UI
       - FS_DOMAIN=${FS_DOMAIN}
       - EXTERNAL_SIP_IP=${EXTERNAL_SIP_IP}
@@ -79,6 +83,11 @@ volumes:
 ################################################################################
 # COOLIFY ENVIRONMENT VARIABLES (set in Coolify UI)
 ################################################################################
+#
+# LICENSE:
+# --------
+# LICENSE_KEY=your-license-key
+# CLIENT_NAME=Kunde GmbH
 #
 # REQUIRED:
 # ---------

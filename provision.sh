@@ -36,6 +36,28 @@ error_exit() {
 }
 
 ################################################################################
+# Banner
+################################################################################
+
+show_banner() {
+  local license="${LICENSE_KEY:-UNLICENSED}"
+  local client="${CLIENT_NAME:-}"
+
+  echo ""
+  echo "================================================================================"
+  if [ -n "$client" ]; then
+    echo "  InsideDynamic Wrapper - ($license) für $client"
+  else
+    echo "  InsideDynamic Wrapper - ($license)"
+  fi
+  echo "================================================================================"
+  echo "  https://github.com/insidedynamic-de/sip_wrapper"
+  echo "  (c) 2025 InsideDynamic GmbH - Mannheim, Germany"
+  echo "================================================================================"
+  echo ""
+}
+
+################################################################################
 # Validation
 ################################################################################
 
@@ -1137,6 +1159,7 @@ show_summary() {
 ################################################################################
 
 main() {
+  show_banner
   echo_log "Starting FreeSWITCH provisioning..."
 
   validate_config
