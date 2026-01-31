@@ -152,10 +152,12 @@ generate_internal_profile() {
   echo_log "Generating internal SIP profile..."
 
   # Determine ACL list and blind auth based on whether ACL_USERS is defined
+  # blind_auth/blind_reg = false means FreeSWITCH requires valid user in directory
+  # ACL_USERS are authenticated by IP via ACL, not by password
   if [ -n "$ACL_USERS" ]; then
     local inbound_acl="domains,acl_users"
-    local blind_auth="true"
-    local blind_reg="true"
+    local blind_auth="false"
+    local blind_reg="false"
   else
     local inbound_acl="domains"
     local blind_auth="false"
