@@ -58,6 +58,33 @@ show_banner() {
 }
 
 ################################################################################
+# Build User-Agent String
+################################################################################
+
+build_user_agent() {
+  # If SIP_USER_AGENT is already set by user, use it as-is
+  if [ -n "$SIP_USER_AGENT" ] && [ "$SIP_USER_AGENT" != "InsideDynamic-Wrapper" ]; then
+    echo_log "Using custom SIP User-Agent: $SIP_USER_AGENT"
+    return
+  fi
+
+  # Build User-Agent like banner: InsideDynamic-Wrapper-(LICENSE_KEY) or InsideDynamic-Wrapper-(LICENSE_KEY)-CLIENT_NAME
+  local license="${LICENSE_KEY:-UNLICENSED}"
+  local client="${CLIENT_NAME:-}"
+
+  if [ -n "$client" ]; then
+    # Replace spaces with underscores in client name for User-Agent
+    client=$(echo "$client" | tr ' ' '_')
+    SIP_USER_AGENT="InsideDynamic-Wrapper-($license)-$client"
+  else
+    SIP_USER_AGENT="InsideDynamic-Wrapper-($license)"
+  fi
+
+  export SIP_USER_AGENT
+  echo_log "SIP User-Agent: $SIP_USER_AGENT"
+}
+
+################################################################################
 # Validation
 ################################################################################
 
@@ -250,7 +277,7 @@ generate_internal_profile() {
     <param name="disable-transfer" value="false"/>
     <param name="manual-redirect" value="false"/>
     <!-- Custom User-Agent: hide FreeSWITCH identity -->
-    <param name="user-agent-string" value="${SIP_USER_AGENT:-InsideDynamic-Wrapper}"/>
+    <param name="user-agent-string" value="$SIP_USER_AGENT"/>
 
     <!-- Caller ID Passthrough - show original client info -->
     <param name="pass-callee-id" value="true"/>
@@ -336,7 +363,7 @@ generate_external_profile() {
     <param name="disable-transfer" value="false"/>
     <param name="manual-redirect" value="false"/>
     <!-- Custom User-Agent: hide FreeSWITCH identity -->
-    <param name="user-agent-string" value="${SIP_USER_AGENT:-InsideDynamic-Wrapper}"/>
+    <param name="user-agent-string" value="$SIP_USER_AGENT"/>
 
     <!-- Media -->
     <param name="inbound-late-negotiation" value="true"/>
@@ -1160,6 +1187,7 @@ show_summary() {
 
 main() {
   show_banner
+  build_user_agent
   echo_log "Starting FreeSWITCH provisioning..."
 
   validate_config
