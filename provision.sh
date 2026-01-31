@@ -643,6 +643,7 @@ generate_local_extensions_dialplan() {
     <!-- Route calls to local extensions (1000-1999) -->
     <extension name="local_extensions">
       <condition field="destination_number" expression="^(1[0-9]{3})$">
+        <!-- NAT Traversal: use real IP from SIP packets, not SDP -->
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
@@ -699,8 +700,10 @@ EOF
       <condition field="destination_number" expression="^(\+|00)(.+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <!-- NAT Traversal: ignore SDP address, use real IP from SIP packets -->
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
+        <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway/\$1\$2"/>
       </condition>
@@ -712,8 +715,10 @@ EOF
       <condition field="destination_number" expression="^($country_code[1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <!-- NAT Traversal: ignore SDP address, use real IP from SIP packets -->
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
+        <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway/+\$1"/>
       </condition>
@@ -725,8 +730,10 @@ EOF
       <condition field="destination_number" expression="^0([1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <!-- NAT Traversal: ignore SDP address, use real IP from SIP packets -->
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
+        <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway/+$country_code\$1"/>
       </condition>
@@ -738,8 +745,10 @@ EOF
       <condition field="destination_number" expression="^([1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <!-- NAT Traversal: ignore SDP address, use real IP from SIP packets -->
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
+        <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway/+$country_code\$1"/>
       </condition>
@@ -806,8 +815,10 @@ EOF
       fi
 
       cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
+        <!-- NAT Traversal: ignore SDP address, use real IP from SIP packets -->
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
+        <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$gateway/$dial_number"/>
       </condition>
@@ -833,8 +844,10 @@ EOF
       <condition field="destination_number" expression="^(\+|00)(.+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <!-- NAT Traversal: ignore SDP address, use real IP from SIP packets -->
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
+        <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/\$1\$2"/>
       </condition>
@@ -845,8 +858,10 @@ EOF
       <condition field="destination_number" expression="^($country_code[1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <!-- NAT Traversal: ignore SDP address, use real IP from SIP packets -->
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
+        <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+\$1"/>
       </condition>
@@ -857,8 +872,10 @@ EOF
       <condition field="destination_number" expression="^0([1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <!-- NAT Traversal: ignore SDP address, use real IP from SIP packets -->
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
+        <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+$country_code\$1"/>
       </condition>
@@ -869,8 +886,10 @@ EOF
       <condition field="destination_number" expression="^([1-9][0-9]+)\$">
         <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
         <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <!-- NAT Traversal: ignore SDP address, use real IP from SIP packets -->
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
+        <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+$country_code\$1"/>
       </condition>
