@@ -992,6 +992,20 @@ EOF
 
       local ext_name="inbound_${gateway}"
 
+      # Look up gateway host from GATEWAYS variable for registration-based matching
+      local inbound_gw_host=""
+      if [ -n "$GATEWAYS" ]; then
+        IFS=',' read -ra GW_LOOKUP_ARRAY <<< "$GATEWAYS"
+        for gw_lookup_entry in "${GW_LOOKUP_ARRAY[@]}"; do
+          IFS=':' read -r lookup_name lookup_host lookup_rest <<< "$gw_lookup_entry"
+          if [ "$lookup_name" = "$gateway" ]; then
+            inbound_gw_host="$lookup_host"
+            echo_log "  Found gateway host: $inbound_gw_host"
+            break
+          fi
+        done
+      fi
+
       # Check if extension is a gateway reference (format: gateway@gateway_name)
       if [[ "$extension" =~ ^gateway@(.+)$ ]]; then
         local out_gateway="${BASH_REMATCH[1]}"
@@ -1011,10 +1025,10 @@ EOF
     </extension>
 EOF
       else
-        # Regular extension transfer
+        # Regular extension transfer - first the gw= parameter match
         cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
 
-    <!-- Inbound: gateway $gateway -> extension $extension -->
+    <!-- Inbound: gateway $gateway -> extension $extension (via gw= parameter) -->
     <extension name="$ext_name">
       <condition field="\${sip_req_params}" expression="(^|;)gw=${gateway}($|;)">
         <action application="set" data="domain_name=\$\${domain}"/>
@@ -1022,6 +1036,25 @@ EOF
       </condition>
     </extension>
 EOF
+
+        # Add registration-based matching if we found the gateway host
+        if [ -n "$inbound_gw_host" ]; then
+          echo_log "  Adding registration-based matching for host: $inbound_gw_host"
+          cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
+
+    <!-- Inbound: gateway $gateway -> extension $extension (via registered gateway) -->
+    <!-- This handles calls from PBX systems (like 3CX) that send to registered contact without gw= param -->
+    <!-- Matches on sip_from_host containing gateway host domain -->
+    <extension name="${ext_name}_via_registration">
+      <condition field="\${sip_from_host}" expression="$inbound_gw_host" break="on-false"/>
+      <condition field="destination_number" expression="^(.+)$">
+        <action application="set" data="domain_name=\$\${domain}"/>
+        <action application="log" data="INFO Inbound from registered gateway $gateway (host $inbound_gw_host) to extension $extension"/>
+        <action application="transfer" data="$extension XML default"/>
+      </condition>
+    </extension>
+EOF
+        fi
       fi
 
       route_count=$((route_count + 1))
