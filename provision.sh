@@ -1001,7 +1001,7 @@ EOF
 
     <!-- Inbound: gateway $gateway -> outbound gateway $out_gateway -->
     <extension name="$ext_name">
-      <condition field="\${sip_req_params}" expression="^gw=${gateway}$">
+      <condition field="\${sip_req_params}" expression="(^|;)gw=${gateway}($|;)">
         <action application="set" data="domain_name=\$\${domain}"/>
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
@@ -1016,7 +1016,7 @@ EOF
 
     <!-- Inbound: gateway $gateway -> extension $extension -->
     <extension name="$ext_name">
-      <condition field="\${sip_req_params}" expression="^gw=${gateway}$">
+      <condition field="\${sip_req_params}" expression="(^|;)gw=${gateway}($|;)">
         <action application="set" data="domain_name=\$\${domain}"/>
         <action application="transfer" data="$extension XML default"/>
       </condition>
