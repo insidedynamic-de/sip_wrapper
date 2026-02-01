@@ -44,9 +44,10 @@ services:
         echo ""
 
         # Validate ENV
-        echo "[STEP 1/6] Validating environment variables..."
-        if [ -z "$FS_DOMAIN" ] || [ -z "$EXTERNAL_SIP_IP" ] || [ -z "$EXTERNAL_RTP_IP" ] || [ -z "$USERS" ] || [ -z "$GATEWAYS" ]; then
+        echo "[STEP 1/8] Validating environment variables..."
+        if [ -z "$FS_DOMAIN" ] || [ -z "$EXTERNAL_SIP_IP" ] || [ -z "$EXTERNAL_RTP_IP" ]; then
           echo "ERROR: Missing required environment variables!"
+          echo "Required: FS_DOMAIN, EXTERNAL_SIP_IP, EXTERNAL_RTP_IP"
           exit 1
         fi
 
@@ -65,23 +66,22 @@ services:
         fi
 
         echo "✓ Environment validated"
-        echo "  EXTERNAL_SIP_IP: $$EXTERNAL_SIP_IP"
-        echo "  EXTERNAL_RTP_IP: $$EXTERNAL_RTP_IP"
+        echo "  EXTERNAL_SIP_IP: $EXTERNAL_SIP_IP"
+        echo "  EXTERNAL_RTP_IP: $EXTERNAL_RTP_IP"
 
         # Check if FreeSWITCH is installed
         echo ""
-        echo "[STEP 2/6] Checking FreeSWITCH installation..."
+        echo "[STEP 2/8] Checking FreeSWITCH installation..."
         if [ -x /usr/bin/freeswitch ]; then
           echo "✓ FreeSWITCH found"
         else
           echo "ERROR: FreeSWITCH not found in this image!"
-          echo "Image: ghcr.io/patrickbaus/freeswitch-docker:latest"
           exit 1
         fi
 
         # Clean default config
         echo ""
-        echo "[STEP 3/6] Preparing configuration..."
+        echo "[STEP 3/8] Preparing configuration..."
         if [ -d /etc/freeswitch ]; then
           find /etc/freeswitch/dialplan -type f -name "*.xml" -delete 2>/dev/null || true
           find /etc/freeswitch/directory -type f -name "*.xml" -delete 2>/dev/null || true
@@ -92,57 +92,78 @@ services:
           echo "✓ Config directories prepared"
         fi
 
-        # Install bash (needed for provision script)
+        # Install bash and python (needed for provision script and admin portal)
         echo ""
-        echo "[STEP 4/6] Installing bash..."
-        apk add --no-cache bash >/dev/null 2>&1 || {
-          echo "ERROR: Failed to install bash"
+        echo "[STEP 4/8] Installing dependencies..."
+        apk add --no-cache bash python3 py3-pip >/dev/null 2>&1 || {
           echo "Trying with apt-get..."
-          apt-get update -qq && apt-get install -y -qq bash || {
-            echo "ERROR: Cannot install bash on this system"
+          apt-get update -qq && apt-get install -y -qq bash python3 python3-pip python3-venv || {
+            echo "ERROR: Cannot install dependencies"
             exit 1
           }
         }
 
-        # Create /bin/bash symlink if it doesn't exist (Alpine installs to /usr/bin/bash)
+        # Create /bin/bash symlink if it doesn't exist
         if [ ! -e /bin/bash ] && [ -x /usr/bin/bash ]; then
           ln -sf /usr/bin/bash /bin/bash
-          echo "✓ Created /bin/bash symlink"
         fi
-
-        echo "✓ Bash installed"
+        echo "✓ Dependencies installed"
 
         # Download and run provision
         echo ""
-        echo "[STEP 5/6] Running provision script..."
+        echo "[STEP 5/8] Running provision script..."
         wget --no-cache -qO /tmp/provision.sh https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh
         chmod +x /tmp/provision.sh
 
-        # Run with verbose mode if DEBUG=true
         if [ "$DEBUG" = "true" ]; then
-          echo "Running provision.sh with DEBUG mode..."
-          /bin/bash -x /tmp/provision.sh 2>&1 || {
-            EXIT_CODE=$$?
-            echo ""
-            echo "ERROR: Provision failed with exit code $$EXIT_CODE"
-            exit 1
-          }
+          /bin/bash -x /tmp/provision.sh 2>&1 || { echo "ERROR: Provision failed"; exit 1; }
         else
-          /bin/bash /tmp/provision.sh || {
-            EXIT_CODE=$$?
-            echo ""
-            echo "ERROR: Provision failed with exit code $$EXIT_CODE"
-            echo "Set DEBUG=true in environment to see detailed output"
-            exit 1
-          }
+          /bin/bash /tmp/provision.sh || { echo "ERROR: Provision failed"; exit 1; }
         fi
         echo "✓ Provision completed"
 
+        # Install Admin Portal
+        echo ""
+        echo "[STEP 6/8] Installing Admin Portal..."
+        if [ "$SKIP_ADMIN" != "true" ]; then
+          mkdir -p /opt/admin/templates
+
+          # Download admin files
+          wget --no-cache -qO /opt/admin/app.py https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/app.py
+          wget --no-cache -qO /opt/admin/requirements.txt https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/requirements.txt
+          wget --no-cache -qO /opt/admin/templates/base.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/base.html
+          wget --no-cache -qO /opt/admin/templates/login.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/login.html
+          wget --no-cache -qO /opt/admin/templates/dashboard.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/dashboard.html
+          wget --no-cache -qO /opt/admin/templates/config.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/config.html
+          wget --no-cache -qO /opt/admin/templates/gateways.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/gateways.html
+          wget --no-cache -qO /opt/admin/templates/users.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/users.html
+
+          # Install Python dependencies
+          pip3 install --no-cache-dir -q flask gunicorn 2>/dev/null || pip install --no-cache-dir -q flask gunicorn
+
+          echo "✓ Admin Portal installed"
+        else
+          echo "✓ Admin Portal skipped (SKIP_ADMIN=true)"
+        fi
+
+        # Start Admin Portal
+        echo ""
+        echo "[STEP 7/8] Starting Admin Portal..."
+        if [ "$SKIP_ADMIN" != "true" ] && [ -f /opt/admin/app.py ]; then
+          cd /opt/admin
+          python3 app.py &
+          ADMIN_PID=$$!
+          echo "✓ Admin Portal started on port $ADMIN_PORT (PID: $$ADMIN_PID)"
+        else
+          echo "✓ Admin Portal not started"
+        fi
+
         # Start FreeSWITCH
         echo ""
-        echo "[STEP 6/6] Starting FreeSWITCH..."
+        echo "[STEP 8/8] Starting FreeSWITCH..."
         echo "=========================================="
         echo "FreeSWITCH is starting..."
+        echo "Admin Portal: http://localhost:$ADMIN_PORT"
         echo "=========================================="
         exec /usr/bin/freeswitch -nonat -nf -nc
 
@@ -155,8 +176,8 @@ services:
       FS_DOMAIN: ${FS_DOMAIN}
       EXTERNAL_SIP_IP: ${EXTERNAL_SIP_IP}
       EXTERNAL_RTP_IP: ${EXTERNAL_RTP_IP}
-      USERS: ${USERS}
-      GATEWAYS: ${GATEWAYS}
+      USERS: ${USERS:-}
+      GATEWAYS: ${GATEWAYS:-}
 
       # ROUTING
       DEFAULT_GATEWAY: ${DEFAULT_GATEWAY:-}
@@ -175,6 +196,12 @@ services:
       SIP_USER_AGENT: ${SIP_USER_AGENT:-InsideDynamic-Wrapper}
       SIP_DEBUG: ${SIP_DEBUG:-0}
       SIP_TRACE: ${SIP_TRACE:-no}
+
+      # ADMIN PORTAL
+      ADMIN_PORT: ${ADMIN_PORT:-8888}
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASS: ${ADMIN_PASS:-admin}
+      SKIP_ADMIN: ${SKIP_ADMIN:-false}
 
       # DEBUG
       DEBUG: ${DEBUG:-false}
@@ -204,9 +231,14 @@ volumes:
 # ✅ Быстрый запуск (образ уже скомпилирован)
 # ✅ Меньше точек отказа
 # ✅ Работает даже если files.freeswitch.org недоступен
+# ✅ Admin Portal на порту 8888
 #
 # ИСПОЛЬЗОВАНИЕ В COOLIFY:
 # 1. Docker Compose file: docker-compose.coolify-prebuilt.yml
 # 2. Установите ENV переменные
 # 3. Deploy
+#
+# ADMIN PORTAL:
+# URL: http://your-server:8888
+# Login: admin / admin (или ADMIN_USER / ADMIN_PASS)
 ################################################################################
