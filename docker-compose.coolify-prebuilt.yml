@@ -224,11 +224,11 @@ services:
       - freeswitch_backups:/var/backups/freeswitch
 
     healthcheck:
-      test: ["CMD", "sh", "-c", "pgrep -x freeswitch > /dev/null || exit 1"]
+      test: ["CMD", "sh", "-c", "pidof freeswitch || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 180s
+      start_period: 300s
 
 volumes:
   freeswitch_backups:
