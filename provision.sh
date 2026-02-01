@@ -962,8 +962,10 @@ EOF
 }
 
 ################################################################################
-# Generate Inbound Dialplan (DID -> user)
-# Format: INBOUND_ROUTES="DID1:extension1,DID2:extension2,*:1000"
+# Generate Inbound Dialplan (gateway -> extension)
+# Format: INBOUND_ROUTES="gateway1:extension1,gateway2:extension2"
+# Example: INBOUND_ROUTES="fritz-rt:1001,sipgate-rt:1002"
+# Matches on 'gw=' parameter in SIP request URI or destination_number
 ################################################################################
 
 generate_inbound_dialplan() {
@@ -971,6 +973,7 @@ generate_inbound_dialplan() {
 
   cat > "$FS_CONF/dialplan/public/00_inbound.xml" <<'EOF'
 <!-- Inbound dialplan rules - included by public.xml wrapper -->
+<!-- Routes match on 'gw=' parameter from SIP request URI (e.g., gw=fritz-rt) -->
 EOF
 
   if [ -n "$INBOUND_ROUTES" ]; then
@@ -978,41 +981,32 @@ EOF
     IFS=',' read -ra INBOUND_ARRAY <<< "$INBOUND_ROUTES"
 
     for inbound_entry in "${INBOUND_ARRAY[@]}"; do
-      IFS=':' read -r did extension <<< "$inbound_entry"
+      IFS=':' read -r gateway extension <<< "$inbound_entry"
 
-      if [ -z "$did" ] || [ -z "$extension" ]; then
+      if [ -z "$gateway" ] || [ -z "$extension" ]; then
         echo_log "WARNING: Invalid inbound route: $inbound_entry (skipping)"
         continue
       fi
 
-      echo_log "Creating inbound route: DID $did -> extension $extension"
+      echo_log "Creating inbound route: gateway $gateway -> extension $extension"
 
-      # Handle wildcard DID
-      if [ "$did" = "*" ]; then
-        local condition_field="destination_number"
-        local condition_expr="^(.+)\$"
-        local ext_name="inbound_catchall"
-      else
-        local condition_field="destination_number"
-        local condition_expr="^($did)\$"
-        local ext_name="inbound_${did}"
-      fi
+      local ext_name="inbound_${gateway}"
 
       # Check if extension is a gateway reference (format: gateway@gateway_name)
       if [[ "$extension" =~ ^gateway@(.+)$ ]]; then
-        local gateway_name="${BASH_REMATCH[1]}"
-        echo_log "  Routing to gateway: $gateway_name"
+        local out_gateway="${BASH_REMATCH[1]}"
+        echo_log "  Routing to gateway: $out_gateway"
 
         cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
 
-    <!-- Inbound: $did -> gateway $gateway_name -->
+    <!-- Inbound: gateway $gateway -> outbound gateway $out_gateway -->
     <extension name="$ext_name">
-      <condition field="$condition_field" expression="$condition_expr">
+      <condition field="\${sip_req_params}" expression="^gw=${gateway}$">
         <action application="set" data="domain_name=\$\${domain}"/>
         <action application="export" data="rtp_auto_adjust=true"/>
         <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
-        <action application="bridge" data="sofia/gateway/$gateway_name/\$1"/>
+        <action application="bridge" data="sofia/gateway/$out_gateway/\${destination_number}"/>
       </condition>
     </extension>
 EOF
@@ -1020,9 +1014,9 @@ EOF
         # Regular extension transfer
         cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
 
-    <!-- Inbound: $did -> extension $extension -->
+    <!-- Inbound: gateway $gateway -> extension $extension -->
     <extension name="$ext_name">
-      <condition field="$condition_field" expression="$condition_expr">
+      <condition field="\${sip_req_params}" expression="^gw=${gateway}$">
         <action application="set" data="domain_name=\$\${domain}"/>
         <action application="transfer" data="$extension XML default"/>
       </condition>
