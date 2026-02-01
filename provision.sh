@@ -591,8 +591,9 @@ EOF
 
 ################################################################################
 # Generate Gateways
-# Format: GATEWAYS="gw1:provider.com:5060:username:password:true:udp:+4932221803986,gw2:..."
-# Fields: name:host:port:username:password:register:transport:caller_id (caller_id is optional)
+# Format: GATEWAYS="type:name:host:port:user:pass:register:transport:auth_user,..."
+# Fields: type:name:host:port:username:password:register:transport:auth_user
+# Types: sip (default), 3cx, pbx, nebenstelle
 ################################################################################
 
 generate_gateways() {
@@ -607,9 +608,9 @@ generate_gateways() {
   IFS=',' read -ra GW_ARRAY <<< "$GATEWAYS"
 
   for gw_entry in "${GW_ARRAY[@]}"; do
-    IFS=':' read -r gw_name gw_host gw_port gw_user gw_pass gw_register gw_transport gw_auth_user <<< "$gw_entry"
+    IFS=':' read -r gw_type gw_name gw_host gw_port gw_user gw_pass gw_register gw_transport gw_auth_user <<< "$gw_entry"
 
-    if [ -z "$gw_name" ] || [ -z "$gw_host" ]; then
+    if [ -z "$gw_type" ] || [ -z "$gw_name" ] || [ -z "$gw_host" ]; then
       echo_log "WARNING: Invalid gateway entry: $gw_entry (skipping)"
       continue
     fi
@@ -625,9 +626,9 @@ generate_gateways() {
     fi
 
     if [ -n "$gw_auth_user" ] && [ "$gw_auth_user" != "$gw_user" ]; then
-      echo_log "Creating gateway: $gw_name ($gw_host:$gw_port, user: $gw_user, auth: $gw_auth_user, register: $gw_register)"
+      echo_log "Creating gateway [$gw_type]: $gw_name ($gw_host:$gw_port, user: $gw_user, auth: $gw_auth_user, register: $gw_register)"
     else
-      echo_log "Creating gateway: $gw_name ($gw_host:$gw_port, register: $gw_register)"
+      echo_log "Creating gateway [$gw_type]: $gw_name ($gw_host:$gw_port, register: $gw_register)"
     fi
 
     cat > "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
@@ -995,14 +996,15 @@ EOF
       local ext_name="inbound_${gateway}"
 
       # Look up gateway host from GATEWAYS variable for registration-based matching
+      # Format: type:name:host:port:...
       local inbound_gw_host=""
       if [ -n "$GATEWAYS" ]; then
         IFS=',' read -ra GW_LOOKUP_ARRAY <<< "$GATEWAYS"
         for gw_lookup_entry in "${GW_LOOKUP_ARRAY[@]}"; do
-          IFS=':' read -r lookup_name lookup_host lookup_rest <<< "$gw_lookup_entry"
+          IFS=':' read -r lookup_type lookup_name lookup_host lookup_rest <<< "$gw_lookup_entry"
           if [ "$lookup_name" = "$gateway" ]; then
             inbound_gw_host="$lookup_host"
-            echo_log "  Found gateway host: $inbound_gw_host"
+            echo_log "  Found gateway host: $inbound_gw_host (type: $lookup_type)"
             break
           fi
         done
@@ -1290,14 +1292,15 @@ generate_routing_config_json() {
     local first_gw=true
     IFS=',' read -ra GW_ARRAY <<< "$GATEWAYS"
     for gw_entry in "${GW_ARRAY[@]}"; do
-      IFS=':' read -r gw_name gw_user gw_pass gw_realm gw_proxy gw_register <<< "$gw_entry"
+      # Format: type:name:host:port:user:pass:register:transport:auth_user
+      IFS=':' read -r gw_type gw_name gw_host gw_port gw_user gw_pass gw_register gw_transport gw_auth_user <<< "$gw_entry"
       if [ -n "$gw_name" ]; then
         if [ "$first_gw" = true ]; then
           first_gw=false
         else
           echo ',' >> "$json_file"
         fi
-        printf '    {"name": "%s", "realm": "%s"}' "$gw_name" "${gw_realm:-$gw_name}" >> "$json_file"
+        printf '    {"name": "%s", "type": "%s", "host": "%s"}' "$gw_name" "$gw_type" "$gw_host" >> "$json_file"
       fi
     done
   fi
