@@ -663,122 +663,10 @@
             </div>
 
             <h3 style="margin-bottom: 24px;">SIP Provider & Telefonanlagen</h3>
-            <table class="integration-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Beschreibung</th>
-                        <th>Outbound</th>
-                        <th>Inbound</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Placetel</strong> SIP Trunk</td>
-                        <td>Business SIP Trunk</td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                        <td><span class="status status-wip">In Arbeit</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Placetel</strong> Nebenstelle</td>
-                        <td>Cloud PBX Nebenstelle</td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                        <td><span class="status status-wip">In Arbeit</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Easybell</strong> SIP Trunk</td>
-                        <td>Business SIP Trunk</td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Easybell</strong> Nebenstelle</td>
-                        <td>Cloud Nebenstelle</td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Sipgate</strong> SIP Trunk</td>
-                        <td>Business SIP Trunk</td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Zadarma</strong> SIP Trunk</td>
-                        <td>Internationaler SIP Trunk</td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Fritzbox</strong></td>
-                        <td>Vodafone Cable Business</td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>3CX</strong></td>
-                        <td>Cloud / On-Premise PBX</td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                        <td><span class="status status-test">Im Test</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Sipgate</strong> Nebenstelle</td>
-                        <td>Cloud Nebenstelle</td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                        <td><span class="status status-wip">In Arbeit</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Agfeo</strong> SIP Trunk</td>
-                        <td>Cloud / On-Premise PBX</td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                        <td><span class="status status-wip">In Arbeit</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>NFON</strong></td>
-                        <td>Cloud PBX</td>
-                        <td><span class="status status-pending">Geplant</span></td>
-                        <td><span class="status status-pending">Geplant</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Telekom</strong></td>
-                        <td>DeutschlandLAN / Company Flex</td>
-                        <td><span class="status status-pending">Geplant</span></td>
-                        <td><span class="status status-pending">Geplant</span></td>
-                    </tr>
-                </tbody>
-            </table>
+            <div id="providers-table">Laden...</div>
 
             <h3 style="margin: 48px 0 24px;">KI-Plattformen</h3>
-            <table class="integration-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Beschreibung</th>
-                        <th>Outbound</th>
-                        <th>Inbound</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>VAPI</strong></td>
-                        <td>KI-Telefonie Plattform</td>
-                        <td><span class="status status-ok">Produktiv</span></td>
-                        <td><span class="status status-wip">In Arbeit</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Retell</strong></td>
-                        <td>KI-Telefonie Plattform</td>
-                        <td><span class="status status-wip">In Arbeit</span></td>
-                        <td><span class="status status-wip">In Arbeit</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Bland AI</strong></td>
-                        <td>KI-Telefonie Plattform</td>
-                        <td><span class="status status-wip">In Arbeit</span></td>
-                        <td><span class="status status-wip">In Arbeit</span></td>
-                    </tr>
-                </tbody>
-            </table>
+            <div id="ai-platforms-table">Laden...</div>
 
             <div class="legend">
                 <div class="legend-item"><span class="status status-ok">Produktiv</span> Getestet & stabil</div>
@@ -841,7 +729,6 @@
             <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px;">
                 <a href="tel:+4962149088100" class="btn btn-secondary">+49 621 49088100</a>
                 <a href="mailto:kontakt@insidedynamic.de" class="btn btn-secondary">kontakt@insidedynamic.de</a>
-                <a href="https://github.com/insidedynamic-de/sip_wrapper" class="btn btn-secondary" target="_blank">GitHub Repository</a>
             </div>
             <p style="opacity: 0.8; font-size: 0.875rem;">
                 InsideDynamic GmbH &bull; Augustaanlage 67 &bull; 68165 Mannheim
@@ -884,7 +771,7 @@
                     <ul>
                         <li>Geschäftsführer: Viktor Nikolayev</li>
                         <li>USt-IdNr.: DE366416827</li>
-                        <li>HRB 749972 (AG Stuttgart)</li>
+                        <li>HRB 749972 (AG Mannheim)</li>
                     </ul>
                 </div>
             </div>
@@ -898,12 +785,18 @@
         </div>
     </footer>
 
-    <!-- Config Loading Script -->
+    <!-- Integrations Data -->
+    <script src="integrations.js"></script>
+
+    <!-- Main Script -->
     <script>
         // Configuration API URL (change to your deployed URL)
         const CONFIG_API_URL = '/api/config';
 
         async function loadConfig() {
+            // Skip if running from file:// (local testing)
+            if (window.location.protocol === 'file:') return;
+
             try {
                 const response = await fetch(CONFIG_API_URL);
                 if (!response.ok) throw new Error('Config not available');
@@ -974,8 +867,102 @@
             }
         }
 
-        // Load config on page load
-        document.addEventListener('DOMContentLoaded', loadConfig);
+        // Load and render integrations from JS data
+        function loadIntegrations() {
+            const data = window.INTEGRATIONS_DATA;
+            if (!data) {
+                document.getElementById('providers-table').innerHTML = '<p style="color: #999;">Keine Daten</p>';
+                return;
+            }
+
+            const statusLabels = data.status_labels;
+
+            // Helper function to render status badge
+            function renderStatus(status) {
+                const info = statusLabels[status] || {label: status, class: 'status-pending'};
+                return `<span class="status ${info.class}">${info.label}</span>`;
+            }
+
+            // Render Providers table
+            const providersDiv = document.getElementById('providers-table');
+            if (data.providers && data.providers.length > 0) {
+                providersDiv.innerHTML = `
+                    <table class="integration-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Beschreibung</th>
+                                <th colspan="2">Outbound</th>
+                                <th colspan="2">Inbound</th>
+                            </tr>
+                            <tr style="font-size: 0.75rem; color: #666;">
+                                <th></th>
+                                <th></th>
+                                <th>Wrapper</th>
+                                <th>AI</th>
+                                <th>Wrapper</th>
+                                <th>AI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.providers.map(p => `
+                                <tr>
+                                    <td><strong>${p.name}</strong> ${p.type || ''}</td>
+                                    <td>${p.description}</td>
+                                    <td>${renderStatus(p.outbound_wrapper)}</td>
+                                    <td>${renderStatus(p.outbound_ai)}</td>
+                                    <td>${renderStatus(p.inbound_wrapper)}</td>
+                                    <td>${renderStatus(p.inbound_ai)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            // Render AI Platforms table
+            const aiDiv = document.getElementById('ai-platforms-table');
+            if (data.ai_platforms && data.ai_platforms.length > 0) {
+                aiDiv.innerHTML = `
+                    <table class="integration-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Beschreibung</th>
+                                <th colspan="2">Outbound</th>
+                                <th colspan="2">Inbound</th>
+                            </tr>
+                            <tr style="font-size: 0.75rem; color: #666;">
+                                <th></th>
+                                <th></th>
+                                <th>Wrapper</th>
+                                <th>AI</th>
+                                <th>Wrapper</th>
+                                <th>AI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.ai_platforms.map(p => `
+                                <tr>
+                                    <td><strong>${p.name}</strong></td>
+                                    <td>${p.description}</td>
+                                    <td>${renderStatus(p.outbound_wrapper)}</td>
+                                    <td>${renderStatus(p.outbound_ai)}</td>
+                                    <td>${renderStatus(p.inbound_wrapper)}</td>
+                                    <td>${renderStatus(p.inbound_ai)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadIntegrations();
+            loadConfig();
+        });
     </script>
 </body>
 </html>
