@@ -263,11 +263,65 @@ def gateways():
     gateways = parse_gateway_status()
     return render_template('gateways.html', gateways=gateways)
 
+def parse_configured_users():
+    """Parse USERS and ACL_USERS environment variables"""
+    users_list = []
+
+    # Parse USERS (format: username:password:extension,...)
+    users_env = os.environ.get('USERS', '')
+    if users_env:
+        for user_str in users_env.split(','):
+            parts = user_str.strip().split(':')
+            if len(parts) >= 3:
+                users_list.append({
+                    'username': parts[0],
+                    'extension': parts[2],
+                    'type': 'auth',
+                    'ip': None
+                })
+
+    # Parse ACL_USERS (format: username:ip|ip2:extension:callerid,...)
+    acl_users_env = os.environ.get('ACL_USERS', '')
+    if acl_users_env:
+        for user_str in acl_users_env.split(','):
+            parts = user_str.strip().split(':')
+            if len(parts) >= 3:
+                users_list.append({
+                    'username': parts[0],
+                    'extension': parts[2] if len(parts) > 2 else '',
+                    'type': 'acl',
+                    'ip': parts[1] if len(parts) > 1 else ''
+                })
+
+    return users_list
+
 @app.route('/users')
 @login_required
 def users():
     registrations = parse_registrations()
-    return render_template('users.html', registrations=registrations)
+    configured_users = parse_configured_users()
+
+    # Build user list with online/offline status
+    users_with_status = []
+    registered_users = {r.get('user', '').split('@')[0]: r for r in registrations}
+
+    for user in configured_users:
+        username = user['username']
+        is_online = username in registered_users
+        reg_info = registered_users.get(username, {})
+
+        users_with_status.append({
+            'username': username,
+            'extension': user['extension'],
+            'type': user['type'],
+            'ip': user.get('ip'),
+            'online': is_online,
+            'contact': reg_info.get('contact', ''),
+            'agent': reg_info.get('agent', ''),
+            'host': reg_info.get('host', '')
+        })
+
+    return render_template('users.html', users=users_with_status, registrations=registrations)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
