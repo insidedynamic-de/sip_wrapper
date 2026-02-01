@@ -102,10 +102,10 @@ services:
           echo "✓ Config directories prepared"
         fi
 
-        # Install bash and python (needed for provision script and admin portal)
+        # Install bash, python and flask (needed for provision script and admin portal)
         echo ""
         echo "[STEP 4/8] Installing dependencies..."
-        apk add --no-cache bash python3 py3-pip >/dev/null 2>&1 || {
+        apk add --no-cache bash python3 py3-flask py3-gunicorn >/dev/null 2>&1 || {
           echo "Trying with apt-get..."
           apt-get update -qq && apt-get install -y -qq bash python3 python3-pip python3-venv || {
             echo "ERROR: Cannot install dependencies"
@@ -148,10 +148,6 @@ services:
           wget --no-cache -qO /opt/admin/templates/gateways.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/gateways.html
           wget --no-cache -qO /opt/admin/templates/users.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/users.html
 
-          # Install Python dependencies (use venv for Alpine)
-          python3 -m venv /opt/admin/venv
-          /opt/admin/venv/bin/pip install --no-cache-dir -q flask gunicorn
-
           echo "✓ Admin Portal installed"
         else
           echo "✓ Admin Portal skipped (SKIP_ADMIN=true)"
@@ -162,7 +158,7 @@ services:
         echo "[STEP 7/8] Starting Admin Portal..."
         if [ "$SKIP_ADMIN" != "true" ] && [ -f /opt/admin/app.py ]; then
           cd /opt/admin
-          /opt/admin/venv/bin/python app.py &
+          python3 app.py &
           ADMIN_PID=$$!
           echo "✓ Admin Portal started on port $ADMIN_PORT (PID: $$ADMIN_PID)"
         else
