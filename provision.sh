@@ -1178,6 +1178,109 @@ show_summary() {
 }
 
 ################################################################################
+# Generate Routing Config JSON
+################################################################################
+
+generate_routing_config_json() {
+  echo_log "Generating routing config JSON..."
+
+  local json_file="/var/lib/freeswitch/routing_config.json"
+
+  # Start JSON
+  echo '{' > "$json_file"
+
+  # Users array
+  echo '  "users": [' >> "$json_file"
+  if [ -n "$USERS" ]; then
+    local first_user=true
+    IFS=',' read -ra USER_ARRAY <<< "$USERS"
+    for user_entry in "${USER_ARRAY[@]}"; do
+      IFS=':' read -r username password extension <<< "$user_entry"
+      if [ -n "$username" ] && [ -n "$extension" ]; then
+        if [ "$first_user" = true ]; then
+          first_user=false
+        else
+          echo ',' >> "$json_file"
+        fi
+        printf '    {"username": "%s", "extension": "%s"}' "$username" "$extension" >> "$json_file"
+      fi
+    done
+  fi
+  echo '' >> "$json_file"
+  echo '  ],' >> "$json_file"
+
+  # Inbound routes array
+  echo '  "inbound_routes": [' >> "$json_file"
+  if [ -n "$INBOUND_ROUTES" ]; then
+    local first_route=true
+    IFS=',' read -ra INBOUND_ARRAY <<< "$INBOUND_ROUTES"
+    for route in "${INBOUND_ARRAY[@]}"; do
+      IFS=':' read -r gateway extension <<< "$route"
+      if [ -n "$gateway" ] && [ -n "$extension" ]; then
+        if [ "$first_route" = true ]; then
+          first_route=false
+        else
+          echo ',' >> "$json_file"
+        fi
+        printf '    {"gateway": "%s", "extension": "%s"}' "$gateway" "$extension" >> "$json_file"
+      fi
+    done
+  fi
+  echo '' >> "$json_file"
+  echo '  ],' >> "$json_file"
+
+  # Outbound user routes array
+  echo '  "outbound_user_routes": [' >> "$json_file"
+  if [ -n "$OUTBOUND_USER_ROUTES" ]; then
+    local first_route=true
+    IFS=',' read -ra ROUTE_ARRAY <<< "$OUTBOUND_USER_ROUTES"
+    for route in "${ROUTE_ARRAY[@]}"; do
+      IFS=':' read -r username gateway <<< "$route"
+      if [ -n "$username" ] && [ -n "$gateway" ]; then
+        if [ "$first_route" = true ]; then
+          first_route=false
+        else
+          echo ',' >> "$json_file"
+        fi
+        printf '    {"username": "%s", "gateway": "%s"}' "$username" "$gateway" >> "$json_file"
+      fi
+    done
+  fi
+  echo '' >> "$json_file"
+  echo '  ],' >> "$json_file"
+
+  # Gateways array
+  echo '  "gateways": [' >> "$json_file"
+  if [ -n "$GATEWAYS" ]; then
+    local first_gw=true
+    IFS=',' read -ra GW_ARRAY <<< "$GATEWAYS"
+    for gw_entry in "${GW_ARRAY[@]}"; do
+      IFS=':' read -r gw_name gw_user gw_pass gw_realm gw_proxy gw_register <<< "$gw_entry"
+      if [ -n "$gw_name" ]; then
+        if [ "$first_gw" = true ]; then
+          first_gw=false
+        else
+          echo ',' >> "$json_file"
+        fi
+        printf '    {"name": "%s", "realm": "%s"}' "$gw_name" "${gw_realm:-$gw_name}" >> "$json_file"
+      fi
+    done
+  fi
+  echo '' >> "$json_file"
+  echo '  ],' >> "$json_file"
+
+  # Defaults
+  printf '  "default_gateway": "%s",\n' "${DEFAULT_GATEWAY:-}" >> "$json_file"
+  printf '  "default_extension": "%s",\n' "${DEFAULT_EXTENSION:-}" >> "$json_file"
+  printf '  "default_country_code": "%s"\n' "${DEFAULT_COUNTRY_CODE:-49}" >> "$json_file"
+
+  echo '}' >> "$json_file"
+
+  chmod 644 "$json_file"
+  echo_log "Routing config saved to $json_file"
+}
+
+################################################################################
 # Main
 ################################################################################
 
@@ -1202,6 +1305,7 @@ main() {
   generate_outbound_dialplan
   generate_inbound_dialplan
   create_dialplan_wrappers
+  generate_routing_config_json
 
   apply_config
   show_summary

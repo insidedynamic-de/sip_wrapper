@@ -29,7 +29,7 @@
             <div class="col-md-5">
                 <div class="border rounded p-3 bg-light">
                     <h6 class="text-success"><i class="bi bi-telephone-inbound me-2"></i>INBOUND</h6>
-                    <small class="text-muted">Gateway → Extension</small>
+                    <small class="text-muted">SIP Trunk (gw=xxx) → Extension</small>
                     <div class="mt-2">
                         <span class="badge bg-success">external:5080</span>
                         <i class="bi bi-arrow-right mx-2"></i>
@@ -144,27 +144,27 @@
                     </div>
                 </div>
 
-                <!-- DID Routes -->
+                <!-- Gateway Routes -->
                 {% if routing.inbound_routes %}
                 <div class="p-3">
-                    <h6 class="mb-3"><i class="bi bi-telephone-plus me-2"></i>DID Routes</h6>
+                    <h6 class="mb-3"><i class="bi bi-diagram-3 me-2"></i>Gateway Routes</h6>
                     <div class="table-responsive">
                         <table class="table table-sm table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>{{ t('did') }}</th>
+                                    <th>Gateway</th>
                                     <th><i class="bi bi-arrow-right"></i></th>
-                                    <th>{{ t('destination') }}</th>
+                                    <th>{{ t('extension') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for route in routing.inbound_routes %}
                                 <tr>
                                     <td>
-                                        {% if route.did == '*' %}
+                                        {% if route.gateway == '*' %}
                                         <span class="badge bg-warning text-dark">* (catch-all)</span>
                                         {% else %}
-                                        <code>{{ route.did }}</code>
+                                        <span class="badge bg-success">{{ route.gateway }}</span>
                                         {% endif %}
                                     </td>
                                     <td><i class="bi bi-arrow-right text-muted"></i></td>
@@ -172,7 +172,7 @@
                                         {% if route.extension.startswith('gateway@') %}
                                         <span class="badge bg-primary"><i class="bi bi-diagram-3 me-1"></i>{{ route.extension[8:] }}</span>
                                         {% else %}
-                                        <span class="badge bg-success">{{ route.extension }}</span>
+                                        <code>{{ route.extension }}</code>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -219,8 +219,8 @@ OUTBOUND_USER_ROUTES=alice:sipgate,bob:placetel
 # Pattern-based routing
 OUTBOUND_ROUTES=^00:intl-gw,^0:national-gw
 
-# Inbound DID routing
-INBOUND_ROUTES=+4932221803986:1001,*:1000
+# Inbound Gateway routing
+INBOUND_ROUTES=fritz-rt:1001,sipgate-rt:1005,*:1000
 
 # Defaults
 DEFAULT_GATEWAY=placetel

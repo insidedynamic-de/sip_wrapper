@@ -1,157 +1,153 @@
+/ # fs_cli
+.=======================================================.
+|            _____ ____     ____ _     ___              |
+|           |  ___/ ___|   / ___| |   |_ _|             |
+|           | |_  \___ \  | |   | |    | |              |
+|           |  _|  ___) | | |___| |___ | |              |
+|           |_|   |____/   \____|_____|___|             |
+|                                                       |
+.=======================================================.
+| Anthony Minessale II, Ken Rice,                       |
+| Michael Jerris, Travis Cross                          |
+| FreeSWITCH (http://www.freeswitch.org)                |
+| Paypal Donations Appreciated: paypal@freeswitch.org   |
+| Brought to you by ClueCon http://www.cluecon.com/     |
+.=======================================================.
+
+.===============================================================.
+|       _                                                       |
+|   ___| |_   _  ___  ___ ___  _ __         ___ ___  _ __ ___   |
+|  / __| | | | |/ _ \/ __/ _ \| '_ \       / __/ _ \| '_ ` _ \  |
+| | (__| | |_| |  __/ (_| (_) | | | |  _  | (_| (_) | | | | | | |
+|  \___|_|\__,_|\___|\___\___/|_| |_| (_)  \___\___/|_| |_| |_| |
+|                                                               |
+.===============================================================.
+
+Type /help <enter> to see a list of commands
+
+
+
+
+[This app Best viewed at 160x60 or more..]
++OK log level  [7]
+recv 1304 bytes from udp/[185.79.24.137]:5060 at 13:55:20.763549:
 ------------------------------------------------------------------------
-OPTIONS sip:46.224.205.100:5060 SIP/2.0
-Via: SIP/2.0/UDP 44.238.177.138;rport;branch=z9hG4bKFpmF1c7N5e31p
-Max-Forwards: 70
-From: <sip:44.238.177.138:5060>;tag=D2eQjZ75Sc6cS
-To: <sip:46.224.205.100:5060>
-Call-ID: 109a2f86-7a14-123f-4698-0a6b2821a33f
-CSeq: 110422318 OPTIONS
-Content-Length: 0
-
-
-send 575 bytes to udp/[44.238.177.138]:5060 at 13:23:40.604442:
-------------------------------------------------------------------------
-SIP/2.0 200 OK
-Via: SIP/2.0/UDP 44.238.177.138;rport=5060;branch=z9hG4bKFpmF1c7N5e31p
-From: <sip:44.238.177.138:5060>;tag=D2eQjZ75Sc6cS
-To: <sip:46.224.205.100:5060>;tag=tp26XUBB3yr2e
-Call-ID: 109a2f86-7a14-123f-4698-0a6b2821a33f
-CSeq: 110422318 OPTIONS
-Contact: <sip:46.224.205.100>
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Accept: application/sdp
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Allow-Events: talk, hold, conference, refer
-Content-Length: 0
-
-
-recv 1356 bytes from udp/[217.10.79.9]:5060 at 13:23:41.645505:
-------------------------------------------------------------------------
-INVITE sip:2595211e0@46.224.205.100:5080;transport=udp;gw=sipgate-rt SIP/2.0
-Record-Route: <sip:217.10.79.9;lr>
-Record-Route: <sip:172.20.40.7;lr;did=d14.2302>
-Record-Route: <sip:217.10.68.137;lr>
-Via: SIP/2.0/UDP 217.10.79.9;branch=z9hG4bKde2d.ad001dfbc18b99bd74da6fec2974ea8b.0
-Via: SIP/2.0/UDP 172.20.40.7;branch=z9hG4bKde2d.82b3c7aa22e8d6d2f6fdf0e0cdb814c8.0
-Via: SIP/2.0/UDP 217.10.68.137;branch=z9hG4bKde2d.e2852f5605f4e1028e6d05cae19c6c2a.0
-Via: SIP/2.0/UDP 217.10.77.190:5060;branch=z9hG4bK6b737a1e
+INVITE sip:777034347089@46.224.205.100:5080;transport=udp;gw=placetel-rt SIP/2.0
+Record-Route: <sip:185.79.24.137;r2=on;lr>
+Record-Route: <sip:185.79.27.31:5070;r2=on;lr>
+Record-Route: <sip:185.79.26.6;lr=on;did=a21.5aa1>
+Via: SIP/2.0/UDP 185.79.24.137;branch=z9hG4bK8f3e.3f5757355b8f554d44872e6b53f816e5.0
+Via: SIP/2.0/UDP 185.79.26.6;branch=z9hG4bK8f3e.d64250fd45534b70e6b0bccabf5b1604.0
+Via: SIP/2.0/UDP 185.79.27.31:5070;rport=5070;branch=z9hG4bK8f3e.0706cf5e3035ab004ca92cf3e565edeb.0
+Via: SIP/2.0/UDP 185.79.27.75:7010;branch=z9hG4bK46b55cda
 Max-Forwards: 67
-From: "017619993000" <sip:017619993000@sipgate.de>;tag=as29412c4f
-To: <sip:2595211e0@sipgate.de>
-Contact: <sip:017619993000@217.10.77.190:5060>
-Call-ID: 4ea3be7e4ad75eae4409bc87627ec990@sipgate.de
-CSeq: 103 INVITE
+From: "017619993000" <sip:017619993000@fpbx.de:7010>;tag=as10ba3dcb
+To: <sip:777034347089@fpbx.de>
+Contact: <sip:017619993000@185.79.27.75:7010>
+Call-ID: 154302532d2cdad6370de6f47a081f90@fpbx.de
+CSeq: 102 INVITE
+Session-Expires: 9000
+Min-SE: 90
 Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO, PUBLISH, MESSAGE
-Supported: replaces
+Supported: replaces, timer
 Content-Type: application/sdp
-Content-Length: 437
+Content-Length: 304
 
 v=0
-o=root 370078243 370078244 IN IP4 212.9.44.174
-s=sipgate VoIP GW
+o=- 1258329569 1258329569 IN IP4 185.79.27.75
+s=-
+c=IN IP4 185.79.27.75
 t=0 0
-m=audio 20542 RTP/AVP 9 8 0 3 97 18 112 101
-c=IN IP4 212.9.44.174
-a=rtpmap:9 G722/8000
+m=audio 19838 RTP/AVP 8 0 18 9 101
 a=rtpmap:8 PCMA/8000
 a=rtpmap:0 PCMU/8000
-a=rtpmap:3 GSM/8000
-a=rtpmap:97 iLBC/8000
-a=fmtp:97 mode=30
 a=rtpmap:18 G729/8000
-a=fmtp:18 annexb=no
-a=rtpmap:112 G726-32/8000
+a=rtpmap:9 G722/8000
 a=rtpmap:101 telephone-event/8000
 a=fmtp:101 0-16
+a=ptime:20
+a=maxptime:140
 a=sendrecv
-a=rtcp:20543
-a=ptime:20
 
-2026-02-01 13:23:41.637379 83.33% [NOTICE] switch_channel.c:1142 New Channel sofia/external/017619993000@sipgate.de [63722804-175a-48cb-ba07-ed2f2243e06f]
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@sipgate.de) Running State Change CS_NEW (Cur 1 Tot 4)
-2026-02-01 13:23:41.637379 83.33% [INFO] sofia.c:10460 sofia/external/017619993000@sipgate.de receiving invite from 217.10.79.9:5060 version: 1.10.12-release  64bit call-id: 4ea3be7e4ad75eae4409bc87627ec990@sipgate.de
-2026-02-01 13:23:41.637379 83.33% [DEBUG] sofia.c:7493 Channel sofia/external/017619993000@sipgate.de entering state [received][100]
-2026-02-01 13:23:41.637379 83.33% [DEBUG] sofia.c:7503 Remote SDP:
+2026-02-01 13:55:20.764194 81.33% [NOTICE] switch_channel.c:1142 New Channel sofia/external/017619993000@fpbx.de:7010 [caf05f41-721e-4bf9-aa36-dc4ab0ab2af3]
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fpbx.de:7010) Running State Change CS_NEW (Cur 1 Tot 5)
+2026-02-01 13:55:20.764194 81.33% [INFO] sofia.c:10460 sofia/external/017619993000@fpbx.de:7010 receiving invite from 185.79.24.137:5060 version: 1.10.12-release  64bit call-id: 154302532d2cdad6370de6f47a081f90@fpbx.de
+2026-02-01 13:55:20.764194 81.33% [DEBUG] sofia.c:7493 Channel sofia/external/017619993000@fpbx.de:7010 entering state [received][100]
+2026-02-01 13:55:20.764194 81.33% [DEBUG] sofia.c:7503 Remote SDP:
 v=0
-o=root 370078243 370078244 IN IP4 212.9.44.174
-s=sipgate VoIP GW
+o=- 1258329569 1258329569 IN IP4 185.79.27.75
+s=-
+c=IN IP4 185.79.27.75
 t=0 0
-m=audio 20542 RTP/AVP 9 8 0 3 97 18 112 101
-c=IN IP4 212.9.44.174
-a=rtpmap:9 G722/8000
+m=audio 19838 RTP/AVP 8 0 18 9 101
 a=rtpmap:8 PCMA/8000
 a=rtpmap:0 PCMU/8000
-a=rtpmap:3 GSM/8000
-a=rtpmap:97 iLBC/8000
-a=fmtp:97 mode=30
 a=rtpmap:18 G729/8000
-a=fmtp:18 annexb=no
-a=rtpmap:112 G726-32/8000
+a=rtpmap:9 G722/8000
 a=rtpmap:101 telephone-event/8000
 a=fmtp:101 0-16
-a=rtcp:20543
 a=ptime:20
+a=maxptime:140
 
-2026-02-01 13:23:41.637379 83.33% [DEBUG] sofia.c:7906 (sofia/external/017619993000@sipgate.de) State Change CS_NEW -> CS_INIT
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:600 (sofia/external/017619993000@sipgate.de) State NEW
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@sipgate.de) Running State Change CS_INIT (Cur 1 Tot 4)
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:624 (sofia/external/017619993000@sipgate.de) State INIT
-2026-02-01 13:23:41.637379 83.33% [DEBUG] mod_sofia.c:97 sofia/external/017619993000@sipgate.de SOFIA INIT
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:40 sofia/external/017619993000@sipgate.de Standard INIT
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:48 (sofia/external/017619993000@sipgate.de) State Change CS_INIT -> CS_ROUTING
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:624 (sofia/external/017619993000@sipgate.de) State INIT going to sleep
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@sipgate.de) Running State Change CS_ROUTING (Cur 1 Tot 4)
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_channel.c:2399 (sofia/external/017619993000@sipgate.de) Callstate Change DOWN -> RINGING
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:640 (sofia/external/017619993000@sipgate.de) State ROUTING
-2026-02-01 13:23:41.637379 83.33% [DEBUG] mod_sofia.c:158 sofia/external/017619993000@sipgate.de SOFIA ROUTING
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:230 sofia/external/017619993000@sipgate.de Standard ROUTING
-2026-02-01 13:23:41.637379 83.33% [INFO] mod_dialplan_xml.c:639 Processing 017619993000 <017619993000>->2595211e0 in context public
-send 365 bytes to udp/[217.10.79.9]:5060 at 13:23:41.647670:
+2026-02-01 13:55:20.764194 81.33% [DEBUG] sofia.c:7906 (sofia/external/017619993000@fpbx.de:7010) State Change CS_NEW -> CS_INIT
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:600 (sofia/external/017619993000@fpbx.de:7010) State NEW
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fpbx.de:7010) Running State Change CS_INIT (Cur 1 Tot 5)
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:624 (sofia/external/017619993000@fpbx.de:7010) State INIT
+2026-02-01 13:55:20.764194 81.33% [DEBUG] mod_sofia.c:97 sofia/external/017619993000@fpbx.de:7010 SOFIA INIT
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:40 sofia/external/017619993000@fpbx.de:7010 Standard INIT
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:48 (sofia/external/017619993000@fpbx.de:7010) State Change CS_INIT -> CS_ROUTING
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:624 (sofia/external/017619993000@fpbx.de:7010) State INIT going to sleep
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fpbx.de:7010) Running State Change CS_ROUTING (Cur 1 Tot 5)
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_channel.c:2399 (sofia/external/017619993000@fpbx.de:7010) Callstate Change DOWN -> RINGING
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:640 (sofia/external/017619993000@fpbx.de:7010) State ROUTING
+2026-02-01 13:55:20.764194 81.33% [DEBUG] mod_sofia.c:158 sofia/external/017619993000@fpbx.de:7010 SOFIA ROUTING
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:230 sofia/external/017619993000@fpbx.de:7010 Standard ROUTING
+2026-02-01 13:55:20.764194 81.33% [INFO] mod_dialplan_xml.c:639 Processing 017619993000 <017619993000>->777034347089 in context public
+send 366 bytes to udp/[185.79.24.137]:5060 at 13:55:20.765163:
 ------------------------------------------------------------------------
 SIP/2.0 100 Trying
-Via: SIP/2.0/UDP 217.10.79.9;branch=z9hG4bKde2d.ad001dfbc18b99bd74da6fec2974ea8b.0
-From: "017619993000" <sip:017619993000@sipgate.de>;tag=as29412c4f
-To: <sip:2595211e0@sipgate.de>
-Call-ID: 4ea3be7e4ad75eae4409bc87627ec990@sipgate.de
-CSeq: 103 INVITE
+Via: SIP/2.0/UDP 185.79.24.137;branch=z9hG4bK8f3e.3f5757355b8f554d44872e6b53f816e5.0
+From: "017619993000" <sip:017619993000@fpbx.de:7010>;tag=as10ba3dcb
+To: <sip:777034347089@fpbx.de>
+Call-ID: 154302532d2cdad6370de6f47a081f90@fpbx.de
+CSeq: 102 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Content-Length: 0
 
 
-Dialplan: sofia/external/017619993000@sipgate.de parsing [public->inbound_fritz-rt] continue=false
-Dialplan: sofia/external/017619993000@sipgate.de Regex (FAIL) [inbound_fritz-rt] ${sip_req_params}(transport=udp;gw=sipgate-rt) =~ /^gw=fritz-rt$/ break=on-false
-Dialplan: sofia/external/017619993000@sipgate.de parsing [public->inbound_3cx-rt] continue=false
-Dialplan: sofia/external/017619993000@sipgate.de Regex (FAIL) [inbound_3cx-rt] ${sip_req_params}(transport=udp;gw=sipgate-rt) =~ /^gw=3cx-rt$/ break=on-false
-Dialplan: sofia/external/017619993000@sipgate.de parsing [public->inbound_sipgate-rt] continue=false
-Dialplan: sofia/external/017619993000@sipgate.de Regex (FAIL) [inbound_sipgate-rt] ${sip_req_params}(transport=udp;gw=sipgate-rt) =~ /^gw=sipgate-rt$/ break=on-false
-2026-02-01 13:23:41.637379 83.33% [INFO] switch_core_state_machine.c:306 No Route, Aborting
-2026-02-01 13:23:41.637379 83.33% [NOTICE] switch_core_state_machine.c:307 Hangup sofia/external/017619993000@sipgate.de [CS_ROUTING] [NO_ROUTE_DESTINATION]
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:640 (sofia/external/017619993000@sipgate.de) State ROUTING going to sleep
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@sipgate.de) Running State Change CS_HANGUP (Cur 1 Tot 4)
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:844 (sofia/external/017619993000@sipgate.de) Callstate Change RINGING -> HANGUP
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:846 (sofia/external/017619993000@sipgate.de) State HANGUP
-2026-02-01 13:23:41.637379 83.33% [DEBUG] mod_sofia.c:469 Channel sofia/external/017619993000@sipgate.de hanging up, cause: NO_ROUTE_DESTINATION
-2026-02-01 13:23:41.637379 83.33% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 404
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:59 sofia/external/017619993000@sipgate.de Standard HANGUP, cause: NO_ROUTE_DESTINATION
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:846 (sofia/external/017619993000@sipgate.de) State HANGUP going to sleep
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:616 (sofia/external/017619993000@sipgate.de) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@sipgate.de) Running State Change CS_REPORTING (Cur 1 Tot 4)
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:932 (sofia/external/017619993000@sipgate.de) State REPORTING
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:168 sofia/external/017619993000@sipgate.de Standard REPORTING, cause: NO_ROUTE_DESTINATION
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:932 (sofia/external/017619993000@sipgate.de) State REPORTING going to sleep
-send 972 bytes to udp/[217.10.79.9]:5060 at 13:23:41.648519:
+Dialplan: sofia/external/017619993000@fpbx.de:7010 parsing [public->inbound_fritz-rt] continue=false
+Dialplan: sofia/external/017619993000@fpbx.de:7010 Regex (FAIL) [inbound_fritz-rt] ${sip_req_params}(transport=udp;gw=placetel-rt) =~ /(^|;)gw=fritz-rt($|;)/ break=on-false
+Dialplan: sofia/external/017619993000@fpbx.de:7010 parsing [public->inbound_3cx-rt] continue=false
+Dialplan: sofia/external/017619993000@fpbx.de:7010 Regex (FAIL) [inbound_3cx-rt] ${sip_req_params}(transport=udp;gw=placetel-rt) =~ /(^|;)gw=3cx-rt($|;)/ break=on-false
+Dialplan: sofia/external/017619993000@fpbx.de:7010 parsing [public->inbound_sipgate-rt] continue=false
+Dialplan: sofia/external/017619993000@fpbx.de:7010 Regex (FAIL) [inbound_sipgate-rt] ${sip_req_params}(transport=udp;gw=placetel-rt) =~ /(^|;)gw=sipgate-rt($|;)/ break=on-false
+2026-02-01 13:55:20.764194 81.33% [INFO] switch_core_state_machine.c:306 No Route, Aborting
+2026-02-01 13:55:20.764194 81.33% [NOTICE] switch_core_state_machine.c:307 Hangup sofia/external/017619993000@fpbx.de:7010 [CS_ROUTING] [NO_ROUTE_DESTINATION]
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:640 (sofia/external/017619993000@fpbx.de:7010) State ROUTING going to sleep
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fpbx.de:7010) Running State Change CS_HANGUP (Cur 1 Tot 5)
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:844 (sofia/external/017619993000@fpbx.de:7010) Callstate Change RINGING -> HANGUP
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:846 (sofia/external/017619993000@fpbx.de:7010) State HANGUP
+2026-02-01 13:55:20.764194 81.33% [DEBUG] mod_sofia.c:469 Channel sofia/external/017619993000@fpbx.de:7010 hanging up, cause: NO_ROUTE_DESTINATION
+2026-02-01 13:55:20.764194 81.33% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 404
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:59 sofia/external/017619993000@fpbx.de:7010 Standard HANGUP, cause: NO_ROUTE_DESTINATION
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:846 (sofia/external/017619993000@fpbx.de:7010) State HANGUP going to sleep
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:616 (sofia/external/017619993000@fpbx.de:7010) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fpbx.de:7010) Running State Change CS_REPORTING (Cur 1 Tot 5)
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:932 (sofia/external/017619993000@fpbx.de:7010) State REPORTING
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:168 sofia/external/017619993000@fpbx.de:7010 Standard REPORTING, cause: NO_ROUTE_DESTINATION
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:932 (sofia/external/017619993000@fpbx.de:7010) State REPORTING going to sleep
+send 990 bytes to udp/[185.79.24.137]:5060 at 13:55:20.765888:
 ------------------------------------------------------------------------
 SIP/2.0 404 Not Found
-Via: SIP/2.0/UDP 217.10.79.9;branch=z9hG4bKde2d.ad001dfbc18b99bd74da6fec2974ea8b.0
-Via: SIP/2.0/UDP 172.20.40.7;branch=z9hG4bKde2d.82b3c7aa22e8d6d2f6fdf0e0cdb814c8.0
-Via: SIP/2.0/UDP 217.10.68.137;branch=z9hG4bKde2d.e2852f5605f4e1028e6d05cae19c6c2a.0
-Via: SIP/2.0/UDP 217.10.77.190:5060;branch=z9hG4bK6b737a1e
+Via: SIP/2.0/UDP 185.79.24.137;branch=z9hG4bK8f3e.3f5757355b8f554d44872e6b53f816e5.0
+Via: SIP/2.0/UDP 185.79.26.6;branch=z9hG4bK8f3e.d64250fd45534b70e6b0bccabf5b1604.0
+Via: SIP/2.0/UDP 185.79.27.31:5070;rport=5070;branch=z9hG4bK8f3e.0706cf5e3035ab004ca92cf3e565edeb.0
+Via: SIP/2.0/UDP 185.79.27.75:7010;branch=z9hG4bK46b55cda
 Max-Forwards: 67
-From: "017619993000" <sip:017619993000@sipgate.de>;tag=as29412c4f
-To: <sip:2595211e0@sipgate.de>;tag=eS7pt21SHv2KD
-Call-ID: 4ea3be7e4ad75eae4409bc87627ec990@sipgate.de
-CSeq: 103 INVITE
+From: "017619993000" <sip:017619993000@fpbx.de:7010>;tag=as10ba3dcb
+To: <sip:777034347089@fpbx.de>;tag=Da01gH8UNSmee
+Call-ID: 154302532d2cdad6370de6f47a081f90@fpbx.de
+CSeq: 102 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -159,822 +155,24 @@ Supported: timer, path, replaces
 Allow-Events: talk, hold, conference, refer
 Reason: Q.850;cause=3;text="NO_ROUTE_DESTINATION"
 Content-Length: 0
-Remote-Party-ID: "2595211e0" <sip:2595211e0@sipgate.de>;party=calling;privacy=off;screen=no
+Remote-Party-ID: "777034347089" <sip:777034347089@fpbx.de>;party=calling;privacy=off;screen=no
 
 
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:607 (sofia/external/017619993000@sipgate.de) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_session.c:1744 Session 4 (sofia/external/017619993000@sipgate.de) Locked, Waiting on external entities
-2026-02-01 13:23:41.637379 83.33% [NOTICE] switch_core_session.c:1762 Session 4 (sofia/external/017619993000@sipgate.de) Ended
-2026-02-01 13:23:41.637379 83.33% [NOTICE] switch_core_session.c:1766 Close Channel sofia/external/017619993000@sipgate.de [CS_DESTROY]
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:735 (sofia/external/017619993000@sipgate.de) Running State Change CS_DESTROY (Cur 0 Tot 4)
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:745 (sofia/external/017619993000@sipgate.de) State DESTROY
-2026-02-01 13:23:41.637379 83.33% [DEBUG] mod_sofia.c:380 sofia/external/017619993000@sipgate.de SOFIA DESTROY
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:175 sofia/external/017619993000@sipgate.de Standard DESTROY
-2026-02-01 13:23:41.637379 83.33% [DEBUG] switch_core_state_machine.c:745 (sofia/external/017619993000@sipgate.de) State DESTROY going to sleep
-recv 468 bytes from udp/[217.10.79.9]:5060 at 13:23:41.657505:
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:607 (sofia/external/017619993000@fpbx.de:7010) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_session.c:1744 Session 5 (sofia/external/017619993000@fpbx.de:7010) Locked, Waiting on external entities
+2026-02-01 13:55:20.764194 81.33% [NOTICE] switch_core_session.c:1762 Session 5 (sofia/external/017619993000@fpbx.de:7010) Ended
+2026-02-01 13:55:20.764194 81.33% [NOTICE] switch_core_session.c:1766 Close Channel sofia/external/017619993000@fpbx.de:7010 [CS_DESTROY]
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:735 (sofia/external/017619993000@fpbx.de:7010) Running State Change CS_DESTROY (Cur 0 Tot 5)
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:745 (sofia/external/017619993000@fpbx.de:7010) State DESTROY
+2026-02-01 13:55:20.764194 81.33% [DEBUG] mod_sofia.c:380 sofia/external/017619993000@fpbx.de:7010 SOFIA DESTROY
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:175 sofia/external/017619993000@fpbx.de:7010 Standard DESTROY
+2026-02-01 13:55:20.764194 81.33% [DEBUG] switch_core_state_machine.c:745 (sofia/external/017619993000@fpbx.de:7010) State DESTROY going to sleep
+recv 389 bytes from udp/[185.79.24.137]:5060 at 13:55:20.769876:
 ------------------------------------------------------------------------
-ACK sip:2595211e0@46.224.205.100:5080;transport=udp;gw=sipgate-rt SIP/2.0
-Via: SIP/2.0/UDP 217.10.79.9;branch=z9hG4bKde2d.ad001dfbc18b99bd74da6fec2974ea8b.0
-Via: SIP/2.0/UDP 172.20.40.7;branch=z9hG4bKde2d.82b3c7aa22e8d6d2f6fdf0e0cdb814c8.0
+ACK sip:777034347089@46.224.205.100:5080;transport=udp;gw=placetel-rt SIP/2.0
+Via: SIP/2.0/UDP 185.79.24.137;branch=z9hG4bK8f3e.3f5757355b8f554d44872e6b53f816e5.0
 Max-Forwards: 67
-From: "017619993000" <sip:017619993000@sipgate.de>;tag=as29412c4f
-To: <sip:2595211e0@sipgate.de>;tag=eS7pt21SHv2KD
-Call-ID: 4ea3be7e4ad75eae4409bc87627ec990@sipgate.de
-CSeq: 103 ACK
-Content-Length: 0
-
-
-send 845 bytes to udp/[109.235.234.68]:5060 at 13:23:43.905879:
-------------------------------------------------------------------------
-REGISTER sip:voip.agfeotel.xyz:5060;transport=udp SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100:5080;rport;branch=z9hG4bKH0ZQBSjy69mFH
-Max-Forwards: 70
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422262 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>
-Expires: 600
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Authorization: Digest username="422047", realm="voip.agfeotel.xyz", nonce="697f53f90001764d76d8a7d1a6ba1ff9376be2c6446bb51e", algorithm=MD5, uri="sip:voip.agfeotel.xyz:5060;transport=udp", response="7d658032c3782465ba096dfb899357ed"
-Content-Length: 0
-
-
-recv 501 bytes from udp/[109.235.234.68]:5060 at 13:23:43.924714:
-------------------------------------------------------------------------
-SIP/2.0 401 Unauthorized
-Via: SIP/2.0/UDP 46.224.205.100:5080;received=46.224.205.100;rport=5080;branch=z9hG4bKH0ZQBSjy69mFH
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>;tag=26d289c6b153a624a6985feaf56ff878.2630
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422262 REGISTER
-WWW-Authenticate: Digest realm="voip.agfeotel.xyz", nonce="697f53fd000176a5c0b8036af8bdead85caca95ec0fbd151", stale=true
-Server: INES SIP-Proxy
-Content-Length: 0
-
-
-send 845 bytes to udp/[109.235.234.68]:5060 at 13:23:43.924978:
-------------------------------------------------------------------------
-REGISTER sip:voip.agfeotel.xyz:5060;transport=udp SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100:5080;rport;branch=z9hG4bKj9rgDm313jB2c
-Max-Forwards: 70
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422263 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>
-Expires: 600
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Authorization: Digest username="422047", realm="voip.agfeotel.xyz", nonce="697f53fd000176a5c0b8036af8bdead85caca95ec0fbd151", algorithm=MD5, uri="sip:voip.agfeotel.xyz:5060;transport=udp", response="2355efea44ee00f4e5494e22287228b6"
-Content-Length: 0
-
-
-recv 592 bytes from udp/[109.235.234.68]:5060 at 13:23:43.966421:
-------------------------------------------------------------------------
-SIP/2.0 200 OK
-Via: SIP/2.0/UDP 46.224.205.100:5080;received=46.224.205.100;rport=5080;branch=z9hG4bKj9rgDm313jB2c
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>;tag=26d289c6b153a624a6985feaf56ff878.7d40
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422263 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>;expires=600, <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>;expires=342, <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>;expires=5
-Server: INES SIP-Proxy
-Content-Length: 0
-
-
-2026-02-01 13:23:43.997380 83.17% [DEBUG] sofia_reg.c:418 Registered agfeo-rt
-send 845 bytes to udp/[109.235.234.68]:5060 at 13:23:44.906845:
-------------------------------------------------------------------------
-REGISTER sip:voip.agfeotel.xyz:5060;transport=udp SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100:5080;rport;branch=z9hG4bKKjj9eFm50U1mr
-Max-Forwards: 70
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422264 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>
-Expires: 600
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Authorization: Digest username="422047", realm="voip.agfeotel.xyz", nonce="697f53fd000176a5c0b8036af8bdead85caca95ec0fbd151", algorithm=MD5, uri="sip:voip.agfeotel.xyz:5060;transport=udp", response="2355efea44ee00f4e5494e22287228b6"
-Content-Length: 0
-
-
-recv 501 bytes from udp/[109.235.234.68]:5060 at 13:23:44.925699:
-------------------------------------------------------------------------
-SIP/2.0 401 Unauthorized
-Via: SIP/2.0/UDP 46.224.205.100:5080;received=46.224.205.100;rport=5080;branch=z9hG4bKKjj9eFm50U1mr
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>;tag=26d289c6b153a624a6985feaf56ff878.7ec2
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422264 REGISTER
-WWW-Authenticate: Digest realm="voip.agfeotel.xyz", nonce="697f53fe000176cbc04ef6676c017aa0fe89b44881b38926", stale=true
-Server: INES SIP-Proxy
-Content-Length: 0
-
-
-send 845 bytes to udp/[109.235.234.68]:5060 at 13:23:44.925935:
-------------------------------------------------------------------------
-REGISTER sip:voip.agfeotel.xyz:5060;transport=udp SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100:5080;rport;branch=z9hG4bKmUB2ga58X4Q7K
-Max-Forwards: 70
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422265 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>
-Expires: 600
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Authorization: Digest username="422047", realm="voip.agfeotel.xyz", nonce="697f53fe000176cbc04ef6676c017aa0fe89b44881b38926", algorithm=MD5, uri="sip:voip.agfeotel.xyz:5060;transport=udp", response="f06c1874f9c34e3b43e150d7888ee50f"
-Content-Length: 0
-
-
-recv 592 bytes from udp/[109.235.234.68]:5060 at 13:23:44.967424:
-------------------------------------------------------------------------
-SIP/2.0 200 OK
-Via: SIP/2.0/UDP 46.224.205.100:5080;received=46.224.205.100;rport=5080;branch=z9hG4bKmUB2ga58X4Q7K
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>;tag=26d289c6b153a624a6985feaf56ff878.960a
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422265 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>;expires=600, <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>;expires=341, <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>;expires=4
-Server: INES SIP-Proxy
-Content-Length: 0
-
-
-2026-02-01 13:23:44.997402 82.83% [DEBUG] sofia_reg.c:418 Registered agfeo-rt
-recv 1114 bytes from udp/[78.94.156.45]:5060 at 13:23:46.469527:
-------------------------------------------------------------------------
-INVITE sip:INDYN-VNI-74@46.224.205.100:5080;gw=fritz-rt SIP/2.0
-Via: SIP/2.0/UDP 78.94.156.45:5060;branch=z9hG4bK2A288C4A12CC07C2
-From: <sip:017619993000@fritz.box>;tag=7FF95EAFC5518DA9
-To: <sip:INDYN-VNI-74@46.224.205.100:5080;gw=fritz-rt>
-Call-ID: 5EE0296D79334210@78.94.156.45
-CSeq: 37 INVITE
-Contact: <sip:5A7072BBB6642646842CEE183240C4E@78.94.156.45>
-Max-Forwards: 70
-P-Called-Party-ID: <sip:43781174@fritz.box>
-Expires: 120
-Session-Expires: 600;refresher=uac
-Min-SE: 90
-User-Agent: AVM FRITZ!Box 6591 Cable (Vodafone) 161.08.03 TAL (Jan 29 2025)
-Supported: 100rel,replaces,timer,199
-Allow-Events: telephone-event,refer
-Allow: INVITE,ACK,OPTIONS,CANCEL,BYE,UPDATE,PRACK,INFO,SUBSCRIBE,NOTIFY,REFER,MESSAGE,PUBLISH
-Content-Type: application/sdp
-Accept: application/sdp, multipart/mixed
-Accept-Encoding: identity
-Content-Length:   254
-
-v=0
-o=user 8509127 8509127 IN IP4 78.94.156.45
-s=call
-c=IN IP4 78.94.156.45
-t=0 0
-m=audio 7084 RTP/AVP 9 8 0 120 121 101
-a=sendrecv
-a=rtpmap:120 PCMA/16000
-a=rtpmap:121 PCMU/16000
-a=rtpmap:101 telephone-event/8000
-a=fmtp:101 0-15
-a=rtcp:7085
-
-2026-02-01 13:23:46.457389 82.43% [NOTICE] switch_channel.c:1142 New Channel sofia/external/017619993000@fritz.box [d00144d1-1767-4162-8e53-288177b21bc6]
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fritz.box) Running State Change CS_NEW (Cur 1 Tot 5)
-2026-02-01 13:23:46.457389 82.43% [INFO] sofia.c:10460 sofia/external/017619993000@fritz.box receiving invite from 78.94.156.45:5060 version: 1.10.12-release  64bit call-id: 5EE0296D79334210@78.94.156.45
-2026-02-01 13:23:46.457389 82.43% [DEBUG] sofia.c:7493 Channel sofia/external/017619993000@fritz.box entering state [received][100]
-2026-02-01 13:23:46.457389 82.43% [DEBUG] sofia.c:7503 Remote SDP:
-v=0
-o=user 8509127 8509127 IN IP4 78.94.156.45
-s=call
-c=IN IP4 78.94.156.45
-t=0 0
-m=audio 7084 RTP/AVP 9 8 0 120 121 101
-a=rtpmap:120 PCMA/16000
-a=rtpmap:121 PCMU/16000
-a=rtpmap:101 telephone-event/8000
-a=fmtp:101 0-15
-a=rtcp:7085
-
-2026-02-01 13:23:46.457389 82.43% [DEBUG] sofia.c:7906 (sofia/external/017619993000@fritz.box) State Change CS_NEW -> CS_INIT
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:600 (sofia/external/017619993000@fritz.box) State NEW
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fritz.box) Running State Change CS_INIT (Cur 1 Tot 5)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:624 (sofia/external/017619993000@fritz.box) State INIT
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_sofia.c:97 sofia/external/017619993000@fritz.box SOFIA INIT
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:40 sofia/external/017619993000@fritz.box Standard INIT
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:48 (sofia/external/017619993000@fritz.box) State Change CS_INIT -> CS_ROUTING
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:624 (sofia/external/017619993000@fritz.box) State INIT going to sleep
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fritz.box) Running State Change CS_ROUTING (Cur 1 Tot 5)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_channel.c:2399 (sofia/external/017619993000@fritz.box) Callstate Change DOWN -> RINGING
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:640 (sofia/external/017619993000@fritz.box) State ROUTING
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_sofia.c:158 sofia/external/017619993000@fritz.box SOFIA ROUTING
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:230 sofia/external/017619993000@fritz.box Standard ROUTING
-2026-02-01 13:23:46.457389 82.43% [INFO] mod_dialplan_xml.c:639 Processing 017619993000 <017619993000>->INDYN-VNI-74 in context public
-send 347 bytes to udp/[78.94.156.45]:5060 at 13:23:46.471527:
-------------------------------------------------------------------------
-SIP/2.0 100 Trying
-Via: SIP/2.0/UDP 78.94.156.45:5060;branch=z9hG4bK2A288C4A12CC07C2
-From: <sip:017619993000@fritz.box>;tag=7FF95EAFC5518DA9
-To: <sip:INDYN-VNI-74@46.224.205.100:5080;gw=fritz-rt>
-Call-ID: 5EE0296D79334210@78.94.156.45
-CSeq: 37 INVITE
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Content-Length: 0
-
-
-Dialplan: sofia/external/017619993000@fritz.box parsing [public->inbound_fritz-rt] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (PASS) [inbound_fritz-rt] ${sip_req_params}(gw=fritz-rt) =~ /^gw=fritz-rt$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box Action set(domain_name=apps.linkify.cloud) 
-Dialplan: sofia/external/017619993000@fritz.box Action transfer(1001 XML default) 
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:281 (sofia/external/017619993000@fritz.box) State Change CS_ROUTING -> CS_EXECUTE
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:640 (sofia/external/017619993000@fritz.box) State ROUTING going to sleep
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fritz.box) Running State Change CS_EXECUTE (Cur 1 Tot 5)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:647 (sofia/external/017619993000@fritz.box) State EXECUTE
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_sofia.c:213 sofia/external/017619993000@fritz.box SOFIA EXECUTE
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:323 sofia/external/017619993000@fritz.box Standard EXECUTE
-EXECUTE [depth=0] sofia/external/017619993000@fritz.box set(domain_name=apps.linkify.cloud)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_dptools.c:1671 SET sofia/external/017619993000@fritz.box [domain_name]=[apps.linkify.cloud]
-EXECUTE [depth=0] sofia/external/017619993000@fritz.box transfer(1001 XML default)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_ivr.c:2296 (sofia/external/017619993000@fritz.box) State Change CS_EXECUTE -> CS_ROUTING
-2026-02-01 13:23:46.457389 82.43% [NOTICE] switch_ivr.c:2303 Transfer sofia/external/017619993000@fritz.box to XML[1001@default]
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:647 (sofia/external/017619993000@fritz.box) State EXECUTE going to sleep
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fritz.box) Running State Change CS_ROUTING (Cur 1 Tot 5)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:640 (sofia/external/017619993000@fritz.box) State ROUTING
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_sofia.c:149 Call appears to be already acknowledged
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_sofia.c:158 sofia/external/017619993000@fritz.box SOFIA ROUTING
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:230 sofia/external/017619993000@fritz.box Standard ROUTING
-2026-02-01 13:23:46.457389 82.43% [INFO] mod_dialplan_xml.c:639 Processing 017619993000 <017619993000>->1001 in context default
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_fritz_international] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_fritz_international] username(017619993000) =~ /^fritz$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_fritz_with_country_code] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_fritz_with_country_code] username(017619993000) =~ /^fritz$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_fritz_national] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_fritz_national] username(017619993000) =~ /^fritz$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_fritz_default] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_fritz_default] username(017619993000) =~ /^fritz$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_3cx_international] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_3cx_international] username(017619993000) =~ /^3cx$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_3cx_with_country_code] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_3cx_with_country_code] username(017619993000) =~ /^3cx$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_3cx_national] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_3cx_national] username(017619993000) =~ /^3cx$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_3cx_default] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_3cx_default] username(017619993000) =~ /^3cx$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_agfeo_international] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_agfeo_international] username(017619993000) =~ /^agfeo$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_agfeo_with_country_code] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_agfeo_with_country_code] username(017619993000) =~ /^agfeo$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_agfeo_national] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_agfeo_national] username(017619993000) =~ /^agfeo$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_agfeo_default] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_agfeo_default] username(017619993000) =~ /^agfeo$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_placetel_international] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_placetel_international] username(017619993000) =~ /^placetel$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_placetel_with_country_code] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_placetel_with_country_code] username(017619993000) =~ /^placetel$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_placetel_national] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_placetel_national] username(017619993000) =~ /^placetel$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_placetel_default] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_placetel_default] username(017619993000) =~ /^placetel$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_vapi1_international] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_vapi1_international] username(017619993000) =~ /^vapi1$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_vapi1_with_country_code] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_vapi1_with_country_code] username(017619993000) =~ /^vapi1$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_vapi1_national] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_vapi1_national] username(017619993000) =~ /^vapi1$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_vapi1_default] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_vapi1_default] username(017619993000) =~ /^vapi1$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_sipgate_international] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_sipgate_international] username(017619993000) =~ /^sipgate$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_sipgate_with_country_code] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_sipgate_with_country_code] username(017619993000) =~ /^sipgate$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_sipgate_national] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_sipgate_national] username(017619993000) =~ /^sipgate$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->user_sipgate_default] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (FAIL) [user_sipgate_default] username(017619993000) =~ /^sipgate$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box parsing [default->local_extensions] continue=false
-Dialplan: sofia/external/017619993000@fritz.box Regex (PASS) [local_extensions] destination_number(1001) =~ /^(1[0-9]{3})$/ break=on-false
-Dialplan: sofia/external/017619993000@fritz.box Action export(rtp_auto_adjust=true) 
-Dialplan: sofia/external/017619993000@fritz.box Action export(sip_comedia=true) 
-Dialplan: sofia/external/017619993000@fritz.box Action set(hangup_after_bridge=true) 
-Dialplan: sofia/external/017619993000@fritz.box Action set(continue_on_fail=true) 
-Dialplan: sofia/external/017619993000@fritz.box Action set(target_user=${user_data(${destination_number}@apps.linkify.cloud attr id)}) 
-Dialplan: sofia/external/017619993000@fritz.box Action bridge(${sofia_contact(${target_user}@apps.linkify.cloud)}) 
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:281 (sofia/external/017619993000@fritz.box) State Change CS_ROUTING -> CS_EXECUTE
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:640 (sofia/external/017619993000@fritz.box) State ROUTING going to sleep
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fritz.box) Running State Change CS_EXECUTE (Cur 1 Tot 5)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:647 (sofia/external/017619993000@fritz.box) State EXECUTE
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_sofia.c:213 sofia/external/017619993000@fritz.box SOFIA EXECUTE
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:323 sofia/external/017619993000@fritz.box Standard EXECUTE
-EXECUTE [depth=0] sofia/external/017619993000@fritz.box export(rtp_auto_adjust=true)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_channel.c:1334 EXPORT (export_vars) [rtp_auto_adjust]=[true]
-EXECUTE [depth=0] sofia/external/017619993000@fritz.box export(sip_comedia=true)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_channel.c:1334 EXPORT (export_vars) [sip_comedia]=[true]
-EXECUTE [depth=0] sofia/external/017619993000@fritz.box set(hangup_after_bridge=true)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_dptools.c:1671 SET sofia/external/017619993000@fritz.box [hangup_after_bridge]=[true]
-EXECUTE [depth=0] sofia/external/017619993000@fritz.box set(continue_on_fail=true)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_dptools.c:1671 SET sofia/external/017619993000@fritz.box [continue_on_fail]=[true]
-EXECUTE [depth=0] sofia/external/017619993000@fritz.box set(target_user=fritz)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_dptools.c:1671 SET sofia/external/017619993000@fritz.box [target_user]=[fritz]
-EXECUTE [depth=0] sofia/external/017619993000@fritz.box bridge(sofia/internal/sip:fritz@93.130.206.37:57883)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_channel.c:1288 sofia/external/017619993000@fritz.box EXPORTING[export_vars] [rtp_auto_adjust]=[true] to event
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_channel.c:1288 sofia/external/017619993000@fritz.box EXPORTING[export_vars] [sip_comedia]=[true] to event
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_ivr_originate.c:2301 Parsing global variables
-2026-02-01 13:23:46.457389 82.43% [NOTICE] switch_channel.c:1142 New Channel sofia/internal/fritz@93.130.206.37:57883 [ff4e074c-505a-491b-ad5e-1a54798d650f]
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_sofia.c:5110 (sofia/internal/fritz@93.130.206.37:57883) State Change CS_NEW -> CS_INIT
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/fritz@93.130.206.37:57883) Running State Change CS_INIT (Cur 2 Tot 6)
-2026-02-01 13:23:46.457389 82.43% [DEBUG] switch_core_state_machine.c:624 (sofia/internal/fritz@93.130.206.37:57883) State INIT
-2026-02-01 13:23:46.457389 82.43% [DEBUG] mod_sofia.c:97 sofia/internal/fritz@93.130.206.37:57883 SOFIA INIT
-2026-02-01 13:23:46.477358 82.43% [INFO] sofia_glue.c:1659 sofia/internal/fritz@93.130.206.37:57883 sending invite call-id: (null)
-2026-02-01 13:23:46.477358 82.43% [DEBUG] sofia_glue.c:1662 sofia/internal/fritz@93.130.206.37:57883 sending invite version: 1.10.12-release  64bit
-Local SDP:
-v=0
-o=FreeSWITCH 1769933450 1769933451 IN IP4 46.224.205.100
-s=FreeSWITCH
-c=IN IP4 46.224.205.100
-t=0 0
-a=sendrecv
-m=audio 18776 RTP/AVP 9 8 0 101 13
-a=rtpmap:9 G722/8000
-a=rtpmap:8 PCMA/8000
-a=rtpmap:0 PCMU/8000
-a=rtpmap:101 telephone-event/8000
-a=fmtp:101 0-15
-a=rtpmap:13 CN/8000
-a=ptime:20
-
-2026-02-01 13:23:46.477358 82.43% [DEBUG] switch_core_state_machine.c:40 sofia/internal/fritz@93.130.206.37:57883 Standard INIT
-2026-02-01 13:23:46.477358 82.43% [DEBUG] switch_core_state_machine.c:48 (sofia/internal/fritz@93.130.206.37:57883) State Change CS_INIT -> CS_ROUTING
-2026-02-01 13:23:46.477358 82.43% [DEBUG] switch_core_state_machine.c:624 (sofia/internal/fritz@93.130.206.37:57883) State INIT going to sleep
-send 1178 bytes to udp/[93.130.206.37]:57883 at 13:23:46.478224:
-------------------------------------------------------------------------
-INVITE sip:fritz@93.130.206.37:57883 SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bK69ptcv50tm1jp
-Max-Forwards: 68
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=UZUZZpve07eNa
-To: <sip:fritz@93.130.206.37:57883>
-Call-ID: 1428cdc8-7a14-123f-bbb6-92000704f2de
-CSeq: 110422321 INVITE
-Contact: <sip:mod_sofia@46.224.205.100:5060>
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Allow-Events: talk, hold, conference, refer
-Content-Type: application/sdp
-Content-Disposition: session
-Content-Length: 308
-P-Called-Party-ID: <sip:43781174@fritz.box>
-X-FS-Support: update_display,send_info
-Remote-Party-ID: "017619993000" <sip:017619993000@46.224.205.100>;party=calling;screen=yes;privacy=off
-
-v=0
-o=FreeSWITCH 1769933450 1769933451 IN IP4 46.224.205.100
-s=FreeSWITCH
-c=IN IP4 46.224.205.100
-t=0 0
-a=sendrecv
-m=audio 18776 RTP/AVP 9 8 0 101 13
-a=rtpmap:9 G722/8000
-a=rtpmap:8 PCMA/8000
-a=rtpmap:0 PCMU/8000
-a=rtpmap:101 telephone-event/8000
-a=fmtp:101 0-15
-a=rtpmap:13 CN/8000
-a=ptime:20
-
-2026-02-01 13:23:46.477358 82.43% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/fritz@93.130.206.37:57883) Running State Change CS_ROUTING (Cur 2 Tot 6)
-2026-02-01 13:23:46.477358 82.43% [DEBUG] sofia.c:7493 Channel sofia/internal/fritz@93.130.206.37:57883 entering state [calling][0]
-2026-02-01 13:23:46.477358 82.43% [DEBUG] switch_core_state_machine.c:640 (sofia/internal/fritz@93.130.206.37:57883) State ROUTING
-2026-02-01 13:23:46.477358 82.43% [DEBUG] mod_sofia.c:158 sofia/internal/fritz@93.130.206.37:57883 SOFIA ROUTING
-2026-02-01 13:23:46.477358 82.43% [DEBUG] switch_ivr_originate.c:67 (sofia/internal/fritz@93.130.206.37:57883) State Change CS_ROUTING -> CS_CONSUME_MEDIA
-2026-02-01 13:23:46.477358 82.43% [DEBUG] switch_core_state_machine.c:640 (sofia/internal/fritz@93.130.206.37:57883) State ROUTING going to sleep
-2026-02-01 13:23:46.477358 82.43% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/fritz@93.130.206.37:57883) Running State Change CS_CONSUME_MEDIA (Cur 2 Tot 6)
-2026-02-01 13:23:46.477358 82.43% [DEBUG] switch_core_state_machine.c:659 (sofia/internal/fritz@93.130.206.37:57883) State CONSUME_MEDIA
-2026-02-01 13:23:46.477358 82.43% [DEBUG] switch_core_state_machine.c:659 (sofia/internal/fritz@93.130.206.37:57883) State CONSUME_MEDIA going to sleep
-recv 407 bytes from udp/[93.130.206.37]:57883 at 13:23:46.492559:
-------------------------------------------------------------------------
-SIP/2.0 100 Trying
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bK69ptcv50tm1jp
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=UZUZZpve07eNa
-To: <sip:fritz@93.130.206.37:57883>
-Call-ID: 1428cdc8-7a14-123f-bbb6-92000704f2de
-CSeq: 110422321 INVITE
-Allow: INVITE, ACK, BYE, CANCEL, INFO, MESSAGE, NOTIFY, OPTIONS, REFER, UPDATE, PRACK
-Server: PhonerLite/3.26
-Content-Length: 0
-
-
-recv 529 bytes from udp/[93.130.206.37]:57883 at 13:23:46.513629:
-------------------------------------------------------------------------
-SIP/2.0 180 Ringing
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bK69ptcv50tm1jp
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=UZUZZpve07eNa
-To: <sip:fritz@93.130.206.37:57883>;tag=001daee7defdf011951799b831dcb0a0
-Call-ID: 1428cdc8-7a14-123f-bbb6-92000704f2de
-CSeq: 110422321 INVITE
-Contact: <sip:fritz@93.130.206.37:57883>
-Allow: INVITE, ACK, BYE, CANCEL, INFO, MESSAGE, NOTIFY, OPTIONS, REFER, UPDATE, PRACK
-Supported: replaces, from-change, 100rel
-Server: PhonerLite/3.26
-Content-Length: 0
-
-
-2026-02-01 13:23:46.497366 82.43% [DEBUG] sofia.c:7493 Channel sofia/internal/fritz@93.130.206.37:57883 entering state [proceeding][180]
-2026-02-01 13:23:46.497366 82.43% [NOTICE] sofia.c:7604 Ring-Ready sofia/internal/fritz@93.130.206.37:57883!
-2026-02-01 13:23:46.497366 82.43% [DEBUG] switch_channel.c:3513 (sofia/internal/fritz@93.130.206.37:57883) Callstate Change DOWN -> RINGING
-2026-02-01 13:23:46.517356 82.43% [NOTICE] mod_sofia.c:2514 Ring-Ready sofia/external/017619993000@fritz.box!
-send 720 bytes to udp/[78.94.156.45]:5060 at 13:23:46.518789:
-------------------------------------------------------------------------
-SIP/2.0 180 Ringing
-Via: SIP/2.0/UDP 78.94.156.45:5060;branch=z9hG4bK2A288C4A12CC07C2
-From: <sip:017619993000@fritz.box>;tag=7FF95EAFC5518DA9
-To: <sip:INDYN-VNI-74@46.224.205.100:5080;gw=fritz-rt>;tag=F20FvXjXe5r6r
-Call-ID: 5EE0296D79334210@78.94.156.45
-CSeq: 37 INVITE
-Contact: <sip:INDYN-VNI-74@46.224.205.100:5080;transport=udp>
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Accept: application/sdp
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Allow-Events: talk, hold, conference, refer
-Content-Length: 0
-Remote-Party-ID: "Outbound Call" <sip:fritz@46.224.205.100>;party=calling;privacy=off;screen=no
-
-
-2026-02-01 13:23:46.517356 82.43% [DEBUG] sofia.c:7493 Channel sofia/external/017619993000@fritz.box entering state [early][180]
-2026-02-01 13:23:46.517356 82.43% [NOTICE] switch_ivr_originate.c:572 Ring Ready sofia/external/017619993000@fritz.box!
-send 845 bytes to udp/[109.235.234.68]:5060 at 13:23:46.907836:
-------------------------------------------------------------------------
-REGISTER sip:voip.agfeotel.xyz:5060;transport=udp SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100:5080;rport;branch=z9hG4bKN44tj5NcUDetF
-Max-Forwards: 70
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422266 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>
-Expires: 600
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Authorization: Digest username="422047", realm="voip.agfeotel.xyz", nonce="697f53fe000176cbc04ef6676c017aa0fe89b44881b38926", algorithm=MD5, uri="sip:voip.agfeotel.xyz:5060;transport=udp", response="f06c1874f9c34e3b43e150d7888ee50f"
-Content-Length: 0
-
-
-recv 501 bytes from udp/[109.235.234.68]:5060 at 13:23:46.926711:
-------------------------------------------------------------------------
-SIP/2.0 401 Unauthorized
-Via: SIP/2.0/UDP 46.224.205.100:5080;received=46.224.205.100;rport=5080;branch=z9hG4bKN44tj5NcUDetF
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>;tag=26d289c6b153a624a6985feaf56ff878.5bba
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422266 REGISTER
-WWW-Authenticate: Digest realm="voip.agfeotel.xyz", nonce="697f5400000176fdc57e896fceedf6889de3ef47b77848f6", stale=true
-Server: INES SIP-Proxy
-Content-Length: 0
-
-
-send 845 bytes to udp/[109.235.234.68]:5060 at 13:23:46.927020:
-------------------------------------------------------------------------
-REGISTER sip:voip.agfeotel.xyz:5060;transport=udp SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100:5080;rport;branch=z9hG4bKpDyKm06Frp4cB
-Max-Forwards: 70
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422267 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>
-Expires: 600
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Authorization: Digest username="422047", realm="voip.agfeotel.xyz", nonce="697f5400000176fdc57e896fceedf6889de3ef47b77848f6", algorithm=MD5, uri="sip:voip.agfeotel.xyz:5060;transport=udp", response="a41a572f32ebdb6e6308e1ab81972b37"
-Content-Length: 0
-
-
-recv 592 bytes from udp/[109.235.234.68]:5060 at 13:23:46.968404:
-------------------------------------------------------------------------
-SIP/2.0 200 OK
-Via: SIP/2.0/UDP 46.224.205.100:5080;received=46.224.205.100;rport=5080;branch=z9hG4bKpDyKm06Frp4cB
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>;tag=26d289c6b153a624a6985feaf56ff878.e0db
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422267 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>;expires=600, <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>;expires=339, <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>;expires=2
-Server: INES SIP-Proxy
-Content-Length: 0
-
-
-2026-02-01 13:23:46.997364 82.07% [DEBUG] sofia_reg.c:418 Registered agfeo-rt
-recv 518 bytes from udp/[78.94.156.45]:5060 at 13:23:47.352042:
-------------------------------------------------------------------------
-CANCEL sip:INDYN-VNI-74@46.224.205.100:5080;gw=fritz-rt SIP/2.0
-Via: SIP/2.0/UDP 78.94.156.45:5060;branch=z9hG4bK2A288C4A12CC07C2
-From: <sip:017619993000@fritz.box>;tag=7FF95EAFC5518DA9
-To: <sip:INDYN-VNI-74@46.224.205.100:5080;gw=fritz-rt>
-Call-ID: 5EE0296D79334210@78.94.156.45
-CSeq: 37 CANCEL
-Reason: Q.850; cause=16
-Max-Forwards: 70
-User-Agent: AVM FRITZ!Box 6591 Cable (Vodafone) 161.08.03 TAL (Jan 29 2025)
-Supported: 100rel,replaces,timer,199
-Allow-Events: telephone-event,refer
-Content-Length: 0
-
-
-send 292 bytes to udp/[78.94.156.45]:5060 at 13:23:47.352203:
-------------------------------------------------------------------------
-SIP/2.0 200 OK
-Via: SIP/2.0/UDP 78.94.156.45:5060;branch=z9hG4bK2A288C4A12CC07C2
-From: <sip:017619993000@fritz.box>;tag=7FF95EAFC5518DA9
-To: <sip:INDYN-VNI-74@46.224.205.100:5080;gw=fritz-rt>;tag=F20FvXjXe5r6r
-Call-ID: 5EE0296D79334210@78.94.156.45
-CSeq: 37 CANCEL
-Content-Length: 0
-
-
-send 546 bytes to udp/[78.94.156.45]:5060 at 13:23:47.352373:
-------------------------------------------------------------------------
-SIP/2.0 487 Request Terminated
-Via: SIP/2.0/UDP 78.94.156.45:5060;branch=z9hG4bK2A288C4A12CC07C2
-From: <sip:017619993000@fritz.box>;tag=7FF95EAFC5518DA9
-To: <sip:INDYN-VNI-74@46.224.205.100:5080;gw=fritz-rt>;tag=F20FvXjXe5r6r
-Call-ID: 5EE0296D79334210@78.94.156.45
-CSeq: 37 INVITE
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Allow-Events: talk, hold, conference, refer
-Content-Length: 0
-
-
-2026-02-01 13:23:47.357370 82.07% [DEBUG] sofia.c:7493 Channel sofia/external/017619993000@fritz.box entering state [terminated][487]
-2026-02-01 13:23:47.357370 82.07% [NOTICE] sofia.c:8736 Hangup sofia/external/017619993000@fritz.box [CS_EXECUTE] [ORIGINATOR_CANCEL]
-recv 412 bytes from udp/[78.94.156.45]:5060 at 13:23:47.370343:
-------------------------------------------------------------------------
-ACK sip:INDYN-VNI-74@46.224.205.100:5080;gw=fritz-rt SIP/2.0
-Via: SIP/2.0/UDP 78.94.156.45:5060;branch=z9hG4bK2A288C4A12CC07C2
-From: <sip:017619993000@fritz.box>;tag=7FF95EAFC5518DA9
-To: <sip:INDYN-VNI-74@46.224.205.100:5080;gw=fritz-rt>;tag=F20FvXjXe5r6r
-Call-ID: 5EE0296D79334210@78.94.156.45
-CSeq: 37 ACK
-User-Agent: AVM FRITZ!Box 6591 Cable (Vodafone) 161.08.03 TAL (Jan 29 2025)
-Content-Length: 0
-
-
-2026-02-01 13:23:47.377357 82.07% [NOTICE] switch_ivr_originate.c:3820 Hangup sofia/internal/fritz@93.130.206.37:57883 [CS_CONSUME_MEDIA] [ORIGINATOR_CANCEL]
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_ivr_originate.c:4045 Originate Cancelled by originator termination Cause: 487 [ORIGINATOR_CANCEL]
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/fritz@93.130.206.37:57883) Running State Change CS_HANGUP (Cur 2 Tot 6)
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/fritz@93.130.206.37:57883) Callstate Change RINGING -> HANGUP
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/fritz@93.130.206.37:57883) State HANGUP
-2026-02-01 13:23:47.377357 82.07% [DEBUG] mod_sofia.c:463 sofia/internal/fritz@93.130.206.37:57883 Overriding SIP cause 487 with 487 from the other leg
-2026-02-01 13:23:47.377357 82.07% [DEBUG] mod_sofia.c:469 Channel sofia/internal/fritz@93.130.206.37:57883 hanging up, cause: ORIGINATOR_CANCEL
-2026-02-01 13:23:47.377357 82.07% [DEBUG] mod_sofia.c:537 Sending CANCEL to sofia/internal/fritz@93.130.206.37:57883
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:59 sofia/internal/fritz@93.130.206.37:57883 Standard HANGUP, cause: ORIGINATOR_CANCEL
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/fritz@93.130.206.37:57883) State HANGUP going to sleep
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/fritz@93.130.206.37:57883) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/fritz@93.130.206.37:57883) Running State Change CS_REPORTING (Cur 2 Tot 6)
-2026-02-01 13:23:47.377357 82.07% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: ORIGINATOR_CANCEL
-send 358 bytes to udp/[93.130.206.37]:57883 at 13:23:47.386032:
-------------------------------------------------------------------------
-CANCEL sip:fritz@93.130.206.37:57883 SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bK69ptcv50tm1jp
-Max-Forwards: 68
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=UZUZZpve07eNa
-To: <sip:fritz@93.130.206.37:57883>
-Call-ID: 1428cdc8-7a14-123f-bbb6-92000704f2de
-CSeq: 110422321 CANCEL
-Reason: Q.850;cause=16
-Content-Length: 0
-
-
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/fritz@93.130.206.37:57883) State REPORTING
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:168 sofia/internal/fritz@93.130.206.37:57883 Standard REPORTING, cause: ORIGINATOR_CANCEL
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/fritz@93.130.206.37:57883) State REPORTING going to sleep
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_session.c:2979 sofia/external/017619993000@fritz.box skip receive message [APPLICATION_EXEC_COMPLETE] (channel is hungup already)
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:647 (sofia/external/017619993000@fritz.box) State EXECUTE going to sleep
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fritz.box) Running State Change CS_HANGUP (Cur 2 Tot 6)
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/fritz@93.130.206.37:57883) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_session.c:1744 Session 6 (sofia/internal/fritz@93.130.206.37:57883) Locked, Waiting on external entities
-2026-02-01 13:23:47.377357 82.07% [NOTICE] switch_core_session.c:1762 Session 6 (sofia/internal/fritz@93.130.206.37:57883) Ended
-2026-02-01 13:23:47.377357 82.07% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/fritz@93.130.206.37:57883 [CS_DESTROY]
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:844 (sofia/external/017619993000@fritz.box) Callstate Change RINGING -> HANGUP
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:846 (sofia/external/017619993000@fritz.box) State HANGUP
-2026-02-01 13:23:47.377357 82.07% [DEBUG] mod_sofia.c:469 Channel sofia/external/017619993000@fritz.box hanging up, cause: ORIGINATOR_CANCEL
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:59 sofia/external/017619993000@fritz.box Standard HANGUP, cause: ORIGINATOR_CANCEL
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:846 (sofia/external/017619993000@fritz.box) State HANGUP going to sleep
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:616 (sofia/external/017619993000@fritz.box) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@fritz.box) Running State Change CS_REPORTING (Cur 1 Tot 6)
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/fritz@93.130.206.37:57883) Running State Change CS_DESTROY (Cur 1 Tot 6)
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:932 (sofia/external/017619993000@fritz.box) State REPORTING
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/fritz@93.130.206.37:57883) State DESTROY
-2026-02-01 13:23:47.377357 82.07% [DEBUG] mod_sofia.c:380 sofia/internal/fritz@93.130.206.37:57883 SOFIA DESTROY
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:175 sofia/internal/fritz@93.130.206.37:57883 Standard DESTROY
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/fritz@93.130.206.37:57883) State DESTROY going to sleep
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:168 sofia/external/017619993000@fritz.box Standard REPORTING, cause: ORIGINATOR_CANCEL
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:932 (sofia/external/017619993000@fritz.box) State REPORTING going to sleep
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:607 (sofia/external/017619993000@fritz.box) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_session.c:1744 Session 5 (sofia/external/017619993000@fritz.box) Locked, Waiting on external entities
-2026-02-01 13:23:47.377357 82.07% [NOTICE] switch_core_session.c:1762 Session 5 (sofia/external/017619993000@fritz.box) Ended
-2026-02-01 13:23:47.377357 82.07% [NOTICE] switch_core_session.c:1766 Close Channel sofia/external/017619993000@fritz.box [CS_DESTROY]
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:735 (sofia/external/017619993000@fritz.box) Running State Change CS_DESTROY (Cur 0 Tot 6)
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:745 (sofia/external/017619993000@fritz.box) State DESTROY
-2026-02-01 13:23:47.377357 82.07% [DEBUG] mod_sofia.c:380 sofia/external/017619993000@fritz.box SOFIA DESTROY
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:175 sofia/external/017619993000@fritz.box Standard DESTROY
-2026-02-01 13:23:47.377357 82.07% [DEBUG] switch_core_state_machine.c:745 (sofia/external/017619993000@fritz.box) State DESTROY going to sleep
-recv 440 bytes from udp/[93.130.206.37]:57883 at 13:23:47.411544:
-------------------------------------------------------------------------
-SIP/2.0 200 OK
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bK69ptcv50tm1jp
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=UZUZZpve07eNa
-To: <sip:fritz@93.130.206.37:57883>;tag=001daee7defdf011951799b831dcb0a0
-Call-ID: 1428cdc8-7a14-123f-bbb6-92000704f2de
-CSeq: 110422321 CANCEL
-Allow: INVITE, ACK, BYE, CANCEL, INFO, MESSAGE, NOTIFY, OPTIONS, REFER, UPDATE, PRACK
-Server: PhonerLite/3.26
-Content-Length: 0
-
-
-recv 498 bytes from udp/[93.130.206.37]:57883 at 13:23:47.411964:
-------------------------------------------------------------------------
-SIP/2.0 487 Request Terminated
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bK69ptcv50tm1jp
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=UZUZZpve07eNa
-To: <sip:fritz@93.130.206.37:57883>;tag=001daee7defdf011951799b831dcb0a0
-Call-ID: 1428cdc8-7a14-123f-bbb6-92000704f2de
-CSeq: 110422321 INVITE
-Contact: <sip:fritz@93.130.206.37:57883>
-Allow: INVITE, ACK, BYE, CANCEL, INFO, MESSAGE, NOTIFY, OPTIONS, REFER, UPDATE, PRACK
-Server: PhonerLite/3.26
-Content-Length: 0
-
-
-send 365 bytes to udp/[93.130.206.37]:57883 at 13:23:47.412092:
-------------------------------------------------------------------------
-ACK sip:fritz@93.130.206.37:57883 SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bK69ptcv50tm1jp
-Max-Forwards: 68
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=UZUZZpve07eNa
-To: <sip:fritz@93.130.206.37:57883>;tag=001daee7defdf011951799b831dcb0a0
-Call-ID: 1428cdc8-7a14-123f-bbb6-92000704f2de
-CSeq: 110422321 ACK
-Content-Length: 0
-
-
-send 845 bytes to udp/[109.235.234.68]:5060 at 13:23:48.908932:
-------------------------------------------------------------------------
-REGISTER sip:voip.agfeotel.xyz:5060;transport=udp SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100:5080;rport;branch=z9hG4bKQpQcpUQKNZtZp
-Max-Forwards: 70
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422268 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>
-Expires: 600
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Authorization: Digest username="422047", realm="voip.agfeotel.xyz", nonce="697f5400000176fdc57e896fceedf6889de3ef47b77848f6", algorithm=MD5, uri="sip:voip.agfeotel.xyz:5060;transport=udp", response="a41a572f32ebdb6e6308e1ab81972b37"
-Content-Length: 0
-
-
-recv 501 bytes from udp/[109.235.234.68]:5060 at 13:23:48.927871:
-------------------------------------------------------------------------
-SIP/2.0 401 Unauthorized
-Via: SIP/2.0/UDP 46.224.205.100:5080;received=46.224.205.100;rport=5080;branch=z9hG4bKQpQcpUQKNZtZp
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>;tag=26d289c6b153a624a6985feaf56ff878.488c
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422268 REGISTER
-WWW-Authenticate: Digest realm="voip.agfeotel.xyz", nonce="697f54020001772ad72ab0cd9a32d9f94088ab215a75c83d", stale=true
-Server: INES SIP-Proxy
-Content-Length: 0
-
-
-send 845 bytes to udp/[109.235.234.68]:5060 at 13:23:48.928156:
-------------------------------------------------------------------------
-REGISTER sip:voip.agfeotel.xyz:5060;transport=udp SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100:5080;rport;branch=z9hG4bKrZg5Qp8pj8gjj
-Max-Forwards: 70
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422269 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>
-Expires: 600
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Authorization: Digest username="422047", realm="voip.agfeotel.xyz", nonce="697f54020001772ad72ab0cd9a32d9f94088ab215a75c83d", algorithm=MD5, uri="sip:voip.agfeotel.xyz:5060;transport=udp", response="7114249b262a8be8f907f5b328e3c5f7"
-Content-Length: 0
-
-
-recv 522 bytes from udp/[109.235.234.68]:5060 at 13:23:48.969608:
-------------------------------------------------------------------------
-SIP/2.0 200 OK
-Via: SIP/2.0/UDP 46.224.205.100:5080;received=46.224.205.100;rport=5080;branch=z9hG4bKrZg5Qp8pj8gjj
-From: <sip:422047@voip.agfeotel.xyz>;tag=2crD5XQFmHQKj
-To: <sip:422047@voip.agfeotel.xyz>;tag=26d289c6b153a624a6985feaf56ff878.0f74
-Call-ID: a4bc0409-f78a-4854-bad1-e85390e477ae
-CSeq: 110422269 REGISTER
-Contact: <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>;expires=600, <sip:422047@46.224.205.100:5080;transport=udp;gw=agfeo-rt>;expires=337
-Server: INES SIP-Proxy
-Content-Length: 0
-
-
-2026-02-01 13:23:48.997398 82.17% [DEBUG] sofia_reg.c:418 Registered agfeo-rt
-recv 491 bytes from udp/[185.79.24.137]:5060 at 13:23:59.897068:
-------------------------------------------------------------------------
-OPTIONS sip:777034347089@46.224.205.100:5080;transport=udp;gw=placetel-rt SIP/2.0
-Via: SIP/2.0/UDP 185.79.24.137;branch=z9hG4bKf9dd.302e1072eb476204eaaf2f531c8d0df6.0;ping=1
-Via: SIP/2.0/UDP 185.79.26.6:5060;branch=z9hG4bK7960038
-From: sip:pinger@fpbx.de;tag=uloc-9ea61a-69695cf7-23acd4-3f037c3-5cea2199-c31615ad
-To: sip:777034347089@46.224.205.100:5080;transport=udp;gw=placetel-rt
-Call-ID: 75e2394-b4b8501f-d5fe502@185.79.26.6
-CSeq: 1 OPTIONS
-Max-Forwards: 69
-Content-Length: 0
-
-
-send 752 bytes to udp/[185.79.24.137]:5060 at 13:23:59.897536:
-------------------------------------------------------------------------
-SIP/2.0 200 OK
-Via: SIP/2.0/UDP 185.79.24.137;branch=z9hG4bKf9dd.302e1072eb476204eaaf2f531c8d0df6.0;ping=1
-Via: SIP/2.0/UDP 185.79.26.6:5060;branch=z9hG4bK7960038
-From: sip:pinger@fpbx.de;tag=uloc-9ea61a-69695cf7-23acd4-3f037c3-5cea2199-c31615ad
-To: <sip:777034347089@46.224.205.100:5080>;transport=udp;gw=placetel-rt;tag=gBt8Xr30BeFSm
-Call-ID: 75e2394-b4b8501f-d5fe502@185.79.26.6
-CSeq: 1 OPTIONS
-Contact: <sip:14@46.224.205.100:5080;transport=udp;gw=3cx-rt>
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Accept: application/sdp
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Allow-Events: talk, hold, conference, refer
-Content-Length: 0
-
-
-recv 301 bytes from udp/[44.229.228.186]:5060 at 13:24:05.064898:
-------------------------------------------------------------------------
-OPTIONS sip:46.224.205.100:5060 SIP/2.0
-Via: SIP/2.0/UDP 44.229.228.186;rport;branch=z9hG4bKey8rp5H6rKj4g
-Max-Forwards: 70
-From: <sip:44.229.228.186:5060>;tag=rQg7UXXH3g4rQ
-To: <sip:46.224.205.100:5060>
-Call-ID: 1f2f0346-7a14-123f-d4af-0ec7040a32ad
-CSeq: 110422330 OPTIONS
-Content-Length: 0
-
-
-send 575 bytes to udp/[44.229.228.186]:5060 at 13:24:05.065282:
-------------------------------------------------------------------------
-SIP/2.0 200 OK
-Via: SIP/2.0/UDP 44.229.228.186;rport=5060;branch=z9hG4bKey8rp5H6rKj4g
-From: <sip:44.229.228.186:5060>;tag=rQg7UXXH3g4rQ
-To: <sip:46.224.205.100:5060>;tag=v8mr1HDjXg57N
-Call-ID: 1f2f0346-7a14-123f-d4af-0ec7040a32ad
-CSeq: 110422330 OPTIONS
-Contact: <sip:46.224.205.100>
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Accept: application/sdp
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Allow-Events: talk, hold, conference, refer
-Content-Length: 0
-
-
-recv 299 bytes from udp/[34.213.129.25]:5060 at 13:24:06.126383:
-------------------------------------------------------------------------
-OPTIONS sip:46.224.205.100:5060 SIP/2.0
-Via: SIP/2.0/UDP 34.213.129.25;rport;branch=z9hG4bK4XQFv08HN00XS
-Max-Forwards: 70
-From: <sip:34.213.129.25:5060>;tag=QKSUBK89QZyXK
-To: <sip:46.224.205.100:5060>
-Call-ID: 1fd0f35b-7a14-123f-b8a6-02dba9997577
-CSeq: 110422331 OPTIONS
-Content-Length: 0
-
-
-send 573 bytes to udp/[34.213.129.25]:5060 at 13:24:06.126889:
-------------------------------------------------------------------------
-SIP/2.0 200 OK
-Via: SIP/2.0/UDP 34.213.129.25;rport=5060;branch=z9hG4bK4XQFv08HN00XS
-From: <sip:34.213.129.25:5060>;tag=QKSUBK89QZyXK
-To: <sip:46.224.205.100:5060>;tag=XHeH3cyNtSUtH
-Call-ID: 1fd0f35b-7a14-123f-b8a6-02dba9997577
-CSeq: 110422331 OPTIONS
-Contact: <sip:46.224.205.100>
-User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
-Accept: application/sdp
-Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
-Supported: timer, path, replaces
-Allow-Events: talk, hold, conference, refer
-Content-Length: 0
+From: "017619993000" <sip:017619993000@fpbx.de:7010>;tag=as10ba3dcb
+To: <sip:777034347089@fpbx.de>;tag=Da01gH8UNSmee
+Call-ID: 154302532d2cdad6370de6f47a081f90@fpbx.de
+CSeq: 102 ACK
