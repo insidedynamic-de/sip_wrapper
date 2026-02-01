@@ -148,8 +148,9 @@ services:
           wget --no-cache -qO /opt/admin/templates/gateways.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/gateways.html
           wget --no-cache -qO /opt/admin/templates/users.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/users.html
 
-          # Install Python dependencies
-          pip3 install --no-cache-dir -q flask gunicorn 2>/dev/null || pip install --no-cache-dir -q flask gunicorn
+          # Install Python dependencies (use venv for Alpine)
+          python3 -m venv /opt/admin/venv
+          /opt/admin/venv/bin/pip install --no-cache-dir -q flask gunicorn
 
           echo "✓ Admin Portal installed"
         else
@@ -161,7 +162,7 @@ services:
         echo "[STEP 7/8] Starting Admin Portal..."
         if [ "$SKIP_ADMIN" != "true" ] && [ -f /opt/admin/app.py ]; then
           cd /opt/admin
-          python3 app.py &
+          /opt/admin/venv/bin/python app.py &
           ADMIN_PID=$$!
           echo "✓ Admin Portal started on port $ADMIN_PORT (PID: $$ADMIN_PID)"
         else
