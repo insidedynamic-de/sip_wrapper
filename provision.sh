@@ -675,6 +675,8 @@ EOF
     <param name="expire-seconds" value="600"/>
     <param name="caller-id-in-from" value="false"/>
     <param name="extension-in-contact" value="true"/>
+    <!-- Clean contact params - some PBX (like 3CX) don't handle extra params well -->
+    <param name="contact-params" value=""/>
   </gateway>
 </include>
 EOF
