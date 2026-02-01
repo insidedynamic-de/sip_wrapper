@@ -1,75 +1,55 @@
-Max-Forwards: 57
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=4NN2434e8K9yp
-To: <sip:1001@apps.linkify.cloud>;tag=5yeU6yNj5vZHj
-Call-ID: e4858264-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+To: <sip:1001@apps.linkify.cloud>;tag=e8a5F149jgKje
+Call-ID: 2c578e92-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.713034 87.30% [DEBUG] sofia.c:6672 Remote Reason: 16
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 18 Tot 31)
-2026-02-01 11:42:13.713034 87.30% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
-2026-02-01 11:42:13.713034 87.30% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 18 Tot 31)
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
-2026-02-01 11:42:13.713034 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
-2026-02-01 11:42:13.713034 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 18 Tot 31)
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.713034 87.30% [DEBUG] switch_core_session.c:1744 Session 18 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
-2026-02-01 11:42:13.733367 87.30% [NOTICE] switch_core_session.c:1762 Session 18 (sofia/internal/1001@apps.linkify.cloud) Ended
-2026-02-01 11:42:13.733367 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
-2026-02-01 11:42:13.733367 87.30% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
-2026-02-01 11:42:13.733367 87.30% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
-2026-02-01 11:42:13.733367 87.30% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 18 Tot 31)
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
-2026-02-01 11:42:13.733367 87.30% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
-2026-02-01 11:42:13.733367 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.733367 87.30% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 18 Tot 31)
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_session.c:1744 Session 17 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
-2026-02-01 11:42:13.733367 87.30% [NOTICE] switch_core_session.c:1762 Session 17 (sofia/internal/017619993000@46.224.205.100) Ended
-2026-02-01 11:42:13.733367 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 17 Tot 31)
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
-2026-02-01 11:42:13.733367 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 16 Tot 31)
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
-2026-02-01 11:42:13.733367 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
-send 822 bytes to udp/[46.224.205.100]:5060 at 11:42:13.744523:
+2026-02-01 11:44:14.210095 90.77% [DEBUG] sofia.c:6672 Remote Reason: 16
+2026-02-01 11:44:14.210095 90.77% [NOTICE] switch_core_session.c:1762 Session 20 (sofia/internal/1001@apps.linkify.cloud) Ended
+2026-02-01 11:44:14.210095 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 18 Tot 29)
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
+2026-02-01 11:44:14.210095 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
+2026-02-01 11:44:14.210095 90.77% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
+2026-02-01 11:44:14.210095 90.77% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 18 Tot 29)
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
+2026-02-01 11:44:14.210095 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 18 Tot 29)
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_session.c:1744 Session 18 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
+2026-02-01 11:44:14.210095 90.77% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
+2026-02-01 11:44:14.210095 90.77% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
+2026-02-01 11:44:14.210095 90.77% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 18 Tot 29)
+2026-02-01 11:44:14.210095 90.77% [NOTICE] switch_core_session.c:1762 Session 18 (sofia/internal/1001@apps.linkify.cloud) Ended
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
+2026-02-01 11:44:14.210095 90.77% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
+2026-02-01 11:44:14.210095 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.210095 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
+send 822 bytes to udp/[46.224.205.100]:5060 at 11:44:14.221407:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKFvyaQj32yF1BF
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKXmZpHXvec6UUF
 Max-Forwards: 58
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=232g1D37D2vSF
-To: <sip:1001@apps.linkify.cloud>;tag=3cv928KBBBKcB
-Call-ID: e484c50b-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=BDZtagjZUNgtB
+To: <sip:1001@apps.linkify.cloud>;tag=cprKcB32ry6cQ
+Call-ID: 2c550d4d-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -82,15 +62,17 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-recv 822 bytes from udp/[46.224.205.100]:5060 at 11:42:13.746824:
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 17 Tot 29)
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
+recv 822 bytes from udp/[46.224.205.100]:5060 at 11:44:14.222096:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKFvyaQj32yF1BF
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKXmZpHXvec6UUF
 Max-Forwards: 58
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=232g1D37D2vSF
-To: <sip:1001@apps.linkify.cloud>;tag=3cv928KBBBKcB
-Call-ID: e484c50b-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=BDZtagjZUNgtB
+To: <sip:1001@apps.linkify.cloud>;tag=cprKcB32ry6cQ
+Call-ID: 2c550d4d-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -103,80 +85,96 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-send 342 bytes to udp/[46.224.205.100]:5060 at 11:42:13.747184:
+send 342 bytes to udp/[46.224.205.100]:5060 at 11:44:14.222481:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKFvyaQj32yF1BF
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKXmZpHXvec6UUF
 Max-Forwards: 58
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=232g1D37D2vSF
-To: <sip:1001@apps.linkify.cloud>;tag=3cv928KBBBKcB
-Call-ID: e484c50b-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=BDZtagjZUNgtB
+To: <sip:1001@apps.linkify.cloud>;tag=cprKcB32ry6cQ
+Call-ID: 2c550d4d-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.733367 87.30% [DEBUG] sofia.c:6672 Remote Reason: 16
-recv 342 bytes from udp/[46.224.205.100]:5060 at 11:42:13.748039:
+2026-02-01 11:44:14.210095 90.77% [DEBUG] sofia.c:6672 Remote Reason: 16
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 17 Tot 29)
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
+recv 342 bytes from udp/[46.224.205.100]:5060 at 11:44:14.224080:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKFvyaQj32yF1BF
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKXmZpHXvec6UUF
 Max-Forwards: 58
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=232g1D37D2vSF
-To: <sip:1001@apps.linkify.cloud>;tag=3cv928KBBBKcB
-Call-ID: e484c50b-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=BDZtagjZUNgtB
+To: <sip:1001@apps.linkify.cloud>;tag=cprKcB32ry6cQ
+Call-ID: 2c550d4d-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.733367 87.30% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
-2026-02-01 11:42:13.733367 87.30% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 16 Tot 31)
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
-2026-02-01 11:42:13.733367 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 16 Tot 31)
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.733367 87.30% [DEBUG] switch_core_session.c:1744 Session 16 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1762 Session 16 (sofia/internal/1001@apps.linkify.cloud) Ended
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 15 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
-2026-02-01 11:42:13.753849 87.30% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 15 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 15 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
-send 822 bytes to udp/[46.224.205.100]:5060 at 11:42:13.759022:
+2026-02-01 11:44:14.210095 90.77% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
+2026-02-01 11:44:14.210095 90.77% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 17 Tot 29)
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
+2026-02-01 11:44:14.210095 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 17 Tot 29)
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_session.c:1744 Session 17 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
+2026-02-01 11:44:14.210095 90.77% [NOTICE] switch_core_session.c:1762 Session 17 (sofia/internal/017619993000@46.224.205.100) Ended
+2026-02-01 11:44:14.210095 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 16 Tot 29)
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_session.c:1744 Session 16 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
+2026-02-01 11:44:14.210095 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
+2026-02-01 11:44:14.210095 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
+2026-02-01 11:44:14.230045 90.77% [NOTICE] switch_core_session.c:1762 Session 16 (sofia/internal/1001@apps.linkify.cloud) Ended
+2026-02-01 11:44:14.230045 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 15 Tot 29)
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
+2026-02-01 11:44:14.230045 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
+2026-02-01 11:44:14.230045 90.77% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
+2026-02-01 11:44:14.230045 90.77% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
+2026-02-01 11:44:14.230045 90.77% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 15 Tot 29)
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
+2026-02-01 11:44:14.230045 90.77% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
+2026-02-01 11:44:14.230045 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.230045 90.77% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 15 Tot 29)
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
+send 822 bytes to udp/[46.224.205.100]:5060 at 11:44:14.240107:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKeK5HNQjZ16aSK
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKvB6XF2BBFX58K
 Max-Forwards: 59
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=0HgZXQ10Kggmr
-To: <sip:1001@apps.linkify.cloud>;tag=1t9QZjj4gS66K
-Call-ID: e48425fb-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=9tc96Sgr133mm
+To: <sip:1001@apps.linkify.cloud>;tag=a4518m1Uyct7F
+Call-ID: 2c514790-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -189,20 +187,17 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_session.c:1744 Session 15 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1762 Session 15 (sofia/internal/017619993000@46.224.205.100) Ended
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 14 Tot 31)
-recv 822 bytes from udp/[46.224.205.100]:5060 at 11:42:13.759770:
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
+recv 822 bytes from udp/[46.224.205.100]:5060 at 11:44:14.240207:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKeK5HNQjZ16aSK
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKvB6XF2BBFX58K
 Max-Forwards: 59
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=0HgZXQ10Kggmr
-To: <sip:1001@apps.linkify.cloud>;tag=1t9QZjj4gS66K
-Call-ID: e48425fb-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=9tc96Sgr133mm
+To: <sip:1001@apps.linkify.cloud>;tag=a4518m1Uyct7F
+Call-ID: 2c514790-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -215,82 +210,89 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
-send 342 bytes to udp/[46.224.205.100]:5060 at 11:42:13.760795:
+send 342 bytes to udp/[46.224.205.100]:5060 at 11:44:14.240346:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKeK5HNQjZ16aSK
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKvB6XF2BBFX58K
 Max-Forwards: 59
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=0HgZXQ10Kggmr
-To: <sip:1001@apps.linkify.cloud>;tag=1t9QZjj4gS66K
-Call-ID: e48425fb-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=9tc96Sgr133mm
+To: <sip:1001@apps.linkify.cloud>;tag=a4518m1Uyct7F
+Call-ID: 2c514790-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 ACK
 Content-Length: 0
 
 
-recv 342 bytes from udp/[46.224.205.100]:5060 at 11:42:13.761231:
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_session.c:1744 Session 15 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
+2026-02-01 11:44:14.230045 90.77% [NOTICE] switch_core_session.c:1762 Session 15 (sofia/internal/017619993000@46.224.205.100) Ended
+2026-02-01 11:44:14.230045 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
+recv 342 bytes from udp/[46.224.205.100]:5060 at 11:44:14.240479:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKeK5HNQjZ16aSK
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKvB6XF2BBFX58K
 Max-Forwards: 59
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=0HgZXQ10Kggmr
-To: <sip:1001@apps.linkify.cloud>;tag=1t9QZjj4gS66K
-Call-ID: e48425fb-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=9tc96Sgr133mm
+To: <sip:1001@apps.linkify.cloud>;tag=a4518m1Uyct7F
+Call-ID: 2c514790-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.753849 87.30% [DEBUG] sofia.c:6672 Remote Reason: 16
-2026-02-01 11:42:13.753849 87.30% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
-2026-02-01 11:42:13.753849 87.30% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 14 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 14 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_session.c:1744 Session 14 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1762 Session 14 (sofia/internal/1001@apps.linkify.cloud) Ended
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 13 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
-2026-02-01 11:42:13.753849 87.30% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 13 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 13 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
-send 822 bytes to udp/[46.224.205.100]:5060 at 11:42:13.776115:
+2026-02-01 11:44:14.230045 90.77% [DEBUG] sofia.c:6672 Remote Reason: 16
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 14 Tot 29)
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
+2026-02-01 11:44:14.230045 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
+2026-02-01 11:44:14.230045 90.77% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
+2026-02-01 11:44:14.230045 90.77% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 14 Tot 29)
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
+2026-02-01 11:44:14.230045 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 14 Tot 29)
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.230045 90.77% [DEBUG] switch_core_session.c:1744 Session 14 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_session.c:1762 Session 14 (sofia/internal/1001@apps.linkify.cloud) Ended
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 13 Tot 29)
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
+2026-02-01 11:44:14.250060 90.77% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 13 Tot 29)
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
+2026-02-01 11:44:14.250060 90.77% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
+2026-02-01 11:44:14.250060 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 13 Tot 29)
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
+send 822 bytes to udp/[46.224.205.100]:5060 at 11:44:14.262279:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKDacSKv1U4Xm6Q
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKU2c5D7t7HmFpr
 Max-Forwards: 60
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=yZXDt1ZSSy3eH
-To: <sip:1001@apps.linkify.cloud>;tag=Z8p6UvgXp7S1c
-Call-ID: e48355f4-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=78SQ33eH7HQFD
+To: <sip:1001@apps.linkify.cloud>;tag=8HKg5yZm4tD2r
+Call-ID: 2c5018dc-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -303,18 +305,15 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
-recv 822 bytes from udp/[46.224.205.100]:5060 at 11:42:13.776230:
+recv 822 bytes from udp/[46.224.205.100]:5060 at 11:44:14.262461:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKDacSKv1U4Xm6Q
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKU2c5D7t7HmFpr
 Max-Forwards: 60
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=yZXDt1ZSSy3eH
-To: <sip:1001@apps.linkify.cloud>;tag=Z8p6UvgXp7S1c
-Call-ID: e48355f4-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=78SQ33eH7HQFD
+To: <sip:1001@apps.linkify.cloud>;tag=8HKg5yZm4tD2r
+Call-ID: 2c5018dc-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -327,85 +326,89 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_session.c:1744 Session 13 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1762 Session 13 (sofia/internal/017619993000@46.224.205.100) Ended
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
-send 342 bytes to udp/[46.224.205.100]:5060 at 11:42:13.776369:
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_session.c:1744 Session 13 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_session.c:1762 Session 13 (sofia/internal/017619993000@46.224.205.100) Ended
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
+send 342 bytes to udp/[46.224.205.100]:5060 at 11:44:14.262549:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKDacSKv1U4Xm6Q
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKU2c5D7t7HmFpr
 Max-Forwards: 60
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=yZXDt1ZSSy3eH
-To: <sip:1001@apps.linkify.cloud>;tag=Z8p6UvgXp7S1c
-Call-ID: e48355f4-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=78SQ33eH7HQFD
+To: <sip:1001@apps.linkify.cloud>;tag=8HKg5yZm4tD2r
+Call-ID: 2c5018dc-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 ACK
 Content-Length: 0
 
 
-recv 342 bytes from udp/[46.224.205.100]:5060 at 11:42:13.776440:
+2026-02-01 11:44:14.250060 90.77% [DEBUG] sofia.c:6672 Remote Reason: 16
+recv 342 bytes from udp/[46.224.205.100]:5060 at 11:44:14.262686:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKDacSKv1U4Xm6Q
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKU2c5D7t7HmFpr
 Max-Forwards: 60
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=yZXDt1ZSSy3eH
-To: <sip:1001@apps.linkify.cloud>;tag=Z8p6UvgXp7S1c
-Call-ID: e48355f4-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=78SQ33eH7HQFD
+To: <sip:1001@apps.linkify.cloud>;tag=8HKg5yZm4tD2r
+Call-ID: 2c5018dc-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 12 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] sofia.c:6672 Remote Reason: 16
-2026-02-01 11:42:13.753849 87.30% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
-2026-02-01 11:42:13.753849 87.30% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 12 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 12 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_session.c:1744 Session 12 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1762 Session 12 (sofia/internal/1001@apps.linkify.cloud) Ended
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 11 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 11 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 11 Tot 31)
-send 822 bytes to udp/[46.224.205.100]:5060 at 11:42:13.790112:
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 12 Tot 29)
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
+2026-02-01 11:44:14.250060 90.77% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
+2026-02-01 11:44:14.250060 90.77% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 12 Tot 29)
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
+2026-02-01 11:44:14.250060 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 12 Tot 29)
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_session.c:1744 Session 12 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_session.c:1762 Session 12 (sofia/internal/1001@apps.linkify.cloud) Ended
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
+2026-02-01 11:44:14.250060 90.77% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 11 Tot 29)
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 11 Tot 29)
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
+2026-02-01 11:44:14.250060 90.77% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
+2026-02-01 11:44:14.250060 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 11 Tot 29)
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
+send 822 bytes to udp/[46.224.205.100]:5060 at 11:44:14.269367:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKc1j0H1gr7myKc
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKtSKccca4mBS3c
 Max-Forwards: 61
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=vDBvpByjZcQ9S
-To: <sip:1001@apps.linkify.cloud>;tag=Xp4mr6epvNDvN
-Call-ID: e482c8b0-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=5p75ZDDaD0aap
+To: <sip:1001@apps.linkify.cloud>;tag=6Z0y18XDa90vH
+Call-ID: 2c4d4e1f-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -418,18 +421,19 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
-recv 822 bytes from udp/[46.224.205.100]:5060 at 11:42:13.790226:
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_session.c:1744 Session 11 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_session.c:1762 Session 11 (sofia/internal/017619993000@46.224.205.100) Ended
+2026-02-01 11:44:14.250060 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
+recv 822 bytes from udp/[46.224.205.100]:5060 at 11:44:14.269529:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKc1j0H1gr7myKc
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKtSKccca4mBS3c
 Max-Forwards: 61
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=vDBvpByjZcQ9S
-To: <sip:1001@apps.linkify.cloud>;tag=Xp4mr6epvNDvN
-Call-ID: e482c8b0-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=5p75ZDDaD0aap
+To: <sip:1001@apps.linkify.cloud>;tag=6Z0y18XDa90vH
+Call-ID: 2c4d4e1f-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -442,89 +446,94 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-send 342 bytes to udp/[46.224.205.100]:5060 at 11:42:13.790364:
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 10 Tot 29)
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
+2026-02-01 11:44:14.250060 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
+send 342 bytes to udp/[46.224.205.100]:5060 at 11:44:14.269753:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKc1j0H1gr7myKc
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKtSKccca4mBS3c
 Max-Forwards: 61
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=vDBvpByjZcQ9S
-To: <sip:1001@apps.linkify.cloud>;tag=Xp4mr6epvNDvN
-Call-ID: e482c8b0-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=5p75ZDDaD0aap
+To: <sip:1001@apps.linkify.cloud>;tag=6Z0y18XDa90vH
+Call-ID: 2c4d4e1f-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_session.c:1744 Session 11 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1762 Session 11 (sofia/internal/017619993000@46.224.205.100) Ended
-2026-02-01 11:42:13.753849 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
-recv 342 bytes from udp/[46.224.205.100]:5060 at 11:42:13.790495:
+2026-02-01 11:44:14.250060 90.77% [DEBUG] sofia.c:6672 Remote Reason: 16
+recv 342 bytes from udp/[46.224.205.100]:5060 at 11:44:14.269920:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKc1j0H1gr7myKc
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKtSKccca4mBS3c
 Max-Forwards: 61
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=vDBvpByjZcQ9S
-To: <sip:1001@apps.linkify.cloud>;tag=Xp4mr6epvNDvN
-Call-ID: e482c8b0-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=5p75ZDDaD0aap
+To: <sip:1001@apps.linkify.cloud>;tag=6Z0y18XDa90vH
+Call-ID: 2c4d4e1f-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.753849 87.30% [DEBUG] sofia.c:6672 Remote Reason: 16
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 10 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
-2026-02-01 11:42:13.753849 87.30% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 10 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
-2026-02-01 11:42:13.753849 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 10 Tot 31)
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.753849 87.30% [DEBUG] switch_core_session.c:1744 Session 10 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
-2026-02-01 11:42:13.793034 87.30% [NOTICE] switch_core_session.c:1762 Session 10 (sofia/internal/1001@apps.linkify.cloud) Ended
-2026-02-01 11:42:13.793034 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 9 Tot 31)
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
-2026-02-01 11:42:13.793034 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
-2026-02-01 11:42:13.793034 87.30% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
-2026-02-01 11:42:13.793034 87.30% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
-2026-02-01 11:42:13.793034 87.30% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 9 Tot 31)
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
-2026-02-01 11:42:13.793034 87.30% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
-2026-02-01 11:42:13.793034 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.793034 87.30% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 9 Tot 31)
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
-send 822 bytes to udp/[46.224.205.100]:5060 at 11:42:13.811072:
+2026-02-01 11:44:14.270035 90.77% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
+2026-02-01 11:44:14.270035 90.77% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 10 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 10 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 10 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_session.c:1744 Session 10 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1762 Session 10 (sofia/internal/1001@apps.linkify.cloud) Ended
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 9 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 9 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_session.c:1744 Session 9 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1762 Session 9 (sofia/internal/017619993000@46.224.205.100) Ended
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 8 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
+send 822 bytes to udp/[46.224.205.100]:5060 at 11:44:14.272832:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKBrS7F6Zmac80g
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKSgtKaHS0Q22gH
 Max-Forwards: 62
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=tUraKNvB5ta4j
-To: <sip:1001@apps.linkify.cloud>;tag=U4H3mgDF230pe
-Call-ID: e4823300-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=34mmvQB3jey4e
+To: <sip:1001@apps.linkify.cloud>;tag=4DeDyjv6FQmQa
+Call-ID: 2c4a8a34-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -537,19 +546,15 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_session.c:1744 Session 9 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
-2026-02-01 11:42:13.793034 87.30% [NOTICE] switch_core_session.c:1762 Session 9 (sofia/internal/017619993000@46.224.205.100) Ended
-2026-02-01 11:42:13.793034 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
-recv 822 bytes from udp/[46.224.205.100]:5060 at 11:42:13.811290:
+recv 822 bytes from udp/[46.224.205.100]:5060 at 11:44:14.272949:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKBrS7F6Zmac80g
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKSgtKaHS0Q22gH
 Max-Forwards: 62
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=tUraKNvB5ta4j
-To: <sip:1001@apps.linkify.cloud>;tag=U4H3mgDF230pe
-Call-ID: e4823300-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=34mmvQB3jey4e
+To: <sip:1001@apps.linkify.cloud>;tag=4DeDyjv6FQmQa
+Call-ID: 2c4a8a34-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -562,78 +567,84 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-send 342 bytes to udp/[46.224.205.100]:5060 at 11:42:13.811404:
+send 342 bytes to udp/[46.224.205.100]:5060 at 11:44:14.273065:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKBrS7F6Zmac80g
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKSgtKaHS0Q22gH
 Max-Forwards: 62
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=tUraKNvB5ta4j
-To: <sip:1001@apps.linkify.cloud>;tag=U4H3mgDF230pe
-Call-ID: e4823300-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=34mmvQB3jey4e
+To: <sip:1001@apps.linkify.cloud>;tag=4DeDyjv6FQmQa
+Call-ID: 2c4a8a34-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.793034 87.30% [DEBUG] sofia.c:6672 Remote Reason: 16
-recv 342 bytes from udp/[46.224.205.100]:5060 at 11:42:13.811499:
+recv 342 bytes from udp/[46.224.205.100]:5060 at 11:44:14.273149:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKBrS7F6Zmac80g
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKSgtKaHS0Q22gH
 Max-Forwards: 62
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=tUraKNvB5ta4j
-To: <sip:1001@apps.linkify.cloud>;tag=U4H3mgDF230pe
-Call-ID: e4823300-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=34mmvQB3jey4e
+To: <sip:1001@apps.linkify.cloud>;tag=4DeDyjv6FQmQa
+Call-ID: 2c4a8a34-7a06-123f-21a4-92000704f2de
+CSeq: 110419335 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 8 Tot 31)
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
-2026-02-01 11:42:13.793034 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
-2026-02-01 11:42:13.793034 87.30% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
-2026-02-01 11:42:13.793034 87.30% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 8 Tot 31)
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
-2026-02-01 11:42:13.793034 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.793034 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 8 Tot 31)
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_session.c:1744 Session 8 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
-2026-02-01 11:42:13.813061 87.30% [NOTICE] switch_core_session.c:1762 Session 8 (sofia/internal/1001@apps.linkify.cloud) Ended
-2026-02-01 11:42:13.813061 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
-2026-02-01 11:42:13.813061 87.30% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
-2026-02-01 11:42:13.813061 87.30% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
-2026-02-01 11:42:13.813061 87.30% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 7 Tot 31)
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 7 Tot 31)
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
-2026-02-01 11:42:13.813061 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
-2026-02-01 11:42:13.813061 87.30% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
-2026-02-01 11:42:13.813061 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
-send 822 bytes to udp/[46.224.205.100]:5060 at 11:42:13.821953:
+2026-02-01 11:44:14.270035 90.77% [DEBUG] sofia.c:6672 Remote Reason: 16
+2026-02-01 11:44:14.270035 90.77% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
+2026-02-01 11:44:14.270035 90.77% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 8 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 8 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
+2026-02-01 11:44:14.270035 90.77% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_session.c:1744 Session 8 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1762 Session 8 (sofia/internal/1001@apps.linkify.cloud) Ended
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 7 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 7 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 7 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_session.c:1744 Session 7 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1762 Session 7 (sofia/internal/017619993000@46.224.205.100) Ended
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
+send 822 bytes to udp/[46.224.205.100]:5060 at 11:44:14.274772:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKaF0eeBFHD3HeN
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKr70t8N8vtScyN
 Max-Forwards: 63
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=r95rFZt4a9XyB
-To: <sip:1001@apps.linkify.cloud>;tag=SjZHHtB87HmHQ
-Call-ID: e4816233-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=1j22r19UrvHZQ
+To: <sip:1001@apps.linkify.cloud>;tag=2UUUtvtZN57HK
+Call-ID: 2c48ae36-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -646,15 +657,20 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-recv 822 bytes from udp/[46.224.205.100]:5060 at 11:42:13.822035:
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 6 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
+recv 822 bytes from udp/[46.224.205.100]:5060 at 11:44:14.274885:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKaF0eeBFHD3HeN
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKr70t8N8vtScyN
 Max-Forwards: 63
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=r95rFZt4a9XyB
-To: <sip:1001@apps.linkify.cloud>;tag=SjZHHtB87HmHQ
-Call-ID: e4816233-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=1j22r19UrvHZQ
+To: <sip:1001@apps.linkify.cloud>;tag=2UUUtvtZN57HK
+Call-ID: 2c48ae36-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -667,92 +683,80 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-send 342 bytes to udp/[46.224.205.100]:5060 at 11:42:13.822103:
+send 342 bytes to udp/[46.224.205.100]:5060 at 11:44:14.274985:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKaF0eeBFHD3HeN
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKr70t8N8vtScyN
 Max-Forwards: 63
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=r95rFZt4a9XyB
-To: <sip:1001@apps.linkify.cloud>;tag=SjZHHtB87HmHQ
-Call-ID: e4816233-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=1j22r19UrvHZQ
+To: <sip:1001@apps.linkify.cloud>;tag=2UUUtvtZN57HK
+Call-ID: 2c48ae36-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 ACK
 Content-Length: 0
 
 
-recv 342 bytes from udp/[46.224.205.100]:5060 at 11:42:13.822152:
+recv 342 bytes from udp/[46.224.205.100]:5060 at 11:44:14.275058:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKaF0eeBFHD3HeN
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKr70t8N8vtScyN
 Max-Forwards: 63
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=r95rFZt4a9XyB
-To: <sip:1001@apps.linkify.cloud>;tag=SjZHHtB87HmHQ
-Call-ID: e4816233-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=1j22r19UrvHZQ
+To: <sip:1001@apps.linkify.cloud>;tag=2UUUtvtZN57HK
+Call-ID: 2c48ae36-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 7 Tot 31)
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_session.c:1744 Session 7 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
-2026-02-01 11:42:13.813061 87.30% [NOTICE] switch_core_session.c:1762 Session 7 (sofia/internal/017619993000@46.224.205.100) Ended
-2026-02-01 11:42:13.813061 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
-2026-02-01 11:42:13.813061 87.30% [DEBUG] sofia.c:6672 Remote Reason: 16
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 6 Tot 31)
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
-2026-02-01 11:42:13.813061 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
-2026-02-01 11:42:13.813061 87.30% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
-2026-02-01 11:42:13.813061 87.30% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 6 Tot 31)
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
-2026-02-01 11:42:13.813061 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 6 Tot 31)
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.813061 87.30% [DEBUG] switch_core_session.c:1744 Session 6 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
-2026-02-01 11:42:13.833034 87.30% [NOTICE] switch_core_session.c:1762 Session 6 (sofia/internal/1001@apps.linkify.cloud) Ended
-2026-02-01 11:42:13.833034 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 5 Tot 31)
-2026-02-01 11:42:13.833034 87.30% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
-2026-02-01 11:42:13.833034 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
-2026-02-01 11:42:13.833034 87.30% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
-2026-02-01 11:42:13.833034 87.30% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 5 Tot 31)
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
-2026-02-01 11:42:13.833034 87.30% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
-2026-02-01 11:42:13.833034 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.833034 87.30% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
-send 822 bytes to udp/[46.224.205.100]:5060 at 11:42:13.839646:
+2026-02-01 11:44:14.270035 90.77% [DEBUG] sofia.c:6672 Remote Reason: 16
+2026-02-01 11:44:14.270035 90.77% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
+2026-02-01 11:44:14.270035 90.77% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 6 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 6 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_session.c:1744 Session 6 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1762 Session 6 (sofia/internal/1001@apps.linkify.cloud) Ended
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 5 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 5 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 5 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
+send 822 bytes to udp/[46.224.205.100]:5060 at 11:44:14.281895:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bK956NcgyDgtUUS
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKQy716tQSXgpBa
 Max-Forwards: 64
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=pQK7B9rXgQHSm
-To: <sip:1001@apps.linkify.cloud>;tag=Q0c0D490D07Bg
-Call-ID: e480a6ec-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=Z0FHNB8mya5Sg
+To: <sip:1001@apps.linkify.cloud>;tag=0989p6rrUKUcc
+Call-ID: 2c462f36-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -765,23 +769,19 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 5 Tot 31)
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_session.c:1744 Session 5 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
-2026-02-01 11:42:13.833034 87.30% [NOTICE] switch_core_session.c:1762 Session 5 (sofia/internal/017619993000@46.224.205.100) Ended
-2026-02-01 11:42:13.833034 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
-recv 822 bytes from udp/[46.224.205.100]:5060 at 11:42:13.840397:
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_session.c:1744 Session 5 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1762 Session 5 (sofia/internal/017619993000@46.224.205.100) Ended
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
+recv 822 bytes from udp/[46.224.205.100]:5060 at 11:44:14.282052:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bK956NcgyDgtUUS
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKQy716tQSXgpBa
 Max-Forwards: 64
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=pQK7B9rXgQHSm
-To: <sip:1001@apps.linkify.cloud>;tag=Q0c0D490D07Bg
-Call-ID: e480a6ec-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=Z0FHNB8mya5Sg
+To: <sip:1001@apps.linkify.cloud>;tag=0989p6rrUKUcc
+Call-ID: 2c462f36-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -794,94 +794,85 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-send 342 bytes to udp/[46.224.205.100]:5060 at 11:42:13.840505:
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 4 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
+send 342 bytes to udp/[46.224.205.100]:5060 at 11:44:14.282211:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bK956NcgyDgtUUS
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKQy716tQSXgpBa
 Max-Forwards: 64
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=pQK7B9rXgQHSm
-To: <sip:1001@apps.linkify.cloud>;tag=Q0c0D490D07Bg
-Call-ID: e480a6ec-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=Z0FHNB8mya5Sg
+To: <sip:1001@apps.linkify.cloud>;tag=0989p6rrUKUcc
+Call-ID: 2c462f36-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 4 Tot 31)
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
-2026-02-01 11:42:13.833034 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
-2026-02-01 11:42:13.833034 87.30% [DEBUG] sofia.c:6672 Remote Reason: 16
-recv 342 bytes from udp/[46.224.205.100]:5060 at 11:42:13.841181:
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] sofia.c:6672 Remote Reason: 16
+recv 342 bytes from udp/[46.224.205.100]:5060 at 11:44:14.282316:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bK956NcgyDgtUUS
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKQy716tQSXgpBa
 Max-Forwards: 64
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=pQK7B9rXgQHSm
-To: <sip:1001@apps.linkify.cloud>;tag=Q0c0D490D07Bg
-Call-ID: e480a6ec-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=Z0FHNB8mya5Sg
+To: <sip:1001@apps.linkify.cloud>;tag=0989p6rrUKUcc
+Call-ID: 2c462f36-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.833034 87.30% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
-2026-02-01 11:42:13.833034 87.30% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 4 Tot 31)
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
-2026-02-01 11:42:13.833034 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 4 Tot 31)
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_session.c:1744 Session 4 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
-2026-02-01 11:42:13.833034 87.30% [NOTICE] switch_core_session.c:1762 Session 4 (sofia/internal/1001@apps.linkify.cloud) Ended
-2026-02-01 11:42:13.833034 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 3 Tot 31)
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
-2026-02-01 11:42:13.833034 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
-2026-02-01 11:42:13.833034 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
-2026-02-01 11:42:13.853337 87.30% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
-2026-02-01 11:42:13.853337 87.30% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
-2026-02-01 11:42:13.853337 87.30% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 3 Tot 31)
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
-2026-02-01 11:42:13.853337 87.30% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
-2026-02-01 11:42:13.853337 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 3 Tot 31)
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_session.c:1744 Session 3 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
-2026-02-01 11:42:13.853337 87.30% [NOTICE] switch_core_session.c:1762 Session 3 (sofia/internal/017619993000@46.224.205.100) Ended
-2026-02-01 11:42:13.853337 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 2 Tot 31)
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
-send 822 bytes to udp/[46.224.205.100]:5060 at 11:42:13.854380:
+2026-02-01 11:44:14.270035 90.77% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
+2026-02-01 11:44:14.270035 90.77% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 4 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 4 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_session.c:1744 Session 4 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1762 Session 4 (sofia/internal/1001@apps.linkify.cloud) Ended
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 3 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_state_machine.c:382 sofia/internal/017619993000@46.224.205.100 has executed the last dialplan instruction, hanging up.
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/internal/017619993000@46.224.205.100 [CS_EXECUTE] [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:647 (sofia/internal/017619993000@46.224.205.100) State EXECUTE going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_HANGUP (Cur 3 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/017619993000@46.224.205.100) Callstate Change RINGING -> HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:463 sofia/internal/017619993000@46.224.205.100 Overriding SIP cause 480 with 480 from the other leg
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/017619993000@46.224.205.100 hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/017619993000@46.224.205.100 Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/017619993000@46.224.205.100) State HANGUP going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/017619993000@46.224.205.100) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_REPORTING (Cur 3 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/017619993000@46.224.205.100 Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/017619993000@46.224.205.100) State REPORTING going to sleep
+send 822 bytes to udp/[46.224.205.100]:5060 at 11:44:14.286216:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bK8vDXaNDaKH58D
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKpNe94Z6N07Zre
 Max-Forwards: 65
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=m50N8jQpp54KD
-To: <sip:1001@apps.linkify.cloud>;tag=Neteae8SKeU6r
-Call-ID: e46ea78e-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=XeXZHN6D4rrmS
+To: <sip:1001@apps.linkify.cloud>;tag=yQprKgQH11e7m
+Call-ID: 2c35ae39-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -894,15 +885,15 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-recv 822 bytes from udp/[46.224.205.100]:5060 at 11:42:13.854482:
+recv 822 bytes from udp/[46.224.205.100]:5060 at 11:44:14.286601:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bK8vDXaNDaKH58D
+Via: SIP/2.0/UDP 46.224.205.100;rport=5060;branch=z9hG4bKpNe94Z6N07Zre
 Max-Forwards: 65
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=m50N8jQpp54KD
-To: <sip:1001@apps.linkify.cloud>;tag=Neteae8SKeU6r
-Call-ID: e46ea78e-7a05-123f-0084-92000704f2de
-CSeq: 110419274 INVITE
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=XeXZHN6D4rrmS
+To: <sip:1001@apps.linkify.cloud>;tag=yQprKgQH11e7m
+Call-ID: 2c35ae39-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY
@@ -915,80 +906,100 @@ X-FS-Display-Number: sip:1001@apps.linkify.cloud
 Remote-Party-ID: "1001" <sip:1001@apps.linkify.cloud>;party=calling;privacy=off;screen=no
 
 
-send 342 bytes to udp/[46.224.205.100]:5060 at 11:42:13.854538:
+send 342 bytes to udp/[46.224.205.100]:5060 at 11:44:14.286707:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bK8vDXaNDaKH58D
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKpNe94Z6N07Zre
 Max-Forwards: 65
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=m50N8jQpp54KD
-To: <sip:1001@apps.linkify.cloud>;tag=Neteae8SKeU6r
-Call-ID: e46ea78e-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=XeXZHN6D4rrmS
+To: <sip:1001@apps.linkify.cloud>;tag=yQprKgQH11e7m
+Call-ID: 2c35ae39-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 ACK
 Content-Length: 0
 
 
-recv 342 bytes from udp/[46.224.205.100]:5060 at 11:42:13.854589:
+recv 342 bytes from udp/[46.224.205.100]:5060 at 11:44:14.286778:
 ------------------------------------------------------------------------
 ACK sip:1001@apps.linkify.cloud SIP/2.0
-Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bK8vDXaNDaKH58D
+Via: SIP/2.0/UDP 46.224.205.100;rport;branch=z9hG4bKpNe94Z6N07Zre
 Max-Forwards: 65
-From: "017619993000" <sip:017619993000@46.224.205.100>;tag=m50N8jQpp54KD
-To: <sip:1001@apps.linkify.cloud>;tag=Neteae8SKeU6r
-Call-ID: e46ea78e-7a05-123f-0084-92000704f2de
-CSeq: 110419274 ACK
+From: "017619993000" <sip:017619993000@46.224.205.100>;tag=XeXZHN6D4rrmS
+To: <sip:1001@apps.linkify.cloud>;tag=yQprKgQH11e7m
+Call-ID: 2c35ae39-7a06-123f-21a4-92000704f2de
+CSeq: 110419334 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:13.853337 87.30% [DEBUG] sofia.c:6672 Remote Reason: 16
-2026-02-01 11:42:13.853337 87.30% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
-2026-02-01 11:42:13.853337 87.30% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 2 Tot 31)
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
-2026-02-01 11:42:13.853337 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 2 Tot 31)
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_session.c:1744 Session 2 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
-2026-02-01 11:42:13.853337 87.30% [NOTICE] switch_core_session.c:1762 Session 2 (sofia/internal/1001@apps.linkify.cloud) Ended
-2026-02-01 11:42:13.853337 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 1 Tot 31)
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
-2026-02-01 11:42:13.853337 87.30% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
-2026-02-01 11:42:13.853337 87.30% [NOTICE] switch_core_state_machine.c:382 sofia/external/017619993000@sipgate.de has executed the last dialplan instruction, hanging up.
-2026-02-01 11:42:13.853337 87.30% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/external/017619993000@sipgate.de [CS_EXECUTE] [NORMAL_CLEARING]
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:647 (sofia/external/017619993000@sipgate.de) State EXECUTE going to sleep
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@sipgate.de) Running State Change CS_HANGUP (Cur 1 Tot 31)
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:844 (sofia/external/017619993000@sipgate.de) Callstate Change RINGING -> HANGUP
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/external/017619993000@sipgate.de) State HANGUP
-2026-02-01 11:42:13.853337 87.30% [DEBUG] mod_sofia.c:463 sofia/external/017619993000@sipgate.de Overriding SIP cause 480 with 480 from the other leg
-2026-02-01 11:42:13.853337 87.30% [DEBUG] mod_sofia.c:469 Channel sofia/external/017619993000@sipgate.de hanging up, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:59 sofia/external/017619993000@sipgate.de Standard HANGUP, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:846 (sofia/external/017619993000@sipgate.de) State HANGUP going to sleep
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:616 (sofia/external/017619993000@sipgate.de) State Change CS_HANGUP -> CS_REPORTING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@sipgate.de) Running State Change CS_REPORTING (Cur 1 Tot 31)
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/external/017619993000@sipgate.de) State REPORTING
-send 982 bytes to udp/[217.10.79.9]:5060 at 11:42:13.876866:
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/017619993000@46.224.205.100) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_session.c:1744 Session 3 (sofia/internal/017619993000@46.224.205.100) Locked, Waiting on external entities
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1762 Session 3 (sofia/internal/017619993000@46.224.205.100) Ended
+2026-02-01 11:44:14.270035 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/017619993000@46.224.205.100 [CS_DESTROY]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/017619993000@46.224.205.100) Running State Change CS_DESTROY (Cur 2 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/017619993000@46.224.205.100 SOFIA DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/017619993000@46.224.205.100 Standard DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/017619993000@46.224.205.100) State DESTROY going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] sofia.c:6672 Remote Reason: 16
+2026-02-01 11:44:14.270035 90.77% [DEBUG] sofia.c:7493 Channel sofia/internal/1001@apps.linkify.cloud entering state [terminated][480]
+2026-02-01 11:44:14.270035 90.77% [NOTICE] sofia.c:8736 Hangup sofia/internal/1001@apps.linkify.cloud [CS_CONSUME_MEDIA] [NORMAL_CLEARING]
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_HANGUP (Cur 2 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/internal/1001@apps.linkify.cloud) Callstate Change DOWN -> HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP
+2026-02-01 11:44:14.270035 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/internal/1001@apps.linkify.cloud hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/internal/1001@apps.linkify.cloud Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/internal/1001@apps.linkify.cloud) State HANGUP going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/internal/1001@apps.linkify.cloud) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_REPORTING (Cur 2 Tot 29)
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/internal/1001@apps.linkify.cloud Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/internal/1001@apps.linkify.cloud) State REPORTING going to sleep
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/internal/1001@apps.linkify.cloud) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.270035 90.77% [DEBUG] switch_core_session.c:1744 Session 2 (sofia/internal/1001@apps.linkify.cloud) Locked, Waiting on external entities
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_ivr_originate.c:4056 Originate Resulted in Error Cause: 16 [NORMAL_CLEARING]
+2026-02-01 11:44:14.290082 90.77% [NOTICE] switch_core_session.c:1762 Session 2 (sofia/internal/1001@apps.linkify.cloud) Ended
+2026-02-01 11:44:14.290082 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/internal/1001@apps.linkify.cloud [CS_DESTROY]
+2026-02-01 11:44:14.290082 90.77% [INFO] mod_dptools.c:3635 Originate Failed.  Cause: NORMAL_CLEARING
+2026-02-01 11:44:14.290082 90.77% [NOTICE] switch_core_state_machine.c:382 sofia/external/017619993000@sipgate.de has executed the last dialplan instruction, hanging up.
+2026-02-01 11:44:14.290082 90.77% [NOTICE] switch_core_state_machine.c:384 Hangup sofia/external/017619993000@sipgate.de [CS_EXECUTE] [NORMAL_CLEARING]
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/internal/1001@apps.linkify.cloud) Running State Change CS_DESTROY (Cur 1 Tot 29)
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:647 (sofia/external/017619993000@sipgate.de) State EXECUTE going to sleep
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@sipgate.de) Running State Change CS_HANGUP (Cur 1 Tot 29)
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY
+2026-02-01 11:44:14.290082 90.77% [DEBUG] mod_sofia.c:380 sofia/internal/1001@apps.linkify.cloud SOFIA DESTROY
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/internal/1001@apps.linkify.cloud Standard DESTROY
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/internal/1001@apps.linkify.cloud) State DESTROY going to sleep
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:844 (sofia/external/017619993000@sipgate.de) Callstate Change RINGING -> HANGUP
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/external/017619993000@sipgate.de) State HANGUP
+2026-02-01 11:44:14.290082 90.77% [DEBUG] mod_sofia.c:463 sofia/external/017619993000@sipgate.de Overriding SIP cause 480 with 480 from the other leg
+2026-02-01 11:44:14.290082 90.77% [DEBUG] mod_sofia.c:469 Channel sofia/external/017619993000@sipgate.de hanging up, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.290082 90.77% [DEBUG] mod_sofia.c:614 Responding to INVITE with: 480
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:59 sofia/external/017619993000@sipgate.de Standard HANGUP, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:846 (sofia/external/017619993000@sipgate.de) State HANGUP going to sleep
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:616 (sofia/external/017619993000@sipgate.de) State Change CS_HANGUP -> CS_REPORTING
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:581 (sofia/external/017619993000@sipgate.de) Running State Change CS_REPORTING (Cur 1 Tot 29)
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/external/017619993000@sipgate.de) State REPORTING
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:168 sofia/external/017619993000@sipgate.de Standard REPORTING, cause: NORMAL_CLEARING
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:932 (sofia/external/017619993000@sipgate.de) State REPORTING going to sleep
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:607 (sofia/external/017619993000@sipgate.de) State Change CS_REPORTING -> CS_DESTROY
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_session.c:1744 Session 1 (sofia/external/017619993000@sipgate.de) Locked, Waiting on external entities
+2026-02-01 11:44:14.290082 90.77% [NOTICE] switch_core_session.c:1762 Session 1 (sofia/external/017619993000@sipgate.de) Ended
+2026-02-01 11:44:14.290082 90.77% [NOTICE] switch_core_session.c:1766 Close Channel sofia/external/017619993000@sipgate.de [CS_DESTROY]
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:735 (sofia/external/017619993000@sipgate.de) Running State Change CS_DESTROY (Cur 0 Tot 29)
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/external/017619993000@sipgate.de) State DESTROY
+2026-02-01 11:44:14.290082 90.77% [DEBUG] mod_sofia.c:380 sofia/external/017619993000@sipgate.de SOFIA DESTROY
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:175 sofia/external/017619993000@sipgate.de Standard DESTROY
+2026-02-01 11:44:14.290082 90.77% [DEBUG] switch_core_state_machine.c:745 (sofia/external/017619993000@sipgate.de) State DESTROY going to sleep
+send 982 bytes to udp/[217.10.79.9]:5060 at 11:44:14.299420:
 ------------------------------------------------------------------------
 SIP/2.0 480 Temporarily Unavailable
-Via: SIP/2.0/UDP 217.10.79.9;branch=z9hG4bK0b38.881857939b82b9159f2def3674161a30.0
-Via: SIP/2.0/UDP 172.20.40.7;branch=z9hG4bK0b38.168463de1ff0bad157486ee4a228e0e5.0
-Via: SIP/2.0/UDP 217.10.68.137;branch=z9hG4bK0b38.749e7ddac18b5d56ff76f40f1e6753e1.0
-Via: SIP/2.0/UDP 217.10.77.190:5060;branch=z9hG4bK16d0a3c1
+Via: SIP/2.0/UDP 217.10.79.9;branch=z9hG4bK0e5a.ca93d690e1c7ed992ae480226f7aa14e.0
+Via: SIP/2.0/UDP 172.20.40.7;branch=z9hG4bK0e5a.1d059d56e1598faa93815d06910d6a0a.0
+Via: SIP/2.0/UDP 217.10.68.137;branch=z9hG4bK0e5a.641726b97a91f32dd6a3ee5f76751934.0
+Via: SIP/2.0/UDP 217.10.77.191:5060;branch=z9hG4bK5ed5c730
 Max-Forwards: 66
-From: "017619993000" <sip:017619993000@sipgate.de>;tag=as0e3d8c63
-To: <sip:2595211e0@sipgate.de>;tag=3c5mmrD7DQm7N
-Call-ID: 5c7abc3c12f3b8e21e6336ad6ed59b48@sipgate.de
+From: "017619993000" <sip:017619993000@sipgate.de>;tag=as7b5ab5f4
+To: <sip:2595211e0@sipgate.de>;tag=6Djpt8rB66FDg
+Call-ID: 5d7cc8675fadd7a37fe6954444766332@sipgate.de
 CSeq: 103 INVITE
 User-Agent: InsideDynamic-Wrapper-(IDGMBH-2025-001)-Mustermann_GmbH
 Accept: application/sdp
@@ -1000,28 +1011,17 @@ Content-Length: 0
 Remote-Party-ID: "2595211e0" <sip:2595211e0@sipgate.de>;party=calling;privacy=off;screen=no
 
 
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:168 sofia/external/017619993000@sipgate.de Standard REPORTING, cause: NORMAL_CLEARING
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:932 (sofia/external/017619993000@sipgate.de) State REPORTING going to sleep
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:607 (sofia/external/017619993000@sipgate.de) State Change CS_REPORTING -> CS_DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_session.c:1744 Session 1 (sofia/external/017619993000@sipgate.de) Locked, Waiting on external entities
-2026-02-01 11:42:13.853337 87.30% [NOTICE] switch_core_session.c:1762 Session 1 (sofia/external/017619993000@sipgate.de) Ended
-2026-02-01 11:42:13.853337 87.30% [NOTICE] switch_core_session.c:1766 Close Channel sofia/external/017619993000@sipgate.de [CS_DESTROY]
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:735 (sofia/external/017619993000@sipgate.de) Running State Change CS_DESTROY (Cur 0 Tot 31)
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/external/017619993000@sipgate.de) State DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] mod_sofia.c:380 sofia/external/017619993000@sipgate.de SOFIA DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:175 sofia/external/017619993000@sipgate.de Standard DESTROY
-2026-02-01 11:42:13.853337 87.30% [DEBUG] switch_core_state_machine.c:745 (sofia/external/017619993000@sipgate.de) State DESTROY going to sleep
-recv 468 bytes from udp/[217.10.79.9]:5060 at 11:42:13.884196:
+recv 468 bytes from udp/[217.10.79.9]:5060 at 11:44:14.306847:
 ------------------------------------------------------------------------
 ACK sip:2595211e0@46.224.205.100:5080;transport=udp;gw=sipgate-rt SIP/2.0
-Via: SIP/2.0/UDP 217.10.79.9;branch=z9hG4bK0b38.881857939b82b9159f2def3674161a30.0
-Via: SIP/2.0/UDP 172.20.40.7;branch=z9hG4bK0b38.168463de1ff0bad157486ee4a228e0e5.0
+Via: SIP/2.0/UDP 217.10.79.9;branch=z9hG4bK0e5a.ca93d690e1c7ed992ae480226f7aa14e.0
+Via: SIP/2.0/UDP 172.20.40.7;branch=z9hG4bK0e5a.1d059d56e1598faa93815d06910d6a0a.0
 Max-Forwards: 67
-From: "017619993000" <sip:017619993000@sipgate.de>;tag=as0e3d8c63
-To: <sip:2595211e0@sipgate.de>;tag=3c5mmrD7DQm7N
-Call-ID: 5c7abc3c12f3b8e21e6336ad6ed59b48@sipgate.de
+From: "017619993000" <sip:017619993000@sipgate.de>;tag=as7b5ab5f4
+To: <sip:2595211e0@sipgate.de>;tag=6Djpt8rB66FDg
+Call-ID: 5d7cc8675fadd7a37fe6954444766332@sipgate.de
 CSeq: 103 ACK
 Content-Length: 0
 
 
-2026-02-01 11:42:14.453105 85.57% [CRIT] switch_time.c:1243 Over Session Rate of 30!
+2026-02-01 11:44:14.750067 89.07% [CRIT] switch_time.c:1243 Over Session Rate of 30!
