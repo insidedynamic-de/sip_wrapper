@@ -421,7 +421,7 @@ generate_users() {
     cat > "$FS_CONF/directory/default/$username.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <include>
-  <user id="$username">
+  <user id="$username" number-alias="$extension">
     <params>
       <param name="password" value="$password"/>
       <param name="vm-password" value="$password"/>
@@ -704,8 +704,9 @@ generate_local_extensions_dialplan() {
         <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="set" data="continue_on_fail=true"/>
-        <!-- Use global domain variable to ensure domain is always set -->
-        <action application="bridge" data="${sofia_contact(*/${destination_number}@$${domain})}"/>
+        <!-- Lookup user by extension (number-alias) and get real username, then call -->
+        <action application="set" data="target_user=${user_data(${destination_number}@$${domain} attr id)}"/>
+        <action application="bridge" data="${sofia_contact(${target_user}@$${domain})}"/>
       </condition>
     </extension>
 EOF
