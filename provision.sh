@@ -630,12 +630,6 @@ generate_gateways() {
       echo_log "Creating gateway: $gw_name ($gw_host:$gw_port, register: $gw_register)"
     fi
 
-    # Generate a deterministic UUID for +sip.instance (RFC 5626)
-    # This helps some PBXs (like 3CX) to recognize the endpoint
-    local gw_uuid
-    gw_uuid=$(echo -n "sip-wrapper-$gw_name" | md5sum | sed 's/^\(........\)\(....\)\(....\)\(....\)\(............\).*/\1-\2-\3-\4-\5/')
-    echo_log "  Gateway UUID: $gw_uuid"
-
     cat > "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <include>
@@ -681,8 +675,8 @@ EOF
     <param name="expire-seconds" value="600"/>
     <param name="caller-id-in-from" value="false"/>
     <param name="extension-in-contact" value="true"/>
-    <!-- RFC 5626: +sip.instance helps PBXs (like 3CX) identify the endpoint -->
-    <param name="contact-params" value="+sip.instance=&quot;&lt;urn:uuid:$gw_uuid&gt;&quot;"/>
+    <!-- contact-params: empty to keep Contact clean -->
+    <param name="contact-params" value=""/>
   </gateway>
 </include>
 EOF
