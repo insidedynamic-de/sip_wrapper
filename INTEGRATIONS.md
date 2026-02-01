@@ -59,15 +59,13 @@ Sie haben eine KI-Telefonie-Lösung (VAPI, Retell, Bland AI) und möchten deutsc
 | **Starface** | Business PBX | - | - | - | - |
 | **Asterisk** | Open Source PBX | - | - | - | - |
 | **Tengo** CentraFlex | Cloud PBX | - | - | - | - |
-| **Plusnet** SIP Trunk | Business SIP Trunk | - | - | - | - |
+| **Plusnet (Fonio)** SIP Trunk | Business SIP Trunk | ✓ | + | ✓ | + |
 | **Telekom** DeutschlandLAN | Business SIP Trunk | - | - | - | - |
 | **Telekom** Company Flex | Cloud PBX | - | - | - | - |
 | **Telekom** Cloud PBX | Cloud Telefonanlage | - | - | - | - |
 | **Gamma** (ehem. HFO) | Business SIP Trunk | - | - | - | - |
 | **Crown** Centrex | Cloud PBX | - | - | - | - |
 | **NFON** | Cloud PBX | - | - | - | - |
-| **Fonial** Nebenstelle | Cloud Nebenstelle | - | - | - | - |
-| **Fonial** SIP Trunk | Business SIP Trunk | - | - | - | - |
 
 **Legende:** ✓ = Produktiv | + = Im Test | A = Aktuell in Arbeit | - = Noch nicht getestet
 

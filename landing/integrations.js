@@ -17,15 +17,13 @@ window.INTEGRATIONS_DATA = {
     {"name": "Starface", "type": "", "description": "Business PBX", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"},
     {"name": "Asterisk", "type": "", "description": "Open Source PBX", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"},
     {"name": "Tengo", "type": "CentraFlex", "description": "Cloud PBX", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"},
-    {"name": "Plusnet", "type": "SIP Trunk", "description": "Business SIP Trunk", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"},
+    {"name": "Plusnet (Fonio)", "type": "SIP Trunk", "description": "Business SIP Trunk", "outbound_wrapper": "produktiv", "outbound_ai": "im_test", "inbound_wrapper": "produktiv", "inbound_ai": "im_test"},
     {"name": "Telekom", "type": "DeutschlandLAN", "description": "Business SIP Trunk", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"},
     {"name": "Telekom", "type": "Company Flex", "description": "Cloud PBX", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"},
     {"name": "Telekom", "type": "Cloud PBX", "description": "Cloud Telefonanlage", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"},
     {"name": "Gamma", "type": "(ehem. HFO)", "description": "Business SIP Trunk", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"},
     {"name": "Crown", "type": "Centrex", "description": "Cloud PBX", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"},
     {"name": "NFON", "type": "", "description": "Cloud PBX", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"},
-    {"name": "Fonial", "type": "Nebenstelle", "description": "Cloud Nebenstelle", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"},
-    {"name": "Fonial", "type": "SIP Trunk", "description": "Business SIP Trunk", "outbound_wrapper": "geplant", "outbound_ai": "geplant", "inbound_wrapper": "geplant", "inbound_ai": "geplant"}
   ],
   "ai_platforms": [
     {"name": "VAPI", "description": "KI-Telefonie Plattform", "outbound_wrapper": "produktiv", "outbound_ai": "produktiv", "inbound_wrapper": "im_test", "inbound_ai": "im_test"},
