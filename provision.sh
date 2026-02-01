@@ -704,7 +704,8 @@ generate_local_extensions_dialplan() {
         <action application="export" data="sip_comedia=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
         <action application="set" data="continue_on_fail=true"/>
-        <action application="bridge" data="sofia/internal/${destination_number}@${domain_name}"/>
+        <!-- Use global domain variable to ensure domain is always set -->
+        <action application="bridge" data="sofia/internal/${destination_number}@$${domain}"/>
       </condition>
     </extension>
 EOF

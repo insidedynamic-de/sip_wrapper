@@ -1,11 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="mb-4">
     <h4 class="mb-0">{{ t('routing') }}</h4>
-    <button class="btn btn-outline-primary btn-sm" onclick="location.reload()">
-        <i class="bi bi-arrow-clockwise me-1"></i>{{ t('reload') }}
-    </button>
 </div>
 
 <!-- Routing Flow Diagram -->
@@ -72,7 +69,7 @@
                         <table class="table table-sm table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>{{ t('username') }}</th>
+                                    <th>{{ t('username') }} ({{ t('extension') }})</th>
                                     <th><i class="bi bi-arrow-right"></i></th>
                                     <th>Gateway</th>
                                 </tr>
@@ -80,7 +77,7 @@
                             <tbody>
                                 {% for route in routing.user_routes %}
                                 <tr>
-                                    <td><code>{{ route.username }}</code></td>
+                                    <td><code>{{ route.username }}</code> <span class="badge bg-secondary">{{ route.extension }}</span></td>
                                     <td><i class="bi bi-arrow-right text-muted"></i></td>
                                     <td><span class="badge bg-primary">{{ route.gateway }}</span></td>
                                 </tr>

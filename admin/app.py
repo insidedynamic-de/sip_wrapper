@@ -396,7 +396,16 @@ def parse_routing_config():
 def routing():
     routing_config = parse_routing_config()
     gateways = parse_gateway_status()
-    return render_template('routing.html', routing=routing_config, gateways=gateways)
+    configured_users = parse_configured_users()
+
+    # Create user extension map for display
+    user_extensions = {u['username']: u['extension'] for u in configured_users}
+
+    # Add extension info to user routes
+    for route in routing_config['user_routes']:
+        route['extension'] = user_extensions.get(route['username'], '-')
+
+    return render_template('routing.html', routing=routing_config, gateways=gateways, users=configured_users)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
