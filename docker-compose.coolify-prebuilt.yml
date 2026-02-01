@@ -147,6 +147,7 @@ services:
           wget --no-cache -qO /opt/admin/templates/config.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/config.html
           wget --no-cache -qO /opt/admin/templates/gateways.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/gateways.html
           wget --no-cache -qO /opt/admin/templates/users.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/users.html
+          wget --no-cache -qO /opt/admin/templates/routing.html https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin/templates/routing.html
 
           echo "✓ Admin Portal installed"
         else

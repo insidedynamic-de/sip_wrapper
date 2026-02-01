@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">{{ t('routing') }}</h4>
+    <button class="btn btn-outline-primary btn-sm" onclick="location.reload()">
+        <i class="bi bi-arrow-clockwise me-1"></i>{{ t('reload') }}
+    </button>
+</div>
+
+<!-- Routing Flow Diagram -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-diagram-3 me-2"></i>Routing Flow
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-md-5">
+                <div class="border rounded p-3 bg-light">
+                    <h6 class="text-primary"><i class="bi bi-telephone-outbound me-2"></i>OUTBOUND</h6>
+                    <small class="text-muted">User/ACL_User → Gateway</small>
+                    <div class="mt-2">
+                        <span class="badge bg-primary">internal:5060</span>
+                        <i class="bi bi-arrow-right mx-2"></i>
+                        <span class="badge bg-secondary">default context</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-center justify-content-center">
+                <i class="bi bi-arrows-expand fs-2 text-muted"></i>
+            </div>
+            <div class="col-md-5">
+                <div class="border rounded p-3 bg-light">
+                    <h6 class="text-success"><i class="bi bi-telephone-inbound me-2"></i>INBOUND</h6>
+                    <small class="text-muted">Gateway → Extension</small>
+                    <div class="mt-2">
+                        <span class="badge bg-success">external:5080</span>
+                        <i class="bi bi-arrow-right mx-2"></i>
+                        <span class="badge bg-secondary">public context</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Outbound Routing -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary bg-opacity-10">
+                <i class="bi bi-telephone-outbound me-2 text-primary"></i>{{ t('outbound_routing') }}
+            </div>
+            <div class="card-body p-0">
+                <!-- Default Gateway -->
+                <div class="p-3 border-bottom bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">{{ t('default_gateway') }}:</span>
+                        {% if routing.default_gateway %}
+                        <span class="badge bg-primary fs-6">{{ routing.default_gateway }}</span>
+                        {% else %}
+                        <span class="badge bg-secondary">-</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- User-specific Routes -->
+                {% if routing.user_routes %}
+                <div class="p-3 border-bottom">
+                    <h6 class="mb-3"><i class="bi bi-person-gear me-2"></i>{{ t('user_routing') }}</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>{{ t('username') }}</th>
+                                    <th><i class="bi bi-arrow-right"></i></th>
+                                    <th>Gateway</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for route in routing.user_routes %}
+                                <tr>
+                                    <td><code>{{ route.username }}</code></td>
+                                    <td><i class="bi bi-arrow-right text-muted"></i></td>
+                                    <td><span class="badge bg-primary">{{ route.gateway }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Pattern-based Routes -->
+                {% if routing.outbound_routes %}
+                <div class="p-3">
+                    <h6 class="mb-3"><i class="bi bi-regex me-2"></i>Pattern Routes</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>{{ t('pattern') }}</th>
+                                    <th>Gateway</th>
+                                    <th>Prepend</th>
+                                    <th>Strip</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for route in routing.outbound_routes %}
+                                <tr>
+                                    <td><code>{{ route.pattern }}</code></td>
+                                    <td><span class="badge bg-primary">{{ route.gateway }}</span></td>
+                                    <td>{{ route.prepend or '-' }}</td>
+                                    <td>{{ route.strip or '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% elif not routing.user_routes and not routing.default_gateway %}
+                <div class="p-4 text-center text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                    {{ t('no_routes') }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Inbound Routing -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header bg-success bg-opacity-10">
+                <i class="bi bi-telephone-inbound me-2 text-success"></i>{{ t('inbound_routing') }}
+            </div>
+            <div class="card-body p-0">
+                <!-- Default Extension -->
+                <div class="p-3 border-bottom bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">{{ t('default_extension') }}:</span>
+                        {% if routing.default_extension %}
+                        <span class="badge bg-success fs-6">{{ routing.default_extension }}</span>
+                        {% else %}
+                        <span class="badge bg-secondary">-</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- DID Routes -->
+                {% if routing.inbound_routes %}
+                <div class="p-3">
+                    <h6 class="mb-3"><i class="bi bi-telephone-plus me-2"></i>DID Routes</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>{{ t('did') }}</th>
+                                    <th><i class="bi bi-arrow-right"></i></th>
+                                    <th>{{ t('destination') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for route in routing.inbound_routes %}
+                                <tr>
+                                    <td>
+                                        {% if route.did == '*' %}
+                                        <span class="badge bg-warning text-dark">* (catch-all)</span>
+                                        {% else %}
+                                        <code>{{ route.did }}</code>
+                                        {% endif %}
+                                    </td>
+                                    <td><i class="bi bi-arrow-right text-muted"></i></td>
+                                    <td>
+                                        {% if route.extension.startswith('gateway@') %}
+                                        <span class="badge bg-primary"><i class="bi bi-diagram-3 me-1"></i>{{ route.extension[8:] }}</span>
+                                        {% else %}
+                                        <span class="badge bg-success">{{ route.extension }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% elif not routing.default_extension %}
+                <div class="p-4 text-center text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                    {{ t('no_routes') }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Number Normalization Info -->
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="bi bi-hash me-2"></i>Number Normalization (Country Code: +{{ routing.default_country_code }})
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Outbound (to Gateway)</h6>
+                <table class="table table-sm">
+                    <thead><tr><th>Input</th><th>Output</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>+{{ routing.default_country_code }}123456789</code></td><td><code>+{{ routing.default_country_code }}123456789</code></td></tr>
+                        <tr><td><code>00{{ routing.default_country_code }}123456789</code></td><td><code>+{{ routing.default_country_code }}123456789</code></td></tr>
+                        <tr><td><code>0123456789</code></td><td><code>+{{ routing.default_country_code }}123456789</code></td></tr>
+                        <tr><td><code>123456789</code></td><td><code>+{{ routing.default_country_code }}123456789</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6>Configuration</h6>
+                <pre class="bg-dark text-light p-3 rounded"><code># User-specific routing
+OUTBOUND_USER_ROUTES=alice:sipgate,bob:placetel
+
+# Pattern-based routing
+OUTBOUND_ROUTES=^00:intl-gw,^0:national-gw
+
+# Inbound DID routing
+INBOUND_ROUTES=+4932221803986:1001,*:1000
+
+# Defaults
+DEFAULT_GATEWAY=placetel
+DEFAULT_EXTENSION=1000
+DEFAULT_COUNTRY_CODE={{ routing.default_country_code }}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Gateways Reference -->
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="bi bi-diagram-3 me-2"></i>Available Gateways
+    </div>
+    <div class="card-body p-0">
+        {% if gateways %}
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>{{ t('status') }}</th>
+                        <th>Use in Routing</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for gw in gateways %}
+                    <tr>
+                        <td><strong>{{ gw.name }}</strong></td>
+                        <td>
+                            <span class="badge {% if gw.status == 'online' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ t(gw.status) }}
+                            </span>
+                        </td>
+                        <td>
+                            <code class="small">sofia/gateway/{{ gw.name }}/DESTINATION</code>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-4 text-center text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            Keine Gateways konfiguriert
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

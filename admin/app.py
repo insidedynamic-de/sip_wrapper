@@ -29,6 +29,7 @@ TRANSLATIONS = {
         'config': 'Konfiguration',
         'gateways': 'Gateways',
         'users': 'Benutzer',
+        'routing': 'Routing',
         'logs': 'Logs',
         'login': 'Anmelden',
         'logout': 'Abmelden',
@@ -62,6 +63,15 @@ TRANSLATIONS = {
         'ip_address': 'IP-Adresse',
         'user_agent': 'User-Agent',
         'contact': 'Kontakt',
+        'outbound_routing': 'Ausgehende Routen',
+        'inbound_routing': 'Eingehende Routen',
+        'user_routing': 'Benutzer-Routen',
+        'default_gateway': 'Standard-Gateway',
+        'default_extension': 'Standard-Nebenstelle',
+        'pattern': 'Muster',
+        'destination': 'Ziel',
+        'did': 'DID/Rufnummer',
+        'no_routes': 'Keine Routen konfiguriert',
     },
     'en': {
         'title': 'InsideDynamic Wrapper - Admin',
@@ -69,6 +79,7 @@ TRANSLATIONS = {
         'config': 'Configuration',
         'gateways': 'Gateways',
         'users': 'Users',
+        'routing': 'Routing',
         'logs': 'Logs',
         'login': 'Login',
         'logout': 'Logout',
@@ -102,6 +113,15 @@ TRANSLATIONS = {
         'ip_address': 'IP Address',
         'user_agent': 'User-Agent',
         'contact': 'Contact',
+        'outbound_routing': 'Outbound Routes',
+        'inbound_routing': 'Inbound Routes',
+        'user_routing': 'User Routes',
+        'default_gateway': 'Default Gateway',
+        'default_extension': 'Default Extension',
+        'pattern': 'Pattern',
+        'destination': 'Destination',
+        'did': 'DID/Number',
+        'no_routes': 'No routes configured',
     }
 }
 
@@ -322,6 +342,61 @@ def users():
         })
 
     return render_template('users.html', users=users_with_status, registrations=registrations)
+
+def parse_routing_config():
+    """Parse routing configuration from environment variables"""
+    routing = {
+        'outbound_routes': [],
+        'inbound_routes': [],
+        'user_routes': [],
+        'default_gateway': os.environ.get('DEFAULT_GATEWAY', ''),
+        'default_extension': os.environ.get('DEFAULT_EXTENSION', ''),
+        'default_country_code': os.environ.get('DEFAULT_COUNTRY_CODE', '49'),
+    }
+
+    # Parse OUTBOUND_ROUTES (format: pattern:gateway:prepend:strip,...)
+    outbound_env = os.environ.get('OUTBOUND_ROUTES', '')
+    if outbound_env:
+        for route in outbound_env.split(','):
+            parts = route.strip().split(':')
+            if len(parts) >= 2:
+                routing['outbound_routes'].append({
+                    'pattern': parts[0],
+                    'gateway': parts[1],
+                    'prepend': parts[2] if len(parts) > 2 else '',
+                    'strip': parts[3] if len(parts) > 3 else '',
+                })
+
+    # Parse INBOUND_ROUTES (format: DID:extension,...)
+    inbound_env = os.environ.get('INBOUND_ROUTES', '')
+    if inbound_env:
+        for route in inbound_env.split(','):
+            parts = route.strip().split(':')
+            if len(parts) >= 2:
+                routing['inbound_routes'].append({
+                    'did': parts[0],
+                    'extension': parts[1],
+                })
+
+    # Parse OUTBOUND_USER_ROUTES (format: username:gateway,...)
+    user_routes_env = os.environ.get('OUTBOUND_USER_ROUTES', '')
+    if user_routes_env:
+        for route in user_routes_env.split(','):
+            parts = route.strip().split(':')
+            if len(parts) >= 2:
+                routing['user_routes'].append({
+                    'username': parts[0],
+                    'gateway': parts[1],
+                })
+
+    return routing
+
+@app.route('/routing')
+@login_required
+def routing():
+    routing_config = parse_routing_config()
+    gateways = parse_gateway_status()
+    return render_template('routing.html', routing=routing_config, gateways=gateways)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

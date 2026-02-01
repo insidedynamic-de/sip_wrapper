@@ -211,6 +211,11 @@
                             <i class="bi bi-people"></i> {{ t('users') }}
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'routing' %}active{% endif %}" href="/routing">
+                            <i class="bi bi-signpost-split"></i> {{ t('routing') }}
+                        </a>
+                    </li>
                     <li class="nav-item mt-4">
                         <a class="nav-link text-danger" href="/logout">
                             <i class="bi bi-box-arrow-left"></i> {{ t('logout') }}
