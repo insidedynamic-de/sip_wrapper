@@ -23,7 +23,7 @@
                         <h6 class="text-muted mb-1">{{ t('gateways') }}</h6>
                         <h3 class="mb-0">{{ gateways|length }}</h3>
                         {% set online_gateways = gateways|selectattr('status', 'equalto', 'online')|list|length %}
-                        <small class="text-success">{{ online_gateways }} {{ t('online') }}</small>
+                        <small class="text-success"><span data-stat="gateways">{{ online_gateways }}/{{ gateways|length }}</span> {{ t('online') }}</small>
                     </div>
                 </div>
             </div>
@@ -41,7 +41,7 @@
                     </div>
                     <div class="flex-grow-1 ms-3">
                         <h6 class="text-muted mb-1">{{ t('users') }}</h6>
-                        <h3 class="mb-0">{{ registrations|length }}</h3>
+                        <h3 class="mb-0" data-stat="users">{{ registrations|length }}</h3>
                         <small class="text-muted">{{ t('registered') }}</small>
                     </div>
                 </div>
@@ -62,7 +62,7 @@
                         <h6 class="text-muted mb-1">{{ t('profile') }}</h6>
                         <h3 class="mb-0">{{ profiles|length }}</h3>
                         {% set online_profiles = profiles|selectattr('status', 'equalto', 'online')|list|length %}
-                        <small class="text-success">{{ online_profiles }} {{ t('online') }}</small>
+                        <small class="text-success"><span data-stat="profiles">{{ online_profiles }}</span> {{ t('online') }}</small>
                     </div>
                 </div>
             </div>
@@ -118,10 +118,10 @@
                         </thead>
                         <tbody>
                             {% for gw in gateways %}
-                            <tr>
+                            <tr data-gateway="{{ gw.name }}">
                                 <td><strong>{{ gw.name }}</strong></td>
                                 <td>
-                                    <span class="status-badge status-{{ gw.status }}">
+                                    <span class="badge {% if gw.status == 'online' %}bg-success{% else %}bg-secondary{% endif %}">
                                         {{ t(gw.status) }}
                                     </span>
                                 </td>

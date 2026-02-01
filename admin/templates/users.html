@@ -12,7 +12,7 @@
 {% if users %}
 <div class="row g-3 mb-4">
     {% for user in users %}
-    <div class="col-md-6 col-lg-4">
+    <div class="col-md-6 col-lg-4" data-user="{{ user.username }}">
         <div class="card h-100 {% if user.online %}border-success{% else %}border-secondary{% endif %}">
             <div class="card-header d-flex justify-content-between align-items-center {% if user.online %}bg-success bg-opacity-10{% else %}bg-secondary bg-opacity-10{% endif %}">
                 <div class="d-flex align-items-center">

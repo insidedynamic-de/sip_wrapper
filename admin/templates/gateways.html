@@ -26,13 +26,12 @@
                 </thead>
                 <tbody>
                     {% for gw in gateways %}
-                    <tr>
+                    <tr data-gateway="{{ gw.name }}">
                         <td>
                             <strong>{{ gw.name }}</strong>
                         </td>
                         <td>
-                            <span class="status-badge status-{{ gw.status }}">
-                                <i class="bi bi-{% if gw.status == 'online' %}check-circle{% else %}x-circle{% endif %} me-1"></i>
+                            <span class="badge {% if gw.status == 'online' %}bg-success{% else %}bg-secondary{% endif %}">
                                 {{ t(gw.status) }}
                             </span>
                         </td>
