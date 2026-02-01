@@ -468,6 +468,36 @@ def set_lang():
 # API Endpoints
 ################################################################################
 
+@app.route('/api/config')
+def api_config():
+    """Public endpoint for routing config (for landing page)"""
+    config_file = '/var/lib/freeswitch/routing_config.json'
+    if os.path.exists(config_file):
+        try:
+            with open(config_file, 'r') as f:
+                return jsonify(json.load(f))
+        except (json.JSONDecodeError, IOError):
+            pass
+    # Fallback to parsed config
+    return jsonify(parse_routing_config())
+
+@app.route('/api/config.js')
+def api_config_js():
+    """Serve config as JavaScript for static pages"""
+    config_file = '/var/lib/freeswitch/routing_config.json'
+    config = {}
+    if os.path.exists(config_file):
+        try:
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            config = parse_routing_config()
+    else:
+        config = parse_routing_config()
+
+    js_content = f"window.ROUTING_CONFIG = {json.dumps(config)};"
+    return js_content, 200, {'Content-Type': 'application/javascript'}
+
 @app.route('/api/status')
 @login_required
 def api_status():
