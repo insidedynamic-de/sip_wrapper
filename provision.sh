@@ -194,6 +194,45 @@ EOF
 }
 
 ################################################################################
+# Generate Event Socket Configuration
+################################################################################
+
+generate_event_socket() {
+  echo_log "Generating event_socket.conf.xml..."
+
+  # Determine ACL for ESL connections
+  local esl_acl="loopback.auto"
+
+  # If FS_ALLOWED_IPS is set to 0.0.0.0 or empty, allow all
+  if [ "${FS_ALLOWED_IPS:-127.0.0.1}" = "0.0.0.0" ] || [ -z "$FS_ALLOWED_IPS" ]; then
+    esl_acl="any_v4.auto"
+    echo_log "  ESL ACL: any_v4.auto (all IPs allowed)"
+  elif [ "$FS_ALLOWED_IPS" = "127.0.0.1" ]; then
+    esl_acl="loopback.auto"
+    echo_log "  ESL ACL: loopback.auto (localhost only)"
+  else
+    # Custom IP - we'll use any_v4 for simplicity, firewall should handle restrictions
+    esl_acl="any_v4.auto"
+    echo_log "  ESL ACL: any_v4.auto (custom IP: $FS_ALLOWED_IPS - use firewall for restrictions)"
+  fi
+
+  cat > "$FS_CONF/autoload_configs/event_socket.conf.xml" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration name="event_socket.conf" description="Socket Client">
+  <settings>
+    <param name="nat-map" value="false"/>
+    <param name="listen-ip" value="::"/>
+    <param name="listen-port" value="${FS_PORT:-8021}"/>
+    <param name="password" value="${FS_PASS:-ClueCon}"/>
+    <param name="apply-inbound-acl" value="$esl_acl"/>
+  </settings>
+</configuration>
+EOF
+
+  echo_log "event_socket.conf.xml generated"
+}
+
+################################################################################
 # Generate Internal Profile (for authenticated users)
 ################################################################################
 
@@ -1339,6 +1378,7 @@ main() {
   clean_config
 
   generate_vars
+  generate_event_socket
   generate_internal_profile
   generate_external_profile
   generate_directory

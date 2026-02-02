@@ -4,4 +4,4 @@ admin/.env
 logs.txt
 __pycache__/
 *.pyc
-OLD/*
+./OLD/*
