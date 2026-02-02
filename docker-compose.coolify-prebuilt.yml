@@ -145,36 +145,36 @@ services:
           ADMIN_BASE="https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin"
 
           # Download admin Python files
-          wget --no-cache -qO /opt/admin/app.py $ADMIN_BASE/app.py
-          wget --no-cache -qO /opt/admin/config_store.py $ADMIN_BASE/config_store.py
-          wget --no-cache -qO /opt/admin/requirements.txt $ADMIN_BASE/requirements.txt
+          wget --no-cache -qO /opt/admin/app.py $$ADMIN_BASE/app.py
+          wget --no-cache -qO /opt/admin/config_store.py $$ADMIN_BASE/config_store.py
+          wget --no-cache -qO /opt/admin/requirements.txt $$ADMIN_BASE/requirements.txt
 
           # Download templates
-          wget --no-cache -qO /opt/admin/templates/base.html $ADMIN_BASE/templates/base.html
-          wget --no-cache -qO /opt/admin/templates/login.html $ADMIN_BASE/templates/login.html
-          wget --no-cache -qO /opt/admin/templates/dashboard.html $ADMIN_BASE/templates/dashboard.html
-          wget --no-cache -qO /opt/admin/templates/config.html $ADMIN_BASE/templates/config.html
-          wget --no-cache -qO /opt/admin/templates/gateways.html $ADMIN_BASE/templates/gateways.html
-          wget --no-cache -qO /opt/admin/templates/users.html $ADMIN_BASE/templates/users.html
-          wget --no-cache -qO /opt/admin/templates/routing.html $ADMIN_BASE/templates/routing.html
-          wget --no-cache -qO /opt/admin/templates/manage.html $ADMIN_BASE/templates/manage.html
+          wget --no-cache -qO /opt/admin/templates/base.html $$ADMIN_BASE/templates/base.html
+          wget --no-cache -qO /opt/admin/templates/login.html $$ADMIN_BASE/templates/login.html
+          wget --no-cache -qO /opt/admin/templates/dashboard.html $$ADMIN_BASE/templates/dashboard.html
+          wget --no-cache -qO /opt/admin/templates/config.html $$ADMIN_BASE/templates/config.html
+          wget --no-cache -qO /opt/admin/templates/gateways.html $$ADMIN_BASE/templates/gateways.html
+          wget --no-cache -qO /opt/admin/templates/users.html $$ADMIN_BASE/templates/users.html
+          wget --no-cache -qO /opt/admin/templates/routing.html $$ADMIN_BASE/templates/routing.html
+          wget --no-cache -qO /opt/admin/templates/manage.html $$ADMIN_BASE/templates/manage.html
 
           # Download static CSS
-          wget --no-cache -qO /opt/admin/static/css/admin.css $ADMIN_BASE/static/css/admin.css
+          wget --no-cache -qO /opt/admin/static/css/admin.css $$ADMIN_BASE/static/css/admin.css
 
           # Download static JS
-          wget --no-cache -qO /opt/admin/static/js/admin.js $ADMIN_BASE/static/js/admin.js
-          wget --no-cache -qO /opt/admin/static/js/manage.js $ADMIN_BASE/static/js/manage.js
+          wget --no-cache -qO /opt/admin/static/js/admin.js $$ADMIN_BASE/static/js/admin.js
+          wget --no-cache -qO /opt/admin/static/js/manage.js $$ADMIN_BASE/static/js/manage.js
 
           # Download vendor files (Bootstrap)
-          wget --no-cache -qO /opt/admin/static/vendor/bootstrap/bootstrap.min.css $ADMIN_BASE/static/vendor/bootstrap/bootstrap.min.css
-          wget --no-cache -qO /opt/admin/static/vendor/bootstrap/bootstrap.bundle.min.js $ADMIN_BASE/static/vendor/bootstrap/bootstrap.bundle.min.js
-          wget --no-cache -qO /opt/admin/static/vendor/bootstrap-icons/bootstrap-icons.min.css $ADMIN_BASE/static/vendor/bootstrap-icons/bootstrap-icons.min.css
+          wget --no-cache -qO /opt/admin/static/vendor/bootstrap/bootstrap.min.css $$ADMIN_BASE/static/vendor/bootstrap/bootstrap.min.css
+          wget --no-cache -qO /opt/admin/static/vendor/bootstrap/bootstrap.bundle.min.js $$ADMIN_BASE/static/vendor/bootstrap/bootstrap.bundle.min.js
+          wget --no-cache -qO /opt/admin/static/vendor/bootstrap-icons/bootstrap-icons.min.css $$ADMIN_BASE/static/vendor/bootstrap-icons/bootstrap-icons.min.css
 
           # Download Bootstrap Icons fonts
           mkdir -p /opt/admin/static/vendor/bootstrap-icons/fonts
-          wget --no-cache -qO /opt/admin/static/vendor/bootstrap-icons/fonts/bootstrap-icons.woff $ADMIN_BASE/static/vendor/bootstrap-icons/fonts/bootstrap-icons.woff 2>/dev/null || true
-          wget --no-cache -qO /opt/admin/static/vendor/bootstrap-icons/fonts/bootstrap-icons.woff2 $ADMIN_BASE/static/vendor/bootstrap-icons/fonts/bootstrap-icons.woff2 2>/dev/null || true
+          wget --no-cache -qO /opt/admin/static/vendor/bootstrap-icons/fonts/bootstrap-icons.woff $$ADMIN_BASE/static/vendor/bootstrap-icons/fonts/bootstrap-icons.woff 2>/dev/null || true
+          wget --no-cache -qO /opt/admin/static/vendor/bootstrap-icons/fonts/bootstrap-icons.woff2 $$ADMIN_BASE/static/vendor/bootstrap-icons/fonts/bootstrap-icons.woff2 2>/dev/null || true
 
           # Install Python dependencies (greenswitch for ESL)
           echo "Installing Python dependencies..."
