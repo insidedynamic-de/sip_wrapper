@@ -245,7 +245,11 @@ def fs_cli(command):
         result = esl.send(f'api {command}')
         esl.stop()
         if result and result.data:
-            return result.data.decode('utf-8').strip()
+            data = result.data
+            # Handle both bytes and str (greenswitch version dependent)
+            if isinstance(data, bytes):
+                data = data.decode('utf-8')
+            return data.strip()
         return None
     except Exception as e:
         print(f"ESL error ({FS_HOST}:{FS_PORT}): {e}")
