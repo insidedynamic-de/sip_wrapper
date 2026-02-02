@@ -243,7 +243,7 @@ def fs_cli(command):
         esl = InboundESL(host=FS_HOST, port=FS_PORT, password=FS_PASS)
         esl.connect()
         result = esl.send(f'api {command}')
-        esl.disconnect()
+        esl.stop()
         if result and result.data:
             return result.data.decode('utf-8').strip()
         return None
