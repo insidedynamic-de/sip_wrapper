@@ -1,3 +1,6 @@
-.env  copy
+.env
+admin/.env
 .claude
 logs.txt
+__pycache__/
+*.pyc

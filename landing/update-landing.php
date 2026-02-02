@@ -4,7 +4,7 @@
 // URL: https://your-domain.com/update-landing.php?token=SECRET_TOKEN
 
 $secret_token = 'CHANGE_THIS_SECRET_123'; // <-- CHANGE THIS!
-// Landing URL: https://1ait.eu/products/sip-wraper
+// Landing URL: https://1ait.eu/products/sip_wrapper/
 $landing_dir = __DIR__;
 $repo_url = 'https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/landing/';
 
@@ -14,9 +14,15 @@ if (!isset($_GET['token']) || $_GET['token'] !== $secret_token) {
     die('Forbidden');
 }
 
+// Ensure directories exist
+@mkdir($landing_dir . '/styles', 0755, true);
+@mkdir($landing_dir . '/js', 0755, true);
+
 $files = [
     'landing.html' => 'index.html',
-    'integrations.js' => 'integrations.js'
+    'styles/main.css' => 'styles/main.css',
+    'js/integrations.js' => 'js/integrations.js',
+    'js/main.js' => 'js/main.js'
 ];
 
 $updated = [];

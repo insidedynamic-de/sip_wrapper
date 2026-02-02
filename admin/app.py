@@ -5,10 +5,29 @@ Simple web interface for FreeSWITCH configuration management
 """
 
 import os
-import subprocess
 import json
+from pathlib import Path
 from flask import Flask, render_template, request, jsonify, session
 from functools import wraps
+
+# Config store for CRUD operations
+import config_store
+
+# Load .env file for local development
+try:
+    from dotenv import load_dotenv
+    # Look for .env in admin folder or parent folder
+    env_paths = [
+        Path(__file__).parent / '.env',
+        Path(__file__).parent.parent / '.env'
+    ]
+    for env_path in env_paths:
+        if env_path.exists():
+            load_dotenv(env_path)
+            print(f"Loaded environment from: {env_path}")
+            break
+except ImportError:
+    pass  # dotenv not installed, use system environment
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('ADMIN_SECRET', 'insidedynamic-wrapper-secret')
@@ -16,7 +35,63 @@ app.secret_key = os.environ.get('ADMIN_SECRET', 'insidedynamic-wrapper-secret')
 # Configuration
 ADMIN_USER = os.environ.get('ADMIN_USER', 'admin')
 ADMIN_PASS = os.environ.get('ADMIN_PASS', 'admin')
-FS_CLI = '/usr/bin/fs_cli'
+
+# FreeSWITCH connection settings
+FS_HOST = os.environ.get('FS_HOST', '127.0.0.1')
+FS_PORT = int(os.environ.get('FS_PORT', '8021'))
+FS_PASS = os.environ.get('FS_PASS', 'ClueCon')
+
+# Security: IP-based access control for FS commands
+# Format: comma-separated IPs or CIDR ranges
+# Special values: 0.0.0.0 = allow all, 127.0.0.1 = localhost only (default)
+FS_ALLOWED_IPS = os.environ.get('FS_ALLOWED_IPS', '127.0.0.1').split(',')
+FS_ALLOWED_IPS = [ip.strip() for ip in FS_ALLOWED_IPS if ip.strip()]
+
+# Try to import ESL library
+try:
+    from greenswitch import InboundESL
+    ESL_AVAILABLE = True
+except ImportError:
+    ESL_AVAILABLE = False
+    print("WARNING: greenswitch not installed - FreeSWITCH commands will not work")
+
+# Try to import ipaddress for CIDR matching
+try:
+    import ipaddress
+    IPADDRESS_AVAILABLE = True
+except ImportError:
+    IPADDRESS_AVAILABLE = False
+
+def ip_matches(client_ip, allowed_pattern):
+    """Check if client IP matches allowed pattern (IP or CIDR)"""
+    if allowed_pattern == '0.0.0.0':
+        return True  # Allow all
+    if client_ip == allowed_pattern:
+        return True
+    # Try CIDR matching
+    if IPADDRESS_AVAILABLE and '/' in allowed_pattern:
+        try:
+            network = ipaddress.ip_network(allowed_pattern, strict=False)
+            client = ipaddress.ip_address(client_ip)
+            return client in network
+        except ValueError:
+            pass
+    return False
+
+def fs_allowed():
+    """Check if FreeSWITCH commands are allowed for this request"""
+    try:
+        client_ip = request.remote_addr
+        # Handle IPv6 localhost
+        if client_ip == '::1':
+            client_ip = '127.0.0.1'
+        for allowed in FS_ALLOWED_IPS:
+            if ip_matches(client_ip, allowed):
+                return True
+        return False
+    except RuntimeError:
+        # Outside request context - allow (startup, etc.)
+        return True
 
 ################################################################################
 # Translations
@@ -153,20 +228,27 @@ def login_required(f):
 ################################################################################
 
 def fs_cli(command):
-    """Execute FreeSWITCH CLI command and return output"""
-    try:
-        result = subprocess.run(
-            [FS_CLI, '-x', command],
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
-        return result.stdout.strip()
-    except subprocess.TimeoutExpired:
+    """Execute FreeSWITCH CLI command via ESL
+
+    Uses ESL (Event Socket Library) for direct Python connection.
+    No fs_cli binary required.
+
+    Connection: FS_HOST:FS_PORT with FS_PASS
+    """
+    if not ESL_AVAILABLE:
+        print("ESL not available - install greenswitch")
         return None
-    except FileNotFoundError:
+
+    try:
+        esl = InboundESL(host=FS_HOST, port=FS_PORT, password=FS_PASS)
+        esl.connect()
+        result = esl.send(f'api {command}')
+        esl.disconnect()
+        if result and result.data:
+            return result.data.decode('utf-8').strip()
         return None
     except Exception as e:
+        print(f"ESL error ({FS_HOST}:{FS_PORT}): {e}")
         return None
 
 def parse_sofia_status():
@@ -239,20 +321,27 @@ def parse_registrations():
 @app.route('/')
 @login_required
 def dashboard():
-    profiles = parse_sofia_status()
-    gateways = parse_gateway_status()
-    registrations = parse_registrations()
+    # Check if FS commands are allowed (IP-based security)
+    fs_access = fs_allowed()
+
+    profiles = parse_sofia_status() if fs_access else []
+    gateways = parse_gateway_status() if fs_access else []
+    registrations = parse_registrations() if fs_access else []
 
     return render_template('dashboard.html',
         profiles=profiles,
         gateways=gateways,
         registrations=registrations,
+        fs_access=fs_access,
+        client_ip=request.remote_addr,
         config={
             'LICENSE_KEY': os.environ.get('LICENSE_KEY', 'UNLICENSED'),
             'CLIENT_NAME': os.environ.get('CLIENT_NAME', ''),
             'FS_DOMAIN': os.environ.get('FS_DOMAIN', ''),
             'EXTERNAL_SIP_IP': os.environ.get('EXTERNAL_SIP_IP', ''),
             'CODEC_PREFS': os.environ.get('CODEC_PREFS', ''),
+            'FS_HOST': FS_HOST,
+            'FS_PORT': FS_PORT,
         }
     )
 
@@ -282,6 +371,11 @@ def config():
 def gateways():
     gateways = parse_gateway_status()
     return render_template('gateways.html', gateways=gateways)
+
+@app.route('/manage')
+@login_required
+def manage():
+    return render_template('manage.html')
 
 def parse_configured_users():
     """Parse USERS and ACL_USERS environment variables"""
@@ -501,40 +595,58 @@ def api_config_js():
 @app.route('/api/status')
 @login_required
 def api_status():
+    if not fs_allowed():
+        return jsonify({
+            'profiles': [],
+            'gateways': [],
+            'registrations': [],
+            'fs_access': False,
+            'error': 'Access denied - IP not in FS_ALLOWED_IPS'
+        })
     return jsonify({
         'profiles': parse_sofia_status(),
         'gateways': parse_gateway_status(),
-        'registrations': parse_registrations()
+        'registrations': parse_registrations(),
+        'fs_access': True
     })
 
 @app.route('/api/gateways')
 @login_required
 def api_gateways():
+    if not fs_allowed():
+        return jsonify({'error': 'Access denied', 'gateways': []})
     return jsonify(parse_gateway_status())
 
 @app.route('/api/registrations')
 @login_required
 def api_registrations():
+    if not fs_allowed():
+        return jsonify({'error': 'Access denied', 'registrations': []})
     return jsonify(parse_registrations())
 
 @app.route('/api/reload', methods=['POST'])
 @login_required
 def api_reload():
+    if not fs_allowed():
+        return jsonify({'success': False, 'error': 'Access denied - IP not in FS_ALLOWED_IPS'})
     result = fs_cli('reloadxml')
     if result is not None:
         fs_cli('sofia profile internal rescan')
         fs_cli('sofia profile external rescan')
         return jsonify({'success': True, 'message': 'Configuration reloaded'})
-    return jsonify({'success': False, 'error': 'Failed to reload'})
+    return jsonify({'success': False, 'error': 'Failed to connect to FreeSWITCH'})
 
 @app.route('/api/fs-cli', methods=['POST'])
 @login_required
 def api_fs_cli():
+    if not fs_allowed():
+        return jsonify({'success': False, 'error': 'Access denied - IP not in FS_ALLOWED_IPS'})
+
     command = request.json.get('command', '')
     if not command:
         return jsonify({'success': False, 'error': 'No command provided'})
 
-    # Security: only allow safe commands
+    # Security: only allow safe read-only commands
     safe_commands = ['sofia status', 'show channels', 'show calls', 'status', 'version']
     if not any(command.startswith(cmd) for cmd in safe_commands):
         return jsonify({'success': False, 'error': 'Command not allowed'})
@@ -542,7 +654,219 @@ def api_fs_cli():
     result = fs_cli(command)
     if result is not None:
         return jsonify({'success': True, 'output': result})
-    return jsonify({'success': False, 'error': 'Command failed'})
+    return jsonify({'success': False, 'error': 'Failed to connect to FreeSWITCH'})
+
+################################################################################
+# CRUD API - Users
+################################################################################
+
+@app.route('/api/crud/users', methods=['GET'])
+@login_required
+def crud_get_users():
+    return jsonify(config_store.get_users())
+
+@app.route('/api/crud/users', methods=['POST'])
+@login_required
+def crud_add_user():
+    data = request.json
+    success, msg = config_store.add_user(
+        data.get('username'),
+        data.get('password'),
+        data.get('extension'),
+        data.get('enabled', True)
+    )
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/users/<username>', methods=['PUT'])
+@login_required
+def crud_update_user(username):
+    data = request.json
+    success, msg = config_store.update_user(username, data)
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/users/<username>', methods=['DELETE'])
+@login_required
+def crud_delete_user(username):
+    success, msg = config_store.delete_user(username)
+    return jsonify({'success': success, 'message': msg})
+
+################################################################################
+# CRUD API - ACL Users
+################################################################################
+
+@app.route('/api/crud/acl-users', methods=['GET'])
+@login_required
+def crud_get_acl_users():
+    return jsonify(config_store.get_acl_users())
+
+@app.route('/api/crud/acl-users', methods=['POST'])
+@login_required
+def crud_add_acl_user():
+    data = request.json
+    success, msg = config_store.add_acl_user(
+        data.get('username'),
+        data.get('ip_address'),
+        data.get('extension'),
+        data.get('caller_id', '')
+    )
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/acl-users/<username>', methods=['PUT'])
+@login_required
+def crud_update_acl_user(username):
+    data = request.json
+    success, msg = config_store.update_acl_user(username, data)
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/acl-users/<username>', methods=['DELETE'])
+@login_required
+def crud_delete_acl_user(username):
+    success, msg = config_store.delete_acl_user(username)
+    return jsonify({'success': success, 'message': msg})
+
+################################################################################
+# CRUD API - Gateways
+################################################################################
+
+@app.route('/api/crud/gateways', methods=['GET'])
+@login_required
+def crud_get_gateways():
+    return jsonify(config_store.get_gateways())
+
+@app.route('/api/crud/gateways', methods=['POST'])
+@login_required
+def crud_add_gateway():
+    data = request.json
+    success, msg = config_store.add_gateway(
+        data.get('name'),
+        data.get('host'),
+        data.get('port', 5060),
+        data.get('username', ''),
+        data.get('password', ''),
+        data.get('register', True),
+        data.get('transport', 'udp'),
+        data.get('auth_username', '')
+    )
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/gateways/<name>', methods=['PUT'])
+@login_required
+def crud_update_gateway(name):
+    data = request.json
+    success, msg = config_store.update_gateway(name, data)
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/gateways/<name>', methods=['DELETE'])
+@login_required
+def crud_delete_gateway(name):
+    success, msg = config_store.delete_gateway(name)
+    return jsonify({'success': success, 'message': msg})
+
+################################################################################
+# CRUD API - Routes
+################################################################################
+
+@app.route('/api/crud/routes', methods=['GET'])
+@login_required
+def crud_get_routes():
+    return jsonify(config_store.get_routes())
+
+@app.route('/api/crud/routes', methods=['PUT'])
+@login_required
+def crud_update_routes():
+    data = request.json
+    success, msg = config_store.update_routes(data)
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/routes/inbound', methods=['POST'])
+@login_required
+def crud_add_inbound_route():
+    data = request.json
+    success, msg = config_store.add_inbound_route(
+        data.get('did'),
+        data.get('destination'),
+        data.get('destination_type', 'extension')
+    )
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/routes/inbound/<did>', methods=['DELETE'])
+@login_required
+def crud_delete_inbound_route(did):
+    success, msg = config_store.delete_inbound_route(did)
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/routes/outbound', methods=['POST'])
+@login_required
+def crud_add_outbound_route():
+    data = request.json
+    success, msg = config_store.add_outbound_route(
+        data.get('pattern'),
+        data.get('gateway'),
+        data.get('prepend', ''),
+        data.get('strip', '')
+    )
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/routes/user', methods=['POST'])
+@login_required
+def crud_add_user_route():
+    data = request.json
+    success, msg = config_store.add_user_route(
+        data.get('username'),
+        data.get('gateway')
+    )
+    return jsonify({'success': success, 'message': msg})
+
+################################################################################
+# CRUD API - Settings
+################################################################################
+
+@app.route('/api/crud/settings', methods=['GET'])
+@login_required
+def crud_get_settings():
+    return jsonify(config_store.get_settings())
+
+@app.route('/api/crud/settings', methods=['PUT'])
+@login_required
+def crud_update_settings():
+    data = request.json
+    success, msg = config_store.update_settings(data)
+    return jsonify({'success': success, 'message': msg})
+
+################################################################################
+# CRUD API - Export & Apply
+################################################################################
+
+@app.route('/api/crud/export', methods=['GET'])
+@login_required
+def crud_export():
+    """Export config for provision.sh compatibility"""
+    return jsonify(config_store.export_for_provision())
+
+@app.route('/api/crud/apply', methods=['POST'])
+@login_required
+def crud_apply():
+    """Export config and reload FreeSWITCH"""
+    if not fs_allowed():
+        return jsonify({'success': False, 'error': 'Access denied - IP not in FS_ALLOWED_IPS'})
+
+    # Export config to routing_config.json
+    export_data = config_store.export_for_provision()
+    config_file = '/var/lib/freeswitch/routing_config.json'
+    try:
+        with open(config_file, 'w') as f:
+            json.dump(export_data, f, indent=2)
+    except IOError as e:
+        return jsonify({'success': False, 'error': f'Failed to write config: {e}'})
+
+    # Reload FreeSWITCH
+    result = fs_cli('reloadxml')
+    if result is not None:
+        fs_cli('sofia profile internal rescan')
+        fs_cli('sofia profile external rescan')
+        return jsonify({'success': True, 'message': 'Config applied and FreeSWITCH reloaded'})
+
+    return jsonify({'success': False, 'error': 'Config saved but failed to reload FreeSWITCH'})
 
 ################################################################################
 # Main

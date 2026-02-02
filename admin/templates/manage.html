@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-gear me-2"></i>{{ t('config') }}</h4>
+    <div>
+        <button class="btn btn-success btn-sm" onclick="applyConfig()">
+            <i class="bi bi-check-circle me-1"></i>Apply & Reload
+        </button>
+    </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#users-tab">
+            <i class="bi bi-people me-1"></i>Users
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#gateways-tab">
+            <i class="bi bi-diagram-3 me-1"></i>Gateways
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#routes-tab">
+            <i class="bi bi-signpost-2 me-1"></i>Routes
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#settings-tab">
+            <i class="bi bi-sliders me-1"></i>Settings
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- Users Tab -->
+    <div class="tab-pane fade show active" id="users-tab">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-person-badge me-2"></i>SIP Users</span>
+                <button class="btn btn-primary btn-sm" onclick="showAddUserModal()">
+                    <i class="bi bi-plus-lg me-1"></i>Add User
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="users-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Extension</th>
+                                <th>Status</th>
+                                <th width="120">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-shield-check me-2"></i>ACL Users (IP-based)</span>
+                <button class="btn btn-primary btn-sm" onclick="showAddAclUserModal()">
+                    <i class="bi bi-plus-lg me-1"></i>Add ACL User
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="acl-users-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>IP Address</th>
+                                <th>Extension</th>
+                                <th>Caller ID</th>
+                                <th width="120">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gateways Tab -->
+    <div class="tab-pane fade" id="gateways-tab">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-diagram-3 me-2"></i>SIP Gateways / Providers</span>
+                <button class="btn btn-primary btn-sm" onclick="showAddGatewayModal()">
+                    <i class="bi bi-plus-lg me-1"></i>Add Gateway
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="gateways-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Host</th>
+                                <th>Port</th>
+                                <th>Username</th>
+                                <th>Register</th>
+                                <th>Status</th>
+                                <th width="120">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Routes Tab -->
+    <div class="tab-pane fade" id="routes-tab">
+        <!-- Default Routes -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-house me-2"></i>Default Routes
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Default Gateway (Outbound)</label>
+                        <select class="form-select" id="default-gateway">
+                            <option value="">-- Select --</option>
+                        </select>
+                        <small class="text-muted">All outbound calls go through this gateway</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Default Extension (Inbound)</label>
+                        <input type="text" class="form-control" id="default-extension" placeholder="1001">
+                        <small class="text-muted">Inbound calls without specific route go here</small>
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-3" onclick="saveDefaultRoutes()">
+                    <i class="bi bi-save me-1"></i>Save Defaults
+                </button>
+            </div>
+        </div>
+
+        <!-- Inbound Routes -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-telephone-inbound me-2"></i>Inbound Routes (DID)</span>
+                <button class="btn btn-primary btn-sm" onclick="showAddInboundRouteModal()">
+                    <i class="bi bi-plus-lg me-1"></i>Add Route
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="inbound-routes-table">
+                        <thead>
+                            <tr>
+                                <th>DID / Number</th>
+                                <th>Destination</th>
+                                <th>Type</th>
+                                <th width="100">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Routes -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-person-lines-fill me-2"></i>User Outbound Routes</span>
+                <button class="btn btn-primary btn-sm" onclick="showAddUserRouteModal()">
+                    <i class="bi bi-plus-lg me-1"></i>Add Route
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="user-routes-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Gateway</th>
+                                <th width="100">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-pane fade" id="settings-tab">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-sliders me-2"></i>System Settings
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">FS Domain</label>
+                        <input type="text" class="form-control" id="setting-fs-domain" placeholder="sip.example.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">External SIP IP</label>
+                        <input type="text" class="form-control" id="setting-external-sip-ip" placeholder="203.0.113.10">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Internal SIP Port</label>
+                        <input type="number" class="form-control" id="setting-internal-sip-port" value="5060">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">External SIP Port</label>
+                        <input type="number" class="form-control" id="setting-external-sip-port" value="5080">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Codec Preferences</label>
+                        <input type="text" class="form-control" id="setting-codec-prefs" placeholder="PCMU,PCMA,G729">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Default Country Code</label>
+                        <input type="text" class="form-control" id="setting-country-code" value="49">
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-3" onclick="saveSettings()">
+                    <i class="bi bi-save me-1"></i>Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userModalTitle">Add User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="user-edit-mode">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" id="user-username" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="user-password" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Extension</label>
+                    <input type="text" class="form-control" id="user-extension" placeholder="1001" required>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="user-enabled" checked>
+                    <label class="form-check-label">Enabled</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveUser()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ACL User Modal -->
+<div class="modal fade" id="aclUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="aclUserModalTitle">Add ACL User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="acl-user-edit-mode">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" id="acl-user-username" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">IP Address</label>
+                    <input type="text" class="form-control" id="acl-user-ip" placeholder="192.168.1.100" required>
+                    <small class="text-muted">Multiple IPs separated by |</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Extension</label>
+                    <input type="text" class="form-control" id="acl-user-extension" placeholder="9000">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Caller ID</label>
+                    <input type="text" class="form-control" id="acl-user-callerid" placeholder="+4932221803986">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveAclUser()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gateway Modal -->
+<div class="modal fade" id="gatewayModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gatewayModalTitle">Add Gateway</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="gateway-edit-mode">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" id="gateway-name" placeholder="provider" required>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-8">
+                        <label class="form-label">Host</label>
+                        <input type="text" class="form-control" id="gateway-host" placeholder="sip.provider.com" required>
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label">Port</label>
+                        <input type="number" class="form-control" id="gateway-port" value="5060">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" id="gateway-username">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="gateway-password">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Auth Username (optional)</label>
+                    <input type="text" class="form-control" id="gateway-auth-username">
+                    <small class="text-muted">For 3CX and some PBX systems</small>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="form-label">Transport</label>
+                        <select class="form-select" id="gateway-transport">
+                            <option value="udp">UDP</option>
+                            <option value="tcp">TCP</option>
+                            <option value="tls">TLS</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-check mt-4">
+                            <input type="checkbox" class="form-check-input" id="gateway-register" checked>
+                            <label class="form-check-label">Register</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveGateway()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inbound Route Modal -->
+<div class="modal fade" id="inboundRouteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Inbound Route</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">DID / Phone Number</label>
+                    <input type="text" class="form-control" id="inbound-did" placeholder="+4930221803986" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Destination Type</label>
+                    <select class="form-select" id="inbound-dest-type">
+                        <option value="extension">Extension</option>
+                        <option value="gateway">Gateway</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Destination</label>
+                    <input type="text" class="form-control" id="inbound-destination" placeholder="1001 or gateway_name">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveInboundRoute()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Route Modal -->
+<div class="modal fade" id="userRouteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add User Route</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">User</label>
+                    <select class="form-select" id="user-route-user"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Gateway</label>
+                    <select class="form-select" id="user-route-gateway"></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveUserRoute()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast" role="alert">
+        <div class="toast-header">
+            <i class="bi bi-info-circle me-2" id="toast-icon"></i>
+            <strong class="me-auto" id="toast-title">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-body"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/manage.js') }}"></script>
+{% endblock %}
