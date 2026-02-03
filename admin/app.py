@@ -978,6 +978,97 @@ def crud_import_from_env():
     })
 
 ################################################################################
+# Config File Import/Export
+################################################################################
+
+@app.route('/api/config/export', methods=['GET'])
+@login_required
+def api_export_config_file():
+    """Export full JSON config as downloadable file"""
+    from flask import Response
+    config = config_store.get_full_config()
+
+    # Create filename with timestamp
+    from datetime import datetime
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"wrapper_config_{timestamp}.json"
+
+    json_content = json.dumps(config, indent=2, ensure_ascii=False)
+
+    return Response(
+        json_content,
+        mimetype='application/json',
+        headers={
+            'Content-Disposition': f'attachment; filename={filename}',
+            'Content-Type': 'application/json; charset=utf-8'
+        }
+    )
+
+@app.route('/api/config/import', methods=['POST'])
+@login_required
+def api_import_config_file():
+    """Import JSON config from uploaded file"""
+    # Check if file was uploaded
+    if 'file' not in request.files:
+        # Try to get JSON from request body
+        if request.is_json:
+            try:
+                new_config = request.json
+            except Exception as e:
+                return jsonify({'success': False, 'error': f'Invalid JSON: {e}'})
+        else:
+            return jsonify({'success': False, 'error': 'No file uploaded'})
+    else:
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'})
+
+        try:
+            content = file.read().decode('utf-8')
+            new_config = json.loads(content)
+        except json.JSONDecodeError as e:
+            return jsonify({'success': False, 'error': f'Invalid JSON: {e}'})
+        except Exception as e:
+            return jsonify({'success': False, 'error': f'Error reading file: {e}'})
+
+    # Validate config structure
+    required_keys = ['users', 'gateways', 'routes']
+    for key in required_keys:
+        if key not in new_config:
+            return jsonify({'success': False, 'error': f'Missing required key: {key}'})
+
+    # Backup current config
+    try:
+        current_config = config_store.get_full_config()
+        backup_path = config_store.get_config_path()
+        backup_file = str(backup_path) + '.backup'
+        with open(backup_file, 'w', encoding='utf-8') as f:
+            json.dump(current_config, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"Warning: Could not create backup: {e}")
+
+    # Merge with defaults to ensure all required fields exist
+    for key in config_store.DEFAULT_CONFIG:
+        if key not in new_config:
+            new_config[key] = config_store.DEFAULT_CONFIG[key]
+
+    # Save new config
+    if config_store.save_config(new_config):
+        return jsonify({
+            'success': True,
+            'message': 'Config imported successfully',
+            'stats': {
+                'users': len(new_config.get('users', [])),
+                'gateways': len(new_config.get('gateways', [])),
+                'acl_users': len(new_config.get('acl_users', [])),
+                'inbound_routes': len(new_config.get('routes', {}).get('inbound', [])),
+                'user_routes': len(new_config.get('routes', {}).get('user_routes', []))
+            }
+        })
+    else:
+        return jsonify({'success': False, 'error': 'Failed to save config'})
+
+################################################################################
 # CRUD API - Export & Apply
 ################################################################################
 

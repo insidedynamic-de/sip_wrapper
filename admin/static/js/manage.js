@@ -98,6 +98,15 @@ async function loadSettings() {
     document.getElementById('setting-external-sip-port').value = settings.external_sip_port || 5080;
     document.getElementById('setting-codec-prefs').value = settings.codec_prefs || '';
     document.getElementById('setting-country-code').value = settings.default_country_code || '49';
+
+    // Load license
+    const license = await apiGet('/api/crud/license');
+    document.getElementById('setting-license-key').value = license.key || '';
+    document.getElementById('setting-client-name').value = license.client_name || '';
+
+    // Load defaults (outbound_caller_id)
+    const defaults = await apiGet('/api/crud/defaults');
+    document.getElementById('setting-outbound-caller-id').value = defaults.outbound_caller_id || '';
 }
 
 // =============================================================================
@@ -538,7 +547,8 @@ async function deleteUserRoute(username) {
 // =============================================================================
 
 async function saveSettings() {
-    const data = {
+    // Save settings
+    const settingsData = {
         fs_domain: document.getElementById('setting-fs-domain').value,
         external_sip_ip: document.getElementById('setting-external-sip-ip').value,
         internal_sip_port: parseInt(document.getElementById('setting-internal-sip-port').value) || 5060,
@@ -547,11 +557,28 @@ async function saveSettings() {
         default_country_code: document.getElementById('setting-country-code').value
     };
 
-    const result = await apiPut('/api/crud/settings', data);
-    if (result.success) {
+    // Save license
+    const licenseData = {
+        key: document.getElementById('setting-license-key').value,
+        client_name: document.getElementById('setting-client-name').value
+    };
+
+    // Save defaults (outbound_caller_id)
+    const defaultsData = {
+        outbound_caller_id: document.getElementById('setting-outbound-caller-id').value
+    };
+
+    const results = await Promise.all([
+        apiPut('/api/crud/settings', settingsData),
+        apiPut('/api/crud/license', licenseData),
+        apiPut('/api/crud/defaults', defaultsData)
+    ]);
+
+    const allSuccess = results.every(r => r.success);
+    if (allSuccess) {
         showToast('Success', 'Settings saved', 'success');
     } else {
-        showToast('Error', result.message, 'error');
+        showToast('Error', 'Failed to save some settings', 'error');
     }
 }
 
@@ -567,6 +594,91 @@ async function applyConfig() {
         showToast('Success', result.message, 'success');
     } else {
         showToast('Error', result.message, 'error');
+    }
+}
+
+// =============================================================================
+// Config Import / Export
+// =============================================================================
+
+async function exportConfig() {
+    try {
+        const response = await fetch('/api/config/export');
+        if (!response.ok) {
+            throw new Error('Export failed');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'wrapper_config.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        showToast('Success', 'Config exported', 'success');
+    } catch (e) {
+        showToast('Error', 'Export failed: ' + e.message, 'error');
+    }
+}
+
+async function importConfig() {
+    const fileInput = document.getElementById('config-file-input');
+    if (!fileInput.files.length) {
+        showToast('Error', 'Please select a JSON file', 'error');
+        return;
+    }
+
+    const file = fileInput.files[0];
+    if (!file.name.endsWith('.json')) {
+        showToast('Error', 'Please select a .json file', 'error');
+        return;
+    }
+
+    if (!confirm('Import config will overwrite all current settings. Continue?')) {
+        return;
+    }
+
+    try {
+        const text = await file.text();
+        const json = JSON.parse(text);
+
+        const response = await fetch('/api/config/import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(json)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            showToast('Success', result.message, 'success');
+            fileInput.value = '';
+            await loadAll();
+        } else {
+            showToast('Error', result.message, 'error');
+        }
+    } catch (e) {
+        showToast('Error', 'Invalid JSON file: ' + e.message, 'error');
+    }
+}
+
+async function importFromEnv() {
+    if (!confirm('Import from ENV variables? This will merge ENV config into current settings.')) {
+        return;
+    }
+
+    try {
+        const result = await apiPost('/api/crud/import-env', {});
+        if (result.success) {
+            showToast('Success', result.message, 'success');
+            await loadAll();
+        } else {
+            showToast('Error', result.message, 'error');
+        }
+    } catch (e) {
+        showToast('Error', 'Import failed: ' + e.message, 'error');
     }
 }
 
