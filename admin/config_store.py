@@ -36,6 +36,7 @@ DEFAULT_CONFIG = {
     "routes": {
         "default_gateway": "",
         "default_extension": "",
+        "outbound_caller_id": "",
         "inbound": [],
         "outbound": [],
         "user_routes": []
@@ -347,8 +348,254 @@ def update_settings(settings_data):
 
 
 # =============================================================================
+# Inbound Routes (gateway -> extension)
+# =============================================================================
+
+def get_inbound_routes():
+    """Get all inbound routes"""
+    config = load_config()
+    return config.get('routes', {}).get('inbound', [])
+
+
+def add_inbound_route_gw(gateway, extension):
+    """Add inbound route (gateway -> extension)"""
+    config = load_config()
+    # Check if exists
+    for route in config['routes']['inbound']:
+        if route.get('gateway') == gateway:
+            return False, "Route for this gateway already exists"
+
+    config['routes']['inbound'].append({
+        'gateway': gateway,
+        'extension': extension
+    })
+    save_config(config)
+    return True, "Inbound route added"
+
+
+def update_inbound_route(gateway, extension):
+    """Update inbound route"""
+    config = load_config()
+    for i, route in enumerate(config['routes']['inbound']):
+        if route.get('gateway') == gateway:
+            config['routes']['inbound'][i]['extension'] = extension
+            save_config(config)
+            return True, "Inbound route updated"
+    return False, "Route not found"
+
+
+def delete_inbound_route_gw(gateway):
+    """Delete inbound route by gateway"""
+    config = load_config()
+    original_len = len(config['routes']['inbound'])
+    config['routes']['inbound'] = [r for r in config['routes']['inbound'] if r.get('gateway') != gateway]
+    if len(config['routes']['inbound']) < original_len:
+        save_config(config)
+        return True, "Inbound route deleted"
+    return False, "Route not found"
+
+
+# =============================================================================
+# Outbound User Routes (user -> gateway)
+# =============================================================================
+
+def get_outbound_user_routes():
+    """Get all outbound user routes"""
+    config = load_config()
+    return config.get('routes', {}).get('user_routes', [])
+
+
+def add_outbound_user_route(username, gateway):
+    """Add/update user-specific outbound route"""
+    config = load_config()
+    # Remove existing route for this user
+    config['routes']['user_routes'] = [
+        r for r in config['routes']['user_routes']
+        if r.get('username') != username
+    ]
+    config['routes']['user_routes'].append({
+        'username': username,
+        'gateway': gateway
+    })
+    save_config(config)
+    return True, "User route updated"
+
+
+def delete_outbound_user_route(username):
+    """Delete user route"""
+    config = load_config()
+    original_len = len(config['routes']['user_routes'])
+    config['routes']['user_routes'] = [r for r in config['routes']['user_routes'] if r.get('username') != username]
+    if len(config['routes']['user_routes']) < original_len:
+        save_config(config)
+        return True, "User route deleted"
+    return False, "Route not found"
+
+
+# =============================================================================
+# Default Settings
+# =============================================================================
+
+def get_default_gateway():
+    """Get default gateway"""
+    config = load_config()
+    return config.get('routes', {}).get('default_gateway', '')
+
+
+def set_default_gateway(gateway):
+    """Set default gateway"""
+    config = load_config()
+    config['routes']['default_gateway'] = gateway
+    save_config(config)
+    return True, "Default gateway updated"
+
+
+def get_default_extension():
+    """Get default extension"""
+    config = load_config()
+    return config.get('routes', {}).get('default_extension', '')
+
+
+def set_default_extension(extension):
+    """Set default extension"""
+    config = load_config()
+    config['routes']['default_extension'] = extension
+    save_config(config)
+    return True, "Default extension updated"
+
+
+def get_outbound_caller_id():
+    """Get outbound caller ID"""
+    config = load_config()
+    return config.get('routes', {}).get('outbound_caller_id', '')
+
+
+def set_outbound_caller_id(caller_id):
+    """Set outbound caller ID"""
+    config = load_config()
+    config['routes']['outbound_caller_id'] = caller_id
+    save_config(config)
+    return True, "Outbound caller ID updated"
+
+
+# =============================================================================
+# Import from ENV (one-time migration)
+# =============================================================================
+
+def import_from_env():
+    """Import configuration from environment variables (one-time migration)"""
+    import os
+
+    config = load_config()
+    imported = {'users': 0, 'gateways': 0, 'acl_users': 0, 'inbound_routes': 0, 'user_routes': 0}
+
+    # Import Users: username:password:extension,...
+    users_env = os.environ.get('USERS', '')
+    if users_env and not config.get('users'):
+        config['users'] = []
+        for user_str in users_env.split(','):
+            parts = user_str.strip().split(':')
+            if len(parts) >= 3:
+                config['users'].append({
+                    'username': parts[0],
+                    'password': parts[1],
+                    'extension': parts[2],
+                    'enabled': True
+                })
+                imported['users'] += 1
+
+    # Import Gateways: type:name:host:port:user:pass:register:transport[:auth_user],...
+    gateways_env = os.environ.get('GATEWAYS', '')
+    if gateways_env and not config.get('gateways'):
+        config['gateways'] = []
+        for gw_str in gateways_env.split(','):
+            parts = gw_str.strip().split(':')
+            if len(parts) >= 6:
+                gw = {
+                    'type': parts[0],
+                    'name': parts[1],
+                    'host': parts[2],
+                    'port': int(parts[3]) if parts[3].isdigit() else 5060,
+                    'username': parts[4],
+                    'password': parts[5],
+                    'register': parts[6].lower() == 'true' if len(parts) > 6 else True,
+                    'transport': parts[7] if len(parts) > 7 else 'udp',
+                    'auth_username': parts[8] if len(parts) > 8 else '',
+                    'enabled': True
+                }
+                config['gateways'].append(gw)
+                imported['gateways'] += 1
+
+    # Import ACL Users: username:ip1|ip2|ip3:extension:caller_id,...
+    acl_env = os.environ.get('ACL_USERS', '')
+    if acl_env and not config.get('acl_users'):
+        config['acl_users'] = []
+        for acl_str in acl_env.split(','):
+            parts = acl_str.strip().split(':')
+            if len(parts) >= 3:
+                config['acl_users'].append({
+                    'username': parts[0],
+                    'ips': parts[1].split('|'),
+                    'extension': parts[2],
+                    'caller_id': parts[3] if len(parts) > 3 else '',
+                    'enabled': True
+                })
+                imported['acl_users'] += 1
+
+    # Import Inbound Routes: gateway:extension,...
+    inbound_env = os.environ.get('INBOUND_ROUTES', '')
+    if inbound_env and not config.get('routes', {}).get('inbound'):
+        if 'routes' not in config:
+            config['routes'] = DEFAULT_CONFIG['routes'].copy()
+        config['routes']['inbound'] = []
+        for route_str in inbound_env.split(','):
+            parts = route_str.strip().split(':')
+            if len(parts) >= 2:
+                config['routes']['inbound'].append({
+                    'gateway': parts[0],
+                    'extension': parts[1]
+                })
+                imported['inbound_routes'] += 1
+
+    # Import Outbound User Routes: user:gateway,...
+    user_routes_env = os.environ.get('OUTBOUND_USER_ROUTES', '')
+    if user_routes_env and not config.get('routes', {}).get('user_routes'):
+        if 'routes' not in config:
+            config['routes'] = DEFAULT_CONFIG['routes'].copy()
+        config['routes']['user_routes'] = []
+        for route_str in user_routes_env.split(','):
+            parts = route_str.strip().split(':')
+            if len(parts) >= 2:
+                config['routes']['user_routes'].append({
+                    'username': parts[0],
+                    'gateway': parts[1]
+                })
+                imported['user_routes'] += 1
+
+    # Import defaults
+    if 'routes' not in config:
+        config['routes'] = DEFAULT_CONFIG['routes'].copy()
+
+    config['routes']['default_gateway'] = os.environ.get('DEFAULT_GATEWAY', config['routes'].get('default_gateway', ''))
+    config['routes']['default_extension'] = os.environ.get('DEFAULT_EXTENSION', config['routes'].get('default_extension', ''))
+    config['routes']['outbound_caller_id'] = os.environ.get('OUTBOUND_CALLER_ID', config['routes'].get('outbound_caller_id', ''))
+
+    if 'settings' not in config:
+        config['settings'] = DEFAULT_CONFIG['settings'].copy()
+    config['settings']['default_country_code'] = os.environ.get('DEFAULT_COUNTRY_CODE', '49')
+
+    save_config(config)
+    return imported
+
+
+# =============================================================================
 # Export for provision.sh
 # =============================================================================
+
+def get_full_config():
+    """Get full configuration"""
+    return load_config()
+
 
 def export_for_provision():
     """Export config in format compatible with provision.sh / routing_config.json"""
@@ -370,6 +617,7 @@ def export_for_provision():
         if gw.get('enabled', True):
             gateways.append({
                 'name': gw['name'],
+                'type': gw.get('type', 'sip'),
                 'host': gw['host'],
                 'port': gw.get('port', 5060),
                 'username': gw.get('username', ''),
@@ -379,14 +627,28 @@ def export_for_provision():
                 'auth_username': gw.get('auth_username', '')
             })
 
+    # Build ACL users
+    acl_users = []
+    for acl in config.get('acl_users', []):
+        if acl.get('enabled', True):
+            acl_users.append({
+                'username': acl['username'],
+                'ips': acl.get('ips', []),
+                'extension': acl['extension'],
+                'caller_id': acl.get('caller_id', '')
+            })
+
     routes = config.get('routes', {})
 
     return {
         'users': users,
+        'acl_users': acl_users,
         'gateways': gateways,
         'inbound_routes': routes.get('inbound', []),
         'outbound_user_routes': routes.get('user_routes', []),
+        'outbound_routes': routes.get('outbound', []),
         'default_gateway': routes.get('default_gateway', ''),
         'default_extension': routes.get('default_extension', ''),
+        'outbound_caller_id': routes.get('outbound_caller_id', ''),
         'default_country_code': config.get('settings', {}).get('default_country_code', '49')
     }
