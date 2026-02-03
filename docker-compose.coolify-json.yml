@@ -1,0 +1,248 @@
+################################################################################
+# InsideDynamic Wrapper for Coolify - JSON Config Version
+#
+# КОНФИГУРАЦИЯ ЧЕРЕЗ JSON:
+# - При первом запуске: импортирует ENV в JSON файл
+# - При последующих: читает только из JSON
+# - Редактирование через Admin Portal
+#
+# MINIMAL ENV (только для Docker):
+# - FS_DOMAIN, EXTERNAL_SIP_IP, EXTERNAL_RTP_IP (network)
+# - ADMIN_*, FS_* (admin portal)
+# - CONFIG_FILE (путь к JSON)
+#
+# ВСЕ ОСТАЛЬНОЕ В JSON:
+# - Users, Gateways, ACL Users
+# - Inbound/Outbound Routes
+# - License, Settings
+################################################################################
+
+version: '3.9'
+
+services:
+  insidedynamic-wrapper:
+    image: ghcr.io/patrickbaus/freeswitch-docker:latest
+    container_name: insidedynamic-wrapper
+
+    labels:
+      - coolify.managed=true
+      - coolify.proxy.port=8888
+
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+
+        if [ "$DEBUG" = "true" ]; then
+          set -x
+        fi
+
+        # Banner
+        echo ""
+        echo "================================================================================"
+        echo "  InsideDynamic Wrapper - JSON Config Mode"
+        echo "================================================================================"
+        echo "  https://insidedynamic.de/wrapper"
+        echo "  (c) 2025 InsideDynamic GmbH - Mannheim, Germany"
+        echo "================================================================================"
+        echo ""
+
+        # Step 1: Validate minimal ENV
+        echo "[STEP 1/8] Validating environment..."
+        if [ -z "$$FS_DOMAIN" ] || [ -z "$$EXTERNAL_SIP_IP" ] || [ -z "$$EXTERNAL_RTP_IP" ]; then
+          echo "ERROR: Missing required: FS_DOMAIN, EXTERNAL_SIP_IP, EXTERNAL_RTP_IP"
+          exit 1
+        fi
+        echo "✓ Environment validated"
+
+        # Step 2: Check FreeSWITCH
+        echo ""
+        echo "[STEP 2/8] Checking FreeSWITCH..."
+        if [ -x /usr/bin/freeswitch ]; then
+          echo "✓ FreeSWITCH found"
+        else
+          echo "ERROR: FreeSWITCH not found!"
+          exit 1
+        fi
+
+        # Step 3: Prepare config dirs
+        echo ""
+        echo "[STEP 3/8] Preparing configuration..."
+        if [ -d /etc/freeswitch ]; then
+          find /etc/freeswitch/dialplan -type f -name "*.xml" -delete 2>/dev/null || true
+          find /etc/freeswitch/directory -type f -name "*.xml" -delete 2>/dev/null || true
+          rm -f /etc/freeswitch/sip_profiles/*.xml 2>/dev/null || true
+          mkdir -p /etc/freeswitch/dialplan/default /etc/freeswitch/dialplan/public
+          mkdir -p /etc/freeswitch/directory/default
+          mkdir -p /etc/freeswitch/sip_profiles/internal /etc/freeswitch/sip_profiles/external
+          echo "✓ Config directories prepared"
+        fi
+
+        # Step 4: Install dependencies
+        echo ""
+        echo "[STEP 4/8] Installing dependencies..."
+        apk add --no-cache bash python3 py3-flask py3-gunicorn py3-pip jq >/dev/null 2>&1 || {
+          echo "ERROR: Cannot install dependencies"
+          exit 1
+        }
+        pip3 install greenswitch --break-system-packages >/dev/null 2>&1 || true
+        if [ ! -e /bin/bash ] && [ -x /usr/bin/bash ]; then
+          ln -sf /usr/bin/bash /bin/bash
+        fi
+        echo "✓ Dependencies installed"
+
+        # Step 5: Download and run provision
+        echo ""
+        echo "[STEP 5/8] Running provision..."
+        wget --no-cache -qO /tmp/provision.sh https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh
+        chmod +x /tmp/provision.sh
+        /bin/bash /tmp/provision.sh || { echo "ERROR: Provision failed"; exit 1; }
+        echo "✓ Provision completed"
+
+        # Step 6: Install Admin Portal
+        echo ""
+        echo "[STEP 6/8] Installing Admin Portal..."
+        if [ "$$SKIP_ADMIN" != "true" ]; then
+          mkdir -p /opt/admin/templates /opt/admin/static/css /opt/admin/static/js
+          mkdir -p /opt/admin/static/vendor/bootstrap /opt/admin/static/vendor/bootstrap-icons/fonts
+
+          ADMIN_BASE="https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin"
+
+          # Download admin files
+          wget --no-cache -qO /opt/admin/app.py $$ADMIN_BASE/app.py
+          wget --no-cache -qO /opt/admin/config_store.py $$ADMIN_BASE/config_store.py
+          wget --no-cache -qO /opt/admin/requirements.txt $$ADMIN_BASE/requirements.txt
+
+          # Templates
+          for tpl in base login dashboard config gateways users routing manage; do
+            wget --no-cache -qO /opt/admin/templates/$${tpl}.html $$ADMIN_BASE/templates/$${tpl}.html
+          done
+
+          # Static files
+          wget --no-cache -qO /opt/admin/static/css/admin.css $$ADMIN_BASE/static/css/admin.css
+          wget --no-cache -qO /opt/admin/static/js/admin.js $$ADMIN_BASE/static/js/admin.js
+          wget --no-cache -qO /opt/admin/static/js/manage.js $$ADMIN_BASE/static/js/manage.js
+
+          # Vendor files
+          wget --no-cache -qO /opt/admin/static/vendor/bootstrap/bootstrap.min.css $$ADMIN_BASE/static/vendor/bootstrap/bootstrap.min.css
+          wget --no-cache -qO /opt/admin/static/vendor/bootstrap/bootstrap.bundle.min.js $$ADMIN_BASE/static/vendor/bootstrap/bootstrap.bundle.min.js
+          wget --no-cache -qO /opt/admin/static/vendor/bootstrap-icons/bootstrap-icons.min.css $$ADMIN_BASE/static/vendor/bootstrap-icons/bootstrap-icons.min.css
+          wget --no-cache -qO /opt/admin/static/vendor/bootstrap-icons/fonts/bootstrap-icons.woff2 $$ADMIN_BASE/static/vendor/bootstrap-icons/fonts/bootstrap-icons.woff2 2>/dev/null || true
+
+          echo "✓ Admin Portal installed"
+        fi
+
+        # Step 7: Start Admin Portal
+        echo ""
+        echo "[STEP 7/8] Starting Admin Portal..."
+        if [ "$$SKIP_ADMIN" != "true" ] && [ -f /opt/admin/app.py ]; then
+          cd /opt/admin
+          python3 app.py &
+          echo "✓ Admin Portal started on port $$ADMIN_PORT"
+        fi
+
+        # Step 8: Start FreeSWITCH
+        echo ""
+        echo "[STEP 8/8] Starting FreeSWITCH..."
+        echo "==========================================="
+        echo "Admin Portal: http://localhost:$$ADMIN_PORT"
+        echo "Config File: $$CONFIG_FILE"
+        echo "==========================================="
+        exec /usr/bin/freeswitch -nonat -nf -nc
+
+    environment:
+      #=========================================================================
+      # NETWORK (required)
+      #=========================================================================
+      FS_DOMAIN: ${FS_DOMAIN}
+      EXTERNAL_SIP_IP: ${EXTERNAL_SIP_IP}
+      EXTERNAL_RTP_IP: ${EXTERNAL_RTP_IP}
+      INTERNAL_SIP_PORT: ${INTERNAL_SIP_PORT:-5060}
+      EXTERNAL_SIP_PORT: ${EXTERNAL_SIP_PORT:-5080}
+      RTP_START_PORT: ${RTP_START_PORT:-16384}
+      RTP_END_PORT: ${RTP_END_PORT:-32768}
+
+      #=========================================================================
+      # ADMIN PORTAL
+      #=========================================================================
+      ADMIN_PORT: ${ADMIN_PORT:-8888}
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASS: ${ADMIN_PASS:-admin}
+      ADMIN_SECRET: ${ADMIN_SECRET:-insidedynamic-wrapper-secret}
+      SKIP_ADMIN: ${SKIP_ADMIN:-false}
+
+      #=========================================================================
+      # ESL (Event Socket)
+      #=========================================================================
+      FS_HOST: ${FS_HOST:-127.0.0.1}
+      FS_PORT: ${FS_PORT:-8021}
+      FS_PASS: ${FS_PASS:-ClueCon}
+      FS_ALLOWED_IPS: ${FS_ALLOWED_IPS:-0.0.0.0}
+
+      #=========================================================================
+      # JSON CONFIG
+      #=========================================================================
+      CONFIG_FILE: ${CONFIG_FILE:-/var/lib/freeswitch/wrapper_config.json}
+
+      #=========================================================================
+      # DEBUG
+      #=========================================================================
+      DEBUG: ${DEBUG:-false}
+
+      #=========================================================================
+      # LEGACY ENV (for first-time import to JSON)
+      # These will be imported to JSON on first run, then ignored
+      #=========================================================================
+      LICENSE_KEY: ${LICENSE_KEY:-}
+      CLIENT_NAME: ${CLIENT_NAME:-}
+      USERS: ${USERS:-}
+      GATEWAYS: ${GATEWAYS:-}
+      ACL_USERS: ${ACL_USERS:-}
+      INBOUND_ROUTES: ${INBOUND_ROUTES:-}
+      OUTBOUND_USER_ROUTES: ${OUTBOUND_USER_ROUTES:-}
+      OUTBOUND_ROUTES: ${OUTBOUND_ROUTES:-}
+      DEFAULT_GATEWAY: ${DEFAULT_GATEWAY:-}
+      DEFAULT_EXTENSION: ${DEFAULT_EXTENSION:-}
+      DEFAULT_COUNTRY_CODE: ${DEFAULT_COUNTRY_CODE:-49}
+      OUTBOUND_CALLER_ID: ${OUTBOUND_CALLER_ID:-}
+      CODEC_PREFS: ${CODEC_PREFS:-PCMU,PCMA,G729,opus}
+      OUTBOUND_CODEC_PREFS: ${OUTBOUND_CODEC_PREFS:-PCMU,PCMA,G729}
+      SIP_USER_AGENT: ${SIP_USER_AGENT:-InsideDynamic-Wrapper}
+
+    network_mode: host
+    restart: unless-stopped
+
+    volumes:
+      - freeswitch_data:/var/lib/freeswitch
+      - freeswitch_backups:/var/backups/freeswitch
+
+    healthcheck:
+      test: ["CMD", "sh", "-c", "pidof freeswitch || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+
+volumes:
+  freeswitch_data:
+    driver: local
+  freeswitch_backups:
+    driver: local
+
+################################################################################
+# JSON CONFIG FILE STRUCTURE (/var/lib/freeswitch/wrapper_config.json):
+################################################################################
+# {
+#   "license": { "key": "...", "client_name": "..." },
+#   "settings": { "fs_domain": "...", "codec_prefs": "...", ... },
+#   "users": [ { "username": "...", "password": "...", "extension": "..." } ],
+#   "gateways": [ { "name": "...", "host": "...", ... } ],
+#   "acl_users": [ { "username": "...", "ips": [...], "extension": "..." } ],
+#   "routes": {
+#     "default_gateway": "...",
+#     "default_extension": "...",
+#     "inbound": [ { "gateway": "...", "extension": "..." } ],
+#     "user_routes": [ { "username": "...", "gateway": "..." } ]
+#   }
+# }
+################################################################################

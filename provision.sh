@@ -22,6 +22,71 @@ FS_CONF="${FS_CONF:-/etc/freeswitch}"
 BACKUP_DIR="${BACKUP_DIR:-/var/backups/freeswitch}"
 TIMESTAMP=$(date -u '+%Y%m%d-%H%M%S')
 
+# JSON Config file path
+CONFIG_FILE="${CONFIG_FILE:-/var/lib/freeswitch/wrapper_config.json}"
+USE_JSON_CONFIG=false
+
+################################################################################
+# JSON Config Loading
+################################################################################
+
+check_json_config() {
+  if [ -f "$CONFIG_FILE" ]; then
+    # Verify jq is available
+    if command -v jq >/dev/null 2>&1; then
+      # Verify JSON is valid
+      if jq empty "$CONFIG_FILE" 2>/dev/null; then
+        USE_JSON_CONFIG=true
+        echo_log "Using JSON config: $CONFIG_FILE"
+        return 0
+      else
+        echo_log "WARNING: JSON config exists but is invalid, using ENV fallback"
+      fi
+    else
+      echo_log "WARNING: jq not installed, using ENV fallback"
+    fi
+  else
+    echo_log "No JSON config found at $CONFIG_FILE, using ENV variables"
+  fi
+  return 1
+}
+
+get_json_value() {
+  # Get a value from JSON config
+  # Usage: get_json_value '.settings.fs_domain'
+  local path="$1"
+  local default="${2:-}"
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    local value
+    value=$(jq -r "$path // empty" "$CONFIG_FILE" 2>/dev/null)
+    if [ -n "$value" ] && [ "$value" != "null" ]; then
+      echo "$value"
+      return
+    fi
+  fi
+  echo "$default"
+}
+
+get_json_array_length() {
+  # Get length of JSON array
+  local path="$1"
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    jq -r "$path | length // 0" "$CONFIG_FILE" 2>/dev/null
+  else
+    echo "0"
+  fi
+}
+
+get_json_array_item() {
+  # Get item from JSON array by index
+  local path="$1"
+  local index="$2"
+  local field="$3"
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    jq -r "${path}[$index].${field} // empty" "$CONFIG_FILE" 2>/dev/null
+  fi
+}
+
 ################################################################################
 # Logging
 ################################################################################
@@ -40,8 +105,17 @@ error_exit() {
 ################################################################################
 
 show_banner() {
-  local license="${LICENSE_KEY:-UNLICENSED}"
-  local client="${CLIENT_NAME:-}"
+  local license
+  local client
+
+  # Try JSON first, then ENV
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    license=$(get_json_value '.license.key' 'UNLICENSED')
+    client=$(get_json_value '.license.client_name' '')
+  else
+    license="${LICENSE_KEY:-UNLICENSED}"
+    client="${CLIENT_NAME:-}"
+  fi
 
   echo ""
   echo "================================================================================"
@@ -62,6 +136,19 @@ show_banner() {
 ################################################################################
 
 build_user_agent() {
+  local custom_ua
+
+  # Check JSON config for custom user agent
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    custom_ua=$(get_json_value '.settings.sip_user_agent' '')
+    if [ -n "$custom_ua" ] && [ "$custom_ua" != "InsideDynamic-Wrapper" ]; then
+      SIP_USER_AGENT="$custom_ua"
+      export SIP_USER_AGENT
+      echo_log "Using custom SIP User-Agent from JSON: $SIP_USER_AGENT"
+      return
+    fi
+  fi
+
   # If SIP_USER_AGENT is already set by user, use it as-is
   if [ -n "$SIP_USER_AGENT" ] && [ "$SIP_USER_AGENT" != "InsideDynamic-Wrapper" ]; then
     echo_log "Using custom SIP User-Agent: $SIP_USER_AGENT"
@@ -69,8 +156,16 @@ build_user_agent() {
   fi
 
   # Build User-Agent like banner: InsideDynamic-Wrapper-(LICENSE_KEY) or InsideDynamic-Wrapper-(LICENSE_KEY)-CLIENT_NAME
-  local license="${LICENSE_KEY:-UNLICENSED}"
-  local client="${CLIENT_NAME:-}"
+  local license
+  local client
+
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    license=$(get_json_value '.license.key' 'UNLICENSED')
+    client=$(get_json_value '.license.client_name' '')
+  else
+    license="${LICENSE_KEY:-UNLICENSED}"
+    client="${CLIENT_NAME:-}"
+  fi
 
   if [ -n "$client" ]; then
     # Replace spaces with underscores in client name for User-Agent
@@ -100,17 +195,37 @@ require_env() {
 validate_config() {
   echo_log "Validating configuration..."
 
-  # Required variables
-  require_env "FS_DOMAIN"
-  require_env "EXTERNAL_SIP_IP"
-  require_env "EXTERNAL_RTP_IP"
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    # Validate JSON config
+    local fs_domain
+    fs_domain=$(get_json_value '.settings.fs_domain' '')
+    if [ -z "$fs_domain" ]; then
+      error_exit "JSON config: settings.fs_domain is required"
+    fi
 
-  # At least one user or gateway should be defined
-  if [ -z "$USERS" ] && [ -z "$GATEWAYS" ]; then
-    error_exit "At least one USER or GATEWAY must be defined"
+    local users_count
+    local gateways_count
+    users_count=$(get_json_array_length '.users')
+    gateways_count=$(get_json_array_length '.gateways')
+
+    if [ "$users_count" -eq 0 ] && [ "$gateways_count" -eq 0 ]; then
+      error_exit "JSON config: At least one user or gateway must be defined"
+    fi
+
+    echo_log "JSON config validated: $users_count users, $gateways_count gateways"
+  else
+    # Required variables
+    require_env "FS_DOMAIN"
+    require_env "EXTERNAL_SIP_IP"
+    require_env "EXTERNAL_RTP_IP"
+
+    # At least one user or gateway should be defined
+    if [ -z "$USERS" ] && [ -z "$GATEWAYS" ]; then
+      error_exit "At least one USER or GATEWAY must be defined"
+    fi
+
+    echo_log "ENV configuration validated"
   fi
-
-  echo_log "Configuration validated"
 }
 
 ################################################################################
@@ -165,28 +280,53 @@ clean_config() {
 generate_vars() {
   echo_log "Generating vars.xml..."
 
+  # Get values from JSON or ENV
+  local var_domain var_ext_sip var_ext_rtp var_int_port var_ext_port
+  local var_rtp_start var_rtp_end var_codec var_out_codec
+
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    var_domain=$(get_json_value '.settings.fs_domain' "$FS_DOMAIN")
+    var_ext_sip=$(get_json_value '.settings.external_sip_ip' "$EXTERNAL_SIP_IP")
+    var_ext_rtp=$(get_json_value '.settings.external_rtp_ip' "$EXTERNAL_RTP_IP")
+    var_int_port=$(get_json_value '.settings.internal_sip_port' "${INTERNAL_SIP_PORT:-5060}")
+    var_ext_port=$(get_json_value '.settings.external_sip_port' "${EXTERNAL_SIP_PORT:-5080}")
+    var_codec=$(get_json_value '.settings.codec_prefs' 'PCMU,PCMA,G729,opus')
+    var_out_codec=$(get_json_value '.settings.outbound_codec_prefs' 'PCMU,PCMA,G729')
+  else
+    var_domain="$FS_DOMAIN"
+    var_ext_sip="$EXTERNAL_SIP_IP"
+    var_ext_rtp="$EXTERNAL_RTP_IP"
+    var_int_port="${INTERNAL_SIP_PORT:-5060}"
+    var_ext_port="${EXTERNAL_SIP_PORT:-5080}"
+    var_codec="${CODEC_PREFS:-PCMU,PCMA,G729,opus}"
+    var_out_codec="${OUTBOUND_CODEC_PREFS:-PCMU,PCMA,G729}"
+  fi
+
+  var_rtp_start="${RTP_START_PORT:-16384}"
+  var_rtp_end="${RTP_END_PORT:-32768}"
+
   cat > "$FS_CONF/vars.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <include>
   <!-- Global Variables -->
-  <X-PRE-PROCESS cmd="set" data="domain=$FS_DOMAIN"/>
-  <X-PRE-PROCESS cmd="set" data="external_sip_ip=$EXTERNAL_SIP_IP"/>
-  <X-PRE-PROCESS cmd="set" data="external_rtp_ip=$EXTERNAL_RTP_IP"/>
+  <X-PRE-PROCESS cmd="set" data="domain=$var_domain"/>
+  <X-PRE-PROCESS cmd="set" data="external_sip_ip=$var_ext_sip"/>
+  <X-PRE-PROCESS cmd="set" data="external_rtp_ip=$var_ext_rtp"/>
 
   <!-- Network Settings -->
-  <X-PRE-PROCESS cmd="set" data="internal_sip_port=${INTERNAL_SIP_PORT:-5060}"/>
-  <X-PRE-PROCESS cmd="set" data="external_sip_port=${EXTERNAL_SIP_PORT:-5080}"/>
+  <X-PRE-PROCESS cmd="set" data="internal_sip_port=$var_int_port"/>
+  <X-PRE-PROCESS cmd="set" data="external_sip_port=$var_ext_port"/>
 
   <!-- RTP Port Range -->
-  <X-PRE-PROCESS cmd="set" data="rtp_start_port=${RTP_START_PORT:-16384}"/>
-  <X-PRE-PROCESS cmd="set" data="rtp_end_port=${RTP_END_PORT:-32768}"/>
+  <X-PRE-PROCESS cmd="set" data="rtp_start_port=$var_rtp_start"/>
+  <X-PRE-PROCESS cmd="set" data="rtp_end_port=$var_rtp_end"/>
 
   <!-- SIP Settings -->
   <X-PRE-PROCESS cmd="set" data="sip_tls_version=${SIP_TLS_VERSION:-tlsv1.2}"/>
 
   <!-- Codec Settings -->
-  <X-PRE-PROCESS cmd="set" data="global_codec_prefs=${CODEC_PREFS:-PCMU,PCMA,G729,opus}"/>
-  <X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=${OUTBOUND_CODEC_PREFS:-PCMU,PCMA,G729}"/>
+  <X-PRE-PROCESS cmd="set" data="global_codec_prefs=$var_codec"/>
+  <X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=$var_out_codec"/>
 </include>
 EOF
 
@@ -242,7 +382,19 @@ generate_internal_profile() {
   # Determine ACL list and blind auth based on whether ACL_USERS is defined
   # blind_auth/blind_reg = false means FreeSWITCH requires valid user in directory
   # ACL_USERS are authenticated by IP via ACL, not by password
-  if [ -n "$ACL_USERS" ]; then
+  local has_acl_users=false
+
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    local acl_len
+    acl_len=$(get_json_array_length '.acl_users')
+    if [ "$acl_len" -gt 0 ]; then
+      has_acl_users=true
+    fi
+  elif [ -n "$ACL_USERS" ]; then
+    has_acl_users=true
+  fi
+
+  if [ "$has_acl_users" = true ]; then
     local inbound_acl="domains,acl_users"
     local blind_auth="false"
     local blind_reg="false"
@@ -429,35 +581,52 @@ EOF
 ################################################################################
 
 generate_users() {
-  if [ -z "$USERS" ]; then
-    echo_log "No authenticated users defined, skipping..."
-    return
-  fi
-
   echo_log "Generating users..."
 
   local user_count=0
-  IFS=',' read -ra USER_ARRAY <<< "$USERS"
+  local outbound_caller_id
 
-  for user_entry in "${USER_ARRAY[@]}"; do
-    IFS=':' read -r username password extension caller_id <<< "$user_entry"
+  # Get default outbound caller ID
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    outbound_caller_id=$(get_json_value '.routes.outbound_caller_id' '')
+  else
+    outbound_caller_id="${OUTBOUND_CALLER_ID:-}"
+  fi
 
-    if [ -z "$username" ] || [ -z "$password" ]; then
-      echo_log "WARNING: Invalid user entry: $user_entry (skipping)"
-      continue
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    # Read from JSON config
+    local users_len
+    users_len=$(get_json_array_length '.users')
+
+    if [ "$users_len" -eq 0 ]; then
+      echo_log "No authenticated users in JSON config, skipping..."
+      return
     fi
 
-    # Default extension to username if not provided
-    extension="${extension:-$username}"
+    for ((i=0; i<users_len; i++)); do
+      local username password extension enabled
 
-    # Default caller_id to OUTBOUND_CALLER_ID or extension
-    if [ -z "$caller_id" ]; then
-      caller_id="${OUTBOUND_CALLER_ID:-$extension}"
-    fi
+      username=$(jq -r ".users[$i].username // empty" "$CONFIG_FILE")
+      password=$(jq -r ".users[$i].password // empty" "$CONFIG_FILE")
+      extension=$(jq -r ".users[$i].extension // empty" "$CONFIG_FILE")
+      enabled=$(jq -r ".users[$i].enabled // true" "$CONFIG_FILE")
 
-    echo_log "Creating user: $username (extension: $extension, caller_id: $caller_id)"
+      if [ "$enabled" != "true" ]; then
+        echo_log "Skipping disabled user: $username"
+        continue
+      fi
 
-    cat > "$FS_CONF/directory/default/$username.xml" <<EOF
+      if [ -z "$username" ] || [ -z "$password" ]; then
+        echo_log "WARNING: Invalid user at index $i (skipping)"
+        continue
+      fi
+
+      extension="${extension:-$username}"
+      local caller_id="${outbound_caller_id:-$extension}"
+
+      echo_log "Creating user: $username (extension: $extension)"
+
+      cat > "$FS_CONF/directory/default/$username.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <include>
   <user id="$username" number-alias="$extension">
@@ -481,8 +650,62 @@ generate_users() {
 </include>
 EOF
 
-    user_count=$((user_count + 1))
-  done
+      user_count=$((user_count + 1))
+    done
+  else
+    # Read from ENV
+    if [ -z "$USERS" ]; then
+      echo_log "No authenticated users defined, skipping..."
+      return
+    fi
+
+    IFS=',' read -ra USER_ARRAY <<< "$USERS"
+
+    for user_entry in "${USER_ARRAY[@]}"; do
+      IFS=':' read -r username password extension caller_id <<< "$user_entry"
+
+      if [ -z "$username" ] || [ -z "$password" ]; then
+        echo_log "WARNING: Invalid user entry: $user_entry (skipping)"
+        continue
+      fi
+
+      # Default extension to username if not provided
+      extension="${extension:-$username}"
+
+      # Default caller_id to OUTBOUND_CALLER_ID or extension
+      if [ -z "$caller_id" ]; then
+        caller_id="${OUTBOUND_CALLER_ID:-$extension}"
+      fi
+
+      echo_log "Creating user: $username (extension: $extension, caller_id: $caller_id)"
+
+      cat > "$FS_CONF/directory/default/$username.xml" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<include>
+  <user id="$username" number-alias="$extension">
+    <params>
+      <param name="password" value="$password"/>
+      <param name="vm-password" value="$password"/>
+    </params>
+    <variables>
+      <variable name="user_context" value="default"/>
+      <variable name="effective_caller_id_number" value="$caller_id"/>
+      <variable name="effective_caller_id_name" value="$username"/>
+      <variable name="outbound_caller_id_number" value="$caller_id"/>
+      <variable name="outbound_caller_id_name" value="$username"/>
+      <!-- NAT Traversal - applied to ALL calls from this user -->
+      <variable name="rtp_auto_adjust" value="true"/>
+      <variable name="sip_comedia" value="true"/>
+      <variable name="bypass_media" value="false"/>
+      <variable name="sip_nat_detected" value="true"/>
+    </variables>
+  </user>
+</include>
+EOF
+
+      user_count=$((user_count + 1))
+    done
+  fi
 
   echo_log "Generated $user_count authenticated users"
 }
@@ -495,14 +718,33 @@ EOF
 ################################################################################
 
 generate_acl_users() {
-  if [ -z "$ACL_USERS" ]; then
+  echo_log "Generating ACL users..."
+
+  local acl_count=0
+  local outbound_caller_id
+  local has_acl_users=false
+
+  # Get default outbound caller ID
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    outbound_caller_id=$(get_json_value '.routes.outbound_caller_id' '')
+    local acl_len
+    acl_len=$(get_json_array_length '.acl_users')
+    if [ "$acl_len" -gt 0 ]; then
+      has_acl_users=true
+    fi
+  else
+    outbound_caller_id="${OUTBOUND_CALLER_ID:-}"
+    if [ -n "$ACL_USERS" ]; then
+      has_acl_users=true
+    fi
+  fi
+
+  if [ "$has_acl_users" = false ]; then
     echo_log "No ACL users defined, skipping..."
     return
   fi
 
-  echo_log "Generating ACL users..."
-
-  # Create ACL configuration
+  # Create ACL configuration header
   cat > "$FS_CONF/autoload_configs/acl.conf.xml" <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration name="acl.conf" description="Network Lists">
@@ -514,53 +756,61 @@ generate_acl_users() {
     <list name="acl_users" default="deny">
 EOF
 
-  local acl_count=0
-  IFS=',' read -ra ACL_ARRAY <<< "$ACL_USERS"
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    # Read from JSON config
+    local acl_len
+    acl_len=$(get_json_array_length '.acl_users')
 
-  for acl_entry in "${ACL_ARRAY[@]}"; do
-    IFS=':' read -r username ip_list extension caller_id <<< "$acl_entry"
+    for ((i=0; i<acl_len; i++)); do
+      local username extension caller_id enabled
 
-    if [ -z "$username" ] || [ -z "$ip_list" ]; then
-      echo_log "WARNING: Invalid ACL entry: $acl_entry (skipping)"
-      continue
-    fi
+      username=$(jq -r ".acl_users[$i].username // empty" "$CONFIG_FILE")
+      extension=$(jq -r ".acl_users[$i].extension // empty" "$CONFIG_FILE")
+      caller_id=$(jq -r ".acl_users[$i].caller_id // empty" "$CONFIG_FILE")
+      enabled=$(jq -r ".acl_users[$i].enabled // true" "$CONFIG_FILE")
 
-    extension="${extension:-$username}"
-
-    # Default caller_id to OUTBOUND_CALLER_ID or extension
-    if [ -z "$caller_id" ]; then
-      caller_id="${OUTBOUND_CALLER_ID:-$extension}"
-    fi
-
-    # Parse multiple IPs separated by | (pipe)
-    IFS='|' read -ra IP_ARRAY <<< "$ip_list"
-    local ip_count=${#IP_ARRAY[@]}
-
-    if [ $ip_count -gt 1 ]; then
-      echo_log "Creating ACL user: $username ($ip_count IPs, extension: $extension, caller_id: $caller_id)"
-    else
-      echo_log "Creating ACL user: $username (IP: $ip_list, extension: $extension, caller_id: $caller_id)"
-    fi
-
-    # Add each IP to ACL (support both single IP and CIDR notation)
-    for ip in "${IP_ARRAY[@]}"; do
-      # If IP already contains /, use as-is (CIDR). Otherwise add /32 (single IP)
-      if [[ "$ip" == *"/"* ]]; then
-        local cidr="$ip"
-      else
-        local cidr="$ip/32"
+      if [ "$enabled" != "true" ]; then
+        echo_log "Skipping disabled ACL user: $username"
+        continue
       fi
 
-      echo_log "  Adding IP to ACL: $cidr"
+      if [ -z "$username" ]; then
+        echo_log "WARNING: Invalid ACL user at index $i (skipping)"
+        continue
+      fi
 
-      # Add IP to common ACL list
-      cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<EOF
+      extension="${extension:-$username}"
+      caller_id="${caller_id:-$outbound_caller_id}"
+      caller_id="${caller_id:-$extension}"
+
+      # Get IPs array
+      local ips_json
+      ips_json=$(jq -r ".acl_users[$i].ips | @json" "$CONFIG_FILE")
+      local ip_count
+      ip_count=$(jq -r ".acl_users[$i].ips | length // 0" "$CONFIG_FILE")
+
+      echo_log "Creating ACL user: $username ($ip_count IPs, extension: $extension)"
+
+      # Add each IP to ACL
+      for ((j=0; j<ip_count; j++)); do
+        local ip
+        ip=$(jq -r ".acl_users[$i].ips[$j]" "$CONFIG_FILE")
+
+        # If IP already contains /, use as-is (CIDR). Otherwise add /32 (single IP)
+        if [[ "$ip" == *"/"* ]]; then
+          local cidr="$ip"
+        else
+          local cidr="$ip/32"
+        fi
+
+        echo_log "  Adding IP to ACL: $cidr"
+        cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<EOF
       <node type="allow" cidr="$cidr"/>
 EOF
-    done
+      done
 
-    # Create user directory entry without password (one user for all IPs)
-    cat > "$FS_CONF/directory/default/$username.xml" <<EOF
+      # Create user directory entry without password
+      cat > "$FS_CONF/directory/default/$username.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <include>
   <user id="$username" number-alias="$extension">
@@ -578,8 +828,76 @@ EOF
 </include>
 EOF
 
-    acl_count=$((acl_count + 1))
-  done
+      acl_count=$((acl_count + 1))
+    done
+  else
+    # Read from ENV
+    IFS=',' read -ra ACL_ARRAY <<< "$ACL_USERS"
+
+    for acl_entry in "${ACL_ARRAY[@]}"; do
+      IFS=':' read -r username ip_list extension caller_id <<< "$acl_entry"
+
+      if [ -z "$username" ] || [ -z "$ip_list" ]; then
+        echo_log "WARNING: Invalid ACL entry: $acl_entry (skipping)"
+        continue
+      fi
+
+      extension="${extension:-$username}"
+
+      # Default caller_id to OUTBOUND_CALLER_ID or extension
+      if [ -z "$caller_id" ]; then
+        caller_id="${OUTBOUND_CALLER_ID:-$extension}"
+      fi
+
+      # Parse multiple IPs separated by | (pipe)
+      IFS='|' read -ra IP_ARRAY <<< "$ip_list"
+      local ip_count=${#IP_ARRAY[@]}
+
+      if [ $ip_count -gt 1 ]; then
+        echo_log "Creating ACL user: $username ($ip_count IPs, extension: $extension, caller_id: $caller_id)"
+      else
+        echo_log "Creating ACL user: $username (IP: $ip_list, extension: $extension, caller_id: $caller_id)"
+      fi
+
+      # Add each IP to ACL (support both single IP and CIDR notation)
+      for ip in "${IP_ARRAY[@]}"; do
+        # If IP already contains /, use as-is (CIDR). Otherwise add /32 (single IP)
+        if [[ "$ip" == *"/"* ]]; then
+          local cidr="$ip"
+        else
+          local cidr="$ip/32"
+        fi
+
+        echo_log "  Adding IP to ACL: $cidr"
+
+        # Add IP to common ACL list
+        cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<EOF
+      <node type="allow" cidr="$cidr"/>
+EOF
+      done
+
+      # Create user directory entry without password (one user for all IPs)
+      cat > "$FS_CONF/directory/default/$username.xml" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<include>
+  <user id="$username" number-alias="$extension">
+    <params>
+      <param name="a1-hash" value="disabled"/>
+    </params>
+    <variables>
+      <variable name="user_context" value="default"/>
+      <variable name="effective_caller_id_number" value="$caller_id"/>
+      <variable name="effective_caller_id_name" value="$username"/>
+      <variable name="outbound_caller_id_number" value="$caller_id"/>
+      <variable name="outbound_caller_id_name" value="$username"/>
+    </variables>
+  </user>
+</include>
+EOF
+
+      acl_count=$((acl_count + 1))
+    done
+  fi
 
   # Close ACL users list and configuration
   cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<'EOF'
@@ -636,76 +954,145 @@ EOF
 ################################################################################
 
 generate_gateways() {
-  if [ -z "$GATEWAYS" ]; then
-    echo_log "No gateways defined, skipping..."
-    return
-  fi
-
   echo_log "Generating gateways..."
 
   local gw_count=0
-  IFS=',' read -ra GW_ARRAY <<< "$GATEWAYS"
 
-  for gw_entry in "${GW_ARRAY[@]}"; do
-    IFS=':' read -r gw_type gw_name gw_host gw_port gw_user gw_pass gw_register gw_transport gw_auth_user <<< "$gw_entry"
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    # Read from JSON config
+    local gateways_len
+    gateways_len=$(get_json_array_length '.gateways')
 
-    if [ -z "$gw_type" ] || [ -z "$gw_name" ] || [ -z "$gw_host" ]; then
-      echo_log "WARNING: Invalid gateway entry: $gw_entry (skipping)"
-      continue
+    if [ "$gateways_len" -eq 0 ]; then
+      echo_log "No gateways in JSON config, skipping..."
+      return
     fi
 
-    # Defaults
-    gw_port="${gw_port:-5060}"
-    gw_register="${gw_register:-true}"
-    gw_transport="${gw_transport:-udp}"
+    for ((i=0; i<gateways_len; i++)); do
+      local gw_type gw_name gw_host gw_port gw_user gw_pass gw_register gw_transport gw_auth_user enabled
 
-    # If auth_user not provided, use username as auth_user (default behavior)
-    if [ -z "$gw_auth_user" ]; then
-      gw_auth_user="$gw_user"
-    fi
+      gw_type=$(jq -r ".gateways[$i].type // \"sip\"" "$CONFIG_FILE")
+      gw_name=$(jq -r ".gateways[$i].name // empty" "$CONFIG_FILE")
+      gw_host=$(jq -r ".gateways[$i].host // empty" "$CONFIG_FILE")
+      gw_port=$(jq -r ".gateways[$i].port // 5060" "$CONFIG_FILE")
+      gw_user=$(jq -r ".gateways[$i].username // empty" "$CONFIG_FILE")
+      gw_pass=$(jq -r ".gateways[$i].password // empty" "$CONFIG_FILE")
+      gw_register=$(jq -r ".gateways[$i].register // true" "$CONFIG_FILE")
+      gw_transport=$(jq -r ".gateways[$i].transport // \"udp\"" "$CONFIG_FILE")
+      gw_auth_user=$(jq -r ".gateways[$i].auth_username // empty" "$CONFIG_FILE")
+      enabled=$(jq -r ".gateways[$i].enabled // true" "$CONFIG_FILE")
 
-    if [ -n "$gw_auth_user" ] && [ "$gw_auth_user" != "$gw_user" ]; then
-      echo_log "Creating gateway [$gw_type]: $gw_name ($gw_host:$gw_port, user: $gw_user, auth: $gw_auth_user, register: $gw_register)"
-    else
+      if [ "$enabled" != "true" ]; then
+        echo_log "Skipping disabled gateway: $gw_name"
+        continue
+      fi
+
+      if [ -z "$gw_name" ] || [ -z "$gw_host" ]; then
+        echo_log "WARNING: Invalid gateway at index $i (skipping)"
+        continue
+      fi
+
+      # If auth_user not provided, use username
+      if [ -z "$gw_auth_user" ]; then
+        gw_auth_user="$gw_user"
+      fi
+
       echo_log "Creating gateway [$gw_type]: $gw_name ($gw_host:$gw_port, register: $gw_register)"
+
+      # Write gateway XML
+      _write_gateway_xml "$gw_name" "$gw_host" "$gw_port" "$gw_user" "$gw_pass" "$gw_register" "$gw_transport" "$gw_auth_user"
+
+      gw_count=$((gw_count + 1))
+    done
+  else
+    # Read from ENV
+    if [ -z "$GATEWAYS" ]; then
+      echo_log "No gateways defined, skipping..."
+      return
     fi
 
-    cat > "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
+    IFS=',' read -ra GW_ARRAY <<< "$GATEWAYS"
+
+    for gw_entry in "${GW_ARRAY[@]}"; do
+      IFS=':' read -r gw_type gw_name gw_host gw_port gw_user gw_pass gw_register gw_transport gw_auth_user <<< "$gw_entry"
+
+      if [ -z "$gw_type" ] || [ -z "$gw_name" ] || [ -z "$gw_host" ]; then
+        echo_log "WARNING: Invalid gateway entry: $gw_entry (skipping)"
+        continue
+      fi
+
+      # Defaults
+      gw_port="${gw_port:-5060}"
+      gw_register="${gw_register:-true}"
+      gw_transport="${gw_transport:-udp}"
+
+      # If auth_user not provided, use username as auth_user (default behavior)
+      if [ -z "$gw_auth_user" ]; then
+        gw_auth_user="$gw_user"
+      fi
+
+      if [ -n "$gw_auth_user" ] && [ "$gw_auth_user" != "$gw_user" ]; then
+        echo_log "Creating gateway [$gw_type]: $gw_name ($gw_host:$gw_port, user: $gw_user, auth: $gw_auth_user, register: $gw_register)"
+      else
+        echo_log "Creating gateway [$gw_type]: $gw_name ($gw_host:$gw_port, register: $gw_register)"
+      fi
+
+      # Write gateway XML
+      _write_gateway_xml "$gw_name" "$gw_host" "$gw_port" "$gw_user" "$gw_pass" "$gw_register" "$gw_transport" "$gw_auth_user"
+
+      gw_count=$((gw_count + 1))
+    done
+  fi
+
+  echo_log "Generated $gw_count gateways"
+}
+
+# Helper function to write gateway XML
+_write_gateway_xml() {
+  local gw_name="$1"
+  local gw_host="$2"
+  local gw_port="$3"
+  local gw_user="$4"
+  local gw_pass="$5"
+  local gw_register="$6"
+  local gw_transport="$7"
+  local gw_auth_user="$8"
+
+  cat > "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <include>
   <gateway name="$gw_name">
 EOF
 
-    # Add username and password only if provided
-    if [ -n "$gw_user" ]; then
-      # For 3CX and similar: if auth-username differs, use it in from-user
-      # This ensures the From header matches the authentication username
-      local from_user="$gw_user"
-      if [ -n "$gw_auth_user" ] && [ "$gw_auth_user" != "$gw_user" ]; then
-        from_user="$gw_auth_user"
-      fi
+  # Add username and password only if provided
+  if [ -n "$gw_user" ]; then
+    # For 3CX and similar: if auth-username differs, use it in from-user
+    local from_user="$gw_user"
+    if [ -n "$gw_auth_user" ] && [ "$gw_auth_user" != "$gw_user" ]; then
+      from_user="$gw_auth_user"
+    fi
 
-      cat >> "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
+    cat >> "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
     <param name="username" value="$gw_user"/>
     <param name="from-user" value="$from_user"/>
 EOF
-    fi
+  fi
 
-    # Add auth-username if different from username (for providers like 3CX)
-    if [ -n "$gw_auth_user" ] && [ "$gw_auth_user" != "$gw_user" ]; then
-      cat >> "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
+  # Add auth-username if different from username (for providers like 3CX)
+  if [ -n "$gw_auth_user" ] && [ "$gw_auth_user" != "$gw_user" ]; then
+    cat >> "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
     <param name="auth-username" value="$gw_auth_user"/>
 EOF
-    fi
+  fi
 
-    if [ -n "$gw_pass" ]; then
-      cat >> "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
+  if [ -n "$gw_pass" ]; then
+    cat >> "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
     <param name="password" value="$gw_pass"/>
 EOF
-    fi
+  fi
 
-    # Add gateway parameters
-    cat >> "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
+  # Add gateway parameters
+  cat >> "$FS_CONF/sip_profiles/external/$gw_name.xml" <<EOF
     <param name="realm" value="$gw_host"/>
     <param name="from-domain" value="$gw_host"/>
     <param name="proxy" value="$gw_host:$gw_port"/>
@@ -720,11 +1107,6 @@ EOF
   </gateway>
 </include>
 EOF
-
-    gw_count=$((gw_count + 1))
-  done
-
-  echo_log "Generated $gw_count gateways"
 }
 
 ################################################################################
@@ -763,34 +1145,80 @@ EOF
 ################################################################################
 
 generate_user_outbound_routing() {
-  if [ -z "$OUTBOUND_USER_ROUTES" ]; then
-    echo_log "No user-based outbound routes defined, skipping..."
-    return
-  fi
-
   echo_log "Generating user-based outbound routing..."
+
+  local route_count=0
+  local country_code
+
+  # Get default country code
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    country_code=$(get_json_value '.settings.default_country_code' '49')
+  else
+    country_code="${DEFAULT_COUNTRY_CODE:-49}"
+  fi
 
   cat > "$FS_CONF/dialplan/default/000_user_routing.xml" <<'EOF'
 <!-- User-based outbound routing - HIGHEST PRIORITY (processed before default gateway) -->
 EOF
 
-  local route_count=0
-  IFS=',' read -ra ROUTE_ARRAY <<< "$OUTBOUND_USER_ROUTES"
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    # Read from JSON config
+    local routes_len
+    routes_len=$(get_json_array_length '.routes.user_routes')
 
-  for route_entry in "${ROUTE_ARRAY[@]}"; do
-    IFS=':' read -r username gateway <<< "$route_entry"
-
-    if [ -z "$username" ] || [ -z "$gateway" ]; then
-      echo_log "WARNING: Invalid user route entry: $route_entry (skipping)"
-      continue
+    if [ "$routes_len" -eq 0 ]; then
+      echo_log "No user-based outbound routes in JSON config"
+      return
     fi
 
-    echo_log "Creating user route: $username -> $gateway"
+    for ((i=0; i<routes_len; i++)); do
+      local username gateway
 
-    # Get default country code for number normalization
-    local country_code="${DEFAULT_COUNTRY_CODE:-49}"
+      username=$(jq -r ".routes.user_routes[$i].username // empty" "$CONFIG_FILE")
+      gateway=$(jq -r ".routes.user_routes[$i].gateway // empty" "$CONFIG_FILE")
 
-    cat >> "$FS_CONF/dialplan/default/000_user_routing.xml" <<EOF
+      if [ -z "$username" ] || [ -z "$gateway" ]; then
+        echo_log "WARNING: Invalid user route at index $i (skipping)"
+        continue
+      fi
+
+      echo_log "Creating user route: $username -> $gateway"
+      _write_user_route_xml "$username" "$gateway" "$country_code"
+      route_count=$((route_count + 1))
+    done
+  else
+    # Read from ENV
+    if [ -z "$OUTBOUND_USER_ROUTES" ]; then
+      echo_log "No user-based outbound routes defined"
+      return
+    fi
+
+    IFS=',' read -ra ROUTE_ARRAY <<< "$OUTBOUND_USER_ROUTES"
+
+    for route_entry in "${ROUTE_ARRAY[@]}"; do
+      IFS=':' read -r username gateway <<< "$route_entry"
+
+      if [ -z "$username" ] || [ -z "$gateway" ]; then
+        echo_log "WARNING: Invalid user route entry: $route_entry (skipping)"
+        continue
+      fi
+
+      echo_log "Creating user route: $username -> $gateway"
+      _write_user_route_xml "$username" "$gateway" "$country_code"
+      route_count=$((route_count + 1))
+    done
+  fi
+
+  echo_log "Generated $route_count user-based outbound routes"
+}
+
+# Helper function to write user route XML
+_write_user_route_xml() {
+  local username="$1"
+  local gateway="$2"
+  local country_code="$3"
+
+  cat >> "$FS_CONF/dialplan/default/000_user_routing.xml" <<EOF
 
     <!-- User $username routes to gateway $gateway -->
 
@@ -854,11 +1282,6 @@ EOF
       </condition>
     </extension>
 EOF
-
-    route_count=$((route_count + 1))
-  done
-
-  echo_log "Generated $route_count user-based outbound routes"
 }
 
 ################################################################################
@@ -869,73 +1292,78 @@ EOF
 generate_outbound_dialplan() {
   echo_log "Generating outbound dialplan..."
 
+  local default_gateway country_code
+  local has_outbound_routes=false
+
+  # Get settings from JSON or ENV
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    default_gateway=$(get_json_value '.routes.default_gateway' '')
+    country_code=$(get_json_value '.settings.default_country_code' '49')
+    local outbound_len
+    outbound_len=$(get_json_array_length '.routes.outbound')
+    if [ "$outbound_len" -gt 0 ]; then
+      has_outbound_routes=true
+    fi
+  else
+    default_gateway="$DEFAULT_GATEWAY"
+    country_code="${DEFAULT_COUNTRY_CODE:-49}"
+    if [ -n "$OUTBOUND_ROUTES" ]; then
+      has_outbound_routes=true
+    fi
+  fi
+
   cat > "$FS_CONF/dialplan/default/00_outbound.xml" <<'EOF'
 <!-- Outbound dialplan rules - included by default.xml wrapper -->
 EOF
 
-  if [ -n "$OUTBOUND_ROUTES" ]; then
+  if [ "$has_outbound_routes" = true ]; then
     local route_count=0
-    IFS=',' read -ra ROUTE_ARRAY <<< "$OUTBOUND_ROUTES"
 
-    for route_entry in "${ROUTE_ARRAY[@]}"; do
-      IFS=':' read -r pattern gateway prepend strip <<< "$route_entry"
+    if [ "$USE_JSON_CONFIG" = true ]; then
+      # Read from JSON config
+      local outbound_len
+      outbound_len=$(get_json_array_length '.routes.outbound')
 
-      if [ -z "$pattern" ] || [ -z "$gateway" ]; then
-        echo_log "WARNING: Invalid outbound route: $route_entry (skipping)"
-        continue
-      fi
+      for ((i=0; i<outbound_len; i++)); do
+        local pattern gateway prepend strip
 
-      echo_log "Creating outbound route: $pattern -> $gateway"
+        pattern=$(jq -r ".routes.outbound[$i].pattern // empty" "$CONFIG_FILE")
+        gateway=$(jq -r ".routes.outbound[$i].gateway // empty" "$CONFIG_FILE")
+        prepend=$(jq -r ".routes.outbound[$i].prepend // empty" "$CONFIG_FILE")
+        strip=$(jq -r ".routes.outbound[$i].strip // empty" "$CONFIG_FILE")
 
-      cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
+        if [ -z "$pattern" ] || [ -z "$gateway" ]; then
+          echo_log "WARNING: Invalid outbound route at index $i (skipping)"
+          continue
+        fi
 
-    <!-- Route: $pattern via $gateway -->
-    <extension name="outbound_${gateway}_${route_count}">
-      <condition field="destination_number" expression="^($pattern)\$">
-EOF
+        echo_log "Creating outbound route: $pattern -> $gateway"
+        _write_outbound_route_xml "$pattern" "$gateway" "$prepend" "$strip" "$route_count"
+        route_count=$((route_count + 1))
+      done
+    else
+      # Read from ENV
+      IFS=',' read -ra ROUTE_ARRAY <<< "$OUTBOUND_ROUTES"
 
-      # Strip prefix if specified
-      if [ -n "$strip" ]; then
-        cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
-        <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
-        <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
-        <action application="set" data="stripped_number=\${regex(\$1|^$strip(.*)|\$1)}"/>
-EOF
-        local dial_number="\${stripped_number}"
-      else
-        local dial_number="\$1"
-      fi
+      for route_entry in "${ROUTE_ARRAY[@]}"; do
+        IFS=':' read -r pattern gateway prepend strip <<< "$route_entry"
 
-      # Add prepend if specified
-      if [ -n "$prepend" ]; then
-        cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
-        <action application="set" data="final_number=$prepend$dial_number"/>
-EOF
-        dial_number="\${final_number}"
-      fi
+        if [ -z "$pattern" ] || [ -z "$gateway" ]; then
+          echo_log "WARNING: Invalid outbound route: $route_entry (skipping)"
+          continue
+        fi
 
-      cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
-        <!-- NAT Traversal: ignore SDP address, use real IP from SIP packets -->
-        <action application="export" data="rtp_auto_adjust=true"/>
-        <action application="export" data="sip_comedia=true"/>
-        <action application="set" data="ignore_sdp_addr=true"/>
-        <action application="set" data="hangup_after_bridge=true"/>
-        <action application="bridge" data="sofia/gateway/$gateway/$dial_number"/>
-      </condition>
-    </extension>
-EOF
-
-      route_count=$((route_count + 1))
-    done
+        echo_log "Creating outbound route: $pattern -> $gateway"
+        _write_outbound_route_xml "$pattern" "$gateway" "$prepend" "$strip" "$route_count"
+        route_count=$((route_count + 1))
+      done
+    fi
 
     echo_log "Generated $route_count outbound routes"
   else
     # Default catch-all outbound route
-    if [ -n "$DEFAULT_GATEWAY" ]; then
-      echo_log "Creating default outbound route via $DEFAULT_GATEWAY"
-
-      # Get default country code (default: 49 for Germany)
-      local country_code="${DEFAULT_COUNTRY_CODE:-49}"
+    if [ -n "$default_gateway" ]; then
+      echo_log "Creating default outbound route via $default_gateway"
 
       cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
 
@@ -949,7 +1377,7 @@ EOF
         <action application="export" data="sip_comedia=true"/>
         <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
-        <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/\$1\$2"/>
+        <action application="bridge" data="sofia/gateway/$default_gateway/\$1\$2"/>
       </condition>
     </extension>
 
@@ -963,7 +1391,7 @@ EOF
         <action application="export" data="sip_comedia=true"/>
         <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
-        <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+\$1"/>
+        <action application="bridge" data="sofia/gateway/$default_gateway/+\$1"/>
       </condition>
     </extension>
 
@@ -977,7 +1405,7 @@ EOF
         <action application="export" data="sip_comedia=true"/>
         <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
-        <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+$country_code\$1"/>
+        <action application="bridge" data="sofia/gateway/$default_gateway/+$country_code\$1"/>
       </condition>
     </extension>
 
@@ -991,7 +1419,7 @@ EOF
         <action application="export" data="sip_comedia=true"/>
         <action application="set" data="ignore_sdp_addr=true"/>
         <action application="set" data="hangup_after_bridge=true"/>
-        <action application="bridge" data="sofia/gateway/$DEFAULT_GATEWAY/+$country_code\$1"/>
+        <action application="bridge" data="sofia/gateway/$default_gateway/+$country_code\$1"/>
       </condition>
     </extension>
 EOF
@@ -1001,6 +1429,52 @@ EOF
   fi
 
   echo_log "Outbound dialplan generated"
+}
+
+# Helper function to write outbound route XML
+_write_outbound_route_xml() {
+  local pattern="$1"
+  local gateway="$2"
+  local prepend="$3"
+  local strip="$4"
+  local route_count="$5"
+
+  cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
+
+    <!-- Route: $pattern via $gateway -->
+    <extension name="outbound_${gateway}_${route_count}">
+      <condition field="destination_number" expression="^($pattern)\$">
+EOF
+
+  # Strip prefix if specified
+  local dial_number="\$1"
+  if [ -n "$strip" ]; then
+    cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
+        <action application="set" data="effective_caller_id_number=\${outbound_caller_id_number}"/>
+        <action application="set" data="effective_caller_id_name=\${outbound_caller_id_name}"/>
+        <action application="set" data="stripped_number=\${regex(\$1|^$strip(.*)|\$1)}"/>
+EOF
+    dial_number="\${stripped_number}"
+  fi
+
+  # Add prepend if specified
+  if [ -n "$prepend" ]; then
+    cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
+        <action application="set" data="final_number=$prepend$dial_number"/>
+EOF
+    dial_number="\${final_number}"
+  fi
+
+  cat >> "$FS_CONF/dialplan/default/00_outbound.xml" <<EOF
+        <!-- NAT Traversal: ignore SDP address, use real IP from SIP packets -->
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
+        <action application="set" data="ignore_sdp_addr=true"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="bridge" data="sofia/gateway/$gateway/$dial_number"/>
+      </condition>
+    </extension>
+EOF
 }
 
 ################################################################################
@@ -1013,102 +1487,99 @@ EOF
 generate_inbound_dialplan() {
   echo_log "Generating inbound dialplan..."
 
+  local default_extension
+  local has_inbound_routes=false
+
+  # Get default extension from JSON or ENV
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    default_extension=$(get_json_value '.routes.default_extension' '')
+    local inbound_len
+    inbound_len=$(get_json_array_length '.routes.inbound')
+    if [ "$inbound_len" -gt 0 ]; then
+      has_inbound_routes=true
+    fi
+  else
+    default_extension="$DEFAULT_EXTENSION"
+    if [ -n "$INBOUND_ROUTES" ]; then
+      has_inbound_routes=true
+    fi
+  fi
+
   cat > "$FS_CONF/dialplan/public/00_inbound.xml" <<'EOF'
 <!-- Inbound dialplan rules - included by public.xml wrapper -->
 <!-- Routes match on 'gw=' parameter from SIP request URI (e.g., gw=fritz-rt) -->
 EOF
 
-  if [ -n "$INBOUND_ROUTES" ]; then
+  if [ "$has_inbound_routes" = true ]; then
     local route_count=0
-    IFS=',' read -ra INBOUND_ARRAY <<< "$INBOUND_ROUTES"
 
-    for inbound_entry in "${INBOUND_ARRAY[@]}"; do
-      IFS=':' read -r gateway extension <<< "$inbound_entry"
+    if [ "$USE_JSON_CONFIG" = true ]; then
+      # Read from JSON config
+      local inbound_len
+      inbound_len=$(get_json_array_length '.routes.inbound')
 
-      if [ -z "$gateway" ] || [ -z "$extension" ]; then
-        echo_log "WARNING: Invalid inbound route: $inbound_entry (skipping)"
-        continue
-      fi
+      for ((i=0; i<inbound_len; i++)); do
+        local gateway extension
 
-      echo_log "Creating inbound route: gateway $gateway -> extension $extension"
+        gateway=$(jq -r ".routes.inbound[$i].gateway // empty" "$CONFIG_FILE")
+        extension=$(jq -r ".routes.inbound[$i].extension // empty" "$CONFIG_FILE")
 
-      local ext_name="inbound_${gateway}"
-
-      # Look up gateway host from GATEWAYS variable for registration-based matching
-      # Format: type:name:host:port:...
-      local inbound_gw_host=""
-      if [ -n "$GATEWAYS" ]; then
-        IFS=',' read -ra GW_LOOKUP_ARRAY <<< "$GATEWAYS"
-        for gw_lookup_entry in "${GW_LOOKUP_ARRAY[@]}"; do
-          IFS=':' read -r lookup_type lookup_name lookup_host lookup_rest <<< "$gw_lookup_entry"
-          if [ "$lookup_name" = "$gateway" ]; then
-            inbound_gw_host="$lookup_host"
-            echo_log "  Found gateway host: $inbound_gw_host (type: $lookup_type)"
-            break
-          fi
-        done
-      fi
-
-      # Check if extension is a gateway reference (format: gateway@gateway_name)
-      if [[ "$extension" =~ ^gateway@(.+)$ ]]; then
-        local out_gateway="${BASH_REMATCH[1]}"
-        echo_log "  Routing to gateway: $out_gateway"
-
-        cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
-
-    <!-- Inbound: gateway $gateway -> outbound gateway $out_gateway -->
-    <extension name="$ext_name">
-      <condition field="\${sip_req_params}" expression="(^|;)gw=${gateway}($|;)">
-        <action application="set" data="domain_name=\$\${domain}"/>
-        <action application="export" data="rtp_auto_adjust=true"/>
-        <action application="export" data="sip_comedia=true"/>
-        <action application="set" data="hangup_after_bridge=true"/>
-        <action application="bridge" data="sofia/gateway/$out_gateway/\${destination_number}"/>
-      </condition>
-    </extension>
-EOF
-      else
-        # Regular extension transfer - first the gw= parameter match
-        cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
-
-    <!-- Inbound: gateway $gateway -> extension $extension (via gw= parameter) -->
-    <extension name="$ext_name">
-      <condition field="\${sip_req_params}" expression="(^|;)gw=${gateway}($|;)">
-        <action application="set" data="domain_name=\$\${domain}"/>
-        <action application="transfer" data="$extension XML default"/>
-      </condition>
-    </extension>
-EOF
-
-        # Add registration-based matching if we found the gateway host
-        if [ -n "$inbound_gw_host" ]; then
-          echo_log "  Adding registration-based matching for host: $inbound_gw_host"
-          cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
-
-    <!-- Inbound: gateway $gateway -> extension $extension (via registered gateway) -->
-    <!-- This handles calls from PBX systems (like 3CX) that send to registered contact without gw= param -->
-    <!-- Matches on sip_from_host containing gateway host domain -->
-    <extension name="${ext_name}_via_registration">
-      <condition field="\${sip_from_host}" expression="$inbound_gw_host" break="on-false"/>
-      <condition field="destination_number" expression="^(.+)$">
-        <action application="set" data="domain_name=\$\${domain}"/>
-        <action application="log" data="INFO Inbound from registered gateway $gateway (host $inbound_gw_host) to extension $extension"/>
-        <action application="transfer" data="$extension XML default"/>
-      </condition>
-    </extension>
-EOF
+        if [ -z "$gateway" ] || [ -z "$extension" ]; then
+          echo_log "WARNING: Invalid inbound route at index $i (skipping)"
+          continue
         fi
-      fi
 
-      route_count=$((route_count + 1))
-    done
+        echo_log "Creating inbound route: gateway $gateway -> extension $extension"
+
+        # Look up gateway host from JSON gateways for registration-based matching
+        local inbound_gw_host=""
+        inbound_gw_host=$(jq -r ".gateways[] | select(.name == \"$gateway\") | .host // empty" "$CONFIG_FILE" 2>/dev/null | head -1)
+        if [ -n "$inbound_gw_host" ]; then
+          echo_log "  Found gateway host: $inbound_gw_host"
+        fi
+
+        _write_inbound_route_xml "$gateway" "$extension" "$inbound_gw_host"
+        route_count=$((route_count + 1))
+      done
+    else
+      # Read from ENV
+      IFS=',' read -ra INBOUND_ARRAY <<< "$INBOUND_ROUTES"
+
+      for inbound_entry in "${INBOUND_ARRAY[@]}"; do
+        IFS=':' read -r gateway extension <<< "$inbound_entry"
+
+        if [ -z "$gateway" ] || [ -z "$extension" ]; then
+          echo_log "WARNING: Invalid inbound route: $inbound_entry (skipping)"
+          continue
+        fi
+
+        echo_log "Creating inbound route: gateway $gateway -> extension $extension"
+
+        # Look up gateway host from GATEWAYS variable for registration-based matching
+        local inbound_gw_host=""
+        if [ -n "$GATEWAYS" ]; then
+          IFS=',' read -ra GW_LOOKUP_ARRAY <<< "$GATEWAYS"
+          for gw_lookup_entry in "${GW_LOOKUP_ARRAY[@]}"; do
+            IFS=':' read -r lookup_type lookup_name lookup_host lookup_rest <<< "$gw_lookup_entry"
+            if [ "$lookup_name" = "$gateway" ]; then
+              inbound_gw_host="$lookup_host"
+              echo_log "  Found gateway host: $inbound_gw_host (type: $lookup_type)"
+              break
+            fi
+          done
+        fi
+
+        _write_inbound_route_xml "$gateway" "$extension" "$inbound_gw_host"
+        route_count=$((route_count + 1))
+      done
+    fi
 
     echo_log "Generated $route_count inbound routes"
   else
     # Default: forward all inbound to default extension
-    if [ -n "$DEFAULT_EXTENSION" ]; then
-      # Check if DEFAULT_EXTENSION is a gateway reference (format: gateway@gateway_name)
-      if [[ "$DEFAULT_EXTENSION" =~ ^gateway@(.+)$ ]]; then
+    if [ -n "$default_extension" ]; then
+      # Check if default_extension is a gateway reference (format: gateway@gateway_name)
+      if [[ "$default_extension" =~ ^gateway@(.+)$ ]]; then
         local gateway_name="${BASH_REMATCH[1]}"
         echo_log "Creating default inbound route to gateway $gateway_name"
 
@@ -1126,7 +1597,7 @@ EOF
     </extension>
 EOF
       else
-        echo_log "Creating default inbound route to extension $DEFAULT_EXTENSION"
+        echo_log "Creating default inbound route to extension $default_extension"
 
         cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
 
@@ -1134,7 +1605,7 @@ EOF
     <extension name="inbound_default">
       <condition field="destination_number" expression="^(.+)\$">
         <action application="set" data="domain_name=\$\${domain}"/>
-        <action application="transfer" data="$DEFAULT_EXTENSION XML default"/>
+        <action application="transfer" data="$default_extension XML default"/>
       </condition>
     </extension>
 EOF
@@ -1145,6 +1616,66 @@ EOF
   fi
 
   echo_log "Inbound dialplan generated"
+}
+
+# Helper function to write inbound route XML
+_write_inbound_route_xml() {
+  local gateway="$1"
+  local extension="$2"
+  local inbound_gw_host="$3"
+
+  local ext_name="inbound_${gateway}"
+
+  # Check if extension is a gateway reference (format: gateway@gateway_name)
+  if [[ "$extension" =~ ^gateway@(.+)$ ]]; then
+    local out_gateway="${BASH_REMATCH[1]}"
+    echo_log "  Routing to gateway: $out_gateway"
+
+    cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
+
+    <!-- Inbound: gateway $gateway -> outbound gateway $out_gateway -->
+    <extension name="$ext_name">
+      <condition field="\${sip_req_params}" expression="(^|;)gw=${gateway}($|;)">
+        <action application="set" data="domain_name=\$\${domain}"/>
+        <action application="export" data="rtp_auto_adjust=true"/>
+        <action application="export" data="sip_comedia=true"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="bridge" data="sofia/gateway/$out_gateway/\${destination_number}"/>
+      </condition>
+    </extension>
+EOF
+  else
+    # Regular extension transfer - first the gw= parameter match
+    cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
+
+    <!-- Inbound: gateway $gateway -> extension $extension (via gw= parameter) -->
+    <extension name="$ext_name">
+      <condition field="\${sip_req_params}" expression="(^|;)gw=${gateway}($|;)">
+        <action application="set" data="domain_name=\$\${domain}"/>
+        <action application="transfer" data="$extension XML default"/>
+      </condition>
+    </extension>
+EOF
+
+    # Add registration-based matching if we found the gateway host
+    if [ -n "$inbound_gw_host" ]; then
+      echo_log "  Adding registration-based matching for host: $inbound_gw_host"
+      cat >> "$FS_CONF/dialplan/public/00_inbound.xml" <<EOF
+
+    <!-- Inbound: gateway $gateway -> extension $extension (via registered gateway) -->
+    <!-- This handles calls from PBX systems (like 3CX) that send to registered contact without gw= param -->
+    <!-- Matches on sip_from_host containing gateway host domain -->
+    <extension name="${ext_name}_via_registration">
+      <condition field="\${sip_from_host}" expression="$inbound_gw_host" break="on-false"/>
+      <condition field="destination_number" expression="^(.+)$">
+        <action application="set" data="domain_name=\$\${domain}"/>
+        <action application="log" data="INFO Inbound from registered gateway $gateway (host $inbound_gw_host) to extension $extension"/>
+        <action application="transfer" data="$extension XML default"/>
+      </condition>
+    </extension>
+EOF
+    fi
+  fi
 }
 
 ################################################################################
@@ -1369,6 +1900,9 @@ generate_routing_config_json() {
 ################################################################################
 
 main() {
+  # Check if JSON config exists - must be done first
+  check_json_config
+
   show_banner
   build_user_agent
   echo_log "Starting FreeSWITCH provisioning..."

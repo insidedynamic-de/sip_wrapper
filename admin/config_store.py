@@ -20,6 +20,10 @@ CONFIG_FILE = os.environ.get('CONFIG_FILE', '/var/lib/freeswitch/wrapper_config.
 DEFAULT_CONFIG = {
     "version": 1,
     "updated_at": None,
+    "license": {
+        "key": "",
+        "client_name": ""
+    },
     "settings": {
         "fs_domain": "",
         "external_sip_ip": "",
@@ -28,7 +32,8 @@ DEFAULT_CONFIG = {
         "external_sip_port": 5080,
         "codec_prefs": "PCMU,PCMA,G729,opus",
         "outbound_codec_prefs": "PCMU,PCMA,G729",
-        "default_country_code": "49"
+        "default_country_code": "49",
+        "sip_user_agent": "InsideDynamic-Wrapper"
     },
     "users": [],
     "acl_users": [],
@@ -489,6 +494,22 @@ def import_from_env():
     config = load_config()
     imported = {'users': 0, 'gateways': 0, 'acl_users': 0, 'inbound_routes': 0, 'user_routes': 0}
 
+    # Import License
+    if 'license' not in config:
+        config['license'] = {}
+    config['license']['key'] = os.environ.get('LICENSE_KEY', config['license'].get('key', ''))
+    config['license']['client_name'] = os.environ.get('CLIENT_NAME', config['license'].get('client_name', ''))
+
+    # Import Settings
+    if 'settings' not in config:
+        config['settings'] = DEFAULT_CONFIG['settings'].copy()
+    config['settings']['fs_domain'] = os.environ.get('FS_DOMAIN', config['settings'].get('fs_domain', ''))
+    config['settings']['external_sip_ip'] = os.environ.get('EXTERNAL_SIP_IP', config['settings'].get('external_sip_ip', ''))
+    config['settings']['external_rtp_ip'] = os.environ.get('EXTERNAL_RTP_IP', config['settings'].get('external_rtp_ip', ''))
+    config['settings']['codec_prefs'] = os.environ.get('CODEC_PREFS', config['settings'].get('codec_prefs', 'PCMU,PCMA,G729,opus'))
+    config['settings']['outbound_codec_prefs'] = os.environ.get('OUTBOUND_CODEC_PREFS', config['settings'].get('outbound_codec_prefs', 'PCMU,PCMA,G729'))
+    config['settings']['sip_user_agent'] = os.environ.get('SIP_USER_AGENT', config['settings'].get('sip_user_agent', 'InsideDynamic-Wrapper'))
+
     # Import Users: username:password:extension,...
     users_env = os.environ.get('USERS', '')
     if users_env and not config.get('users'):
@@ -639,16 +660,33 @@ def export_for_provision():
             })
 
     routes = config.get('routes', {})
+    settings = config.get('settings', {})
+    license_info = config.get('license', {})
 
     return {
+        # License
+        'license_key': license_info.get('key', ''),
+        'client_name': license_info.get('client_name', ''),
+
+        # Settings
+        'fs_domain': settings.get('fs_domain', ''),
+        'external_sip_ip': settings.get('external_sip_ip', ''),
+        'external_rtp_ip': settings.get('external_rtp_ip', ''),
+        'codec_prefs': settings.get('codec_prefs', 'PCMU,PCMA,G729,opus'),
+        'outbound_codec_prefs': settings.get('outbound_codec_prefs', 'PCMU,PCMA,G729'),
+        'sip_user_agent': settings.get('sip_user_agent', 'InsideDynamic-Wrapper'),
+        'default_country_code': settings.get('default_country_code', '49'),
+
+        # Users & Gateways
         'users': users,
         'acl_users': acl_users,
         'gateways': gateways,
+
+        # Routes
         'inbound_routes': routes.get('inbound', []),
         'outbound_user_routes': routes.get('user_routes', []),
         'outbound_routes': routes.get('outbound', []),
         'default_gateway': routes.get('default_gateway', ''),
         'default_extension': routes.get('default_extension', ''),
-        'outbound_caller_id': routes.get('outbound_caller_id', ''),
-        'default_country_code': config.get('settings', {}).get('default_country_code', '49')
+        'outbound_caller_id': routes.get('outbound_caller_id', '')
     }

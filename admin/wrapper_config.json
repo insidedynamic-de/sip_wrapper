@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "updated_at": "2026-02-03T00:00:00Z",
+  "license": {
+    "key": "IDGMBH-2025-001",
+    "client_name": "Mustermann GmbH"
+  },
+  "settings": {
+    "fs_domain": "apps.linkify.cloud",
+    "external_sip_ip": "46.224.205.100",
+    "external_rtp_ip": "46.224.205.100",
+    "internal_sip_port": 5060,
+    "external_sip_port": 5080,
+    "codec_prefs": "G722,PCMA,PCMU,G729,opus",
+    "outbound_codec_prefs": "G722,PCMA,PCMU,G729",
+    "default_country_code": "49",
+    "sip_user_agent": "InsideDynamic-Wrapper"
+  },
+  "users": [
+    {
+      "username": "fritz",
+      "password": "SecretPass",
+      "extension": "1001",
+      "enabled": true
+    },
+    {
+      "username": "3cx",
+      "password": "SecretPass",
+      "extension": "1002",
+      "enabled": true
+    },
+    {
+      "username": "agfeo",
+      "password": "SecretPass",
+      "extension": "1003",
+      "enabled": true
+    },
+    {
+      "username": "placetel",
+      "password": "SecretPass",
+      "extension": "1004",
+      "enabled": true
+    },
+    {
+      "username": "sipgate",
+      "password": "SecretPass",
+      "extension": "1005",
+      "enabled": true
+    },
+    {
+      "username": "plusnet",
+      "password": "SecretPass",
+      "extension": "1006",
+      "enabled": true
+    }
+  ],
+  "acl_users": [
+    {
+      "username": "vapi1",
+      "ips": ["34.213.129.25", "44.238.177.138", "44.229.228.186"],
+      "extension": "9000",
+      "caller_id": "+4932221803988",
+      "enabled": true
+    }
+  ],
+  "gateways": [
+    {
+      "type": "sip",
+      "name": "fritz-rt",
+      "host": "7cj8rm6hnqk5fwta.myfritz.net",
+      "port": 5060,
+      "username": "INDYN-VNI-74",
+      "password": "Mannheim.68165",
+      "register": true,
+      "transport": "udp",
+      "auth_username": "",
+      "enabled": true
+    },
+    {
+      "type": "sip",
+      "name": "placetel-rt",
+      "host": "fpbx.de",
+      "port": 5060,
+      "username": "777034347089",
+      "password": "B2yOzUsm5jLh",
+      "register": true,
+      "transport": "udp",
+      "auth_username": "",
+      "enabled": true
+    },
+    {
+      "type": "3cx",
+      "name": "3cx-rt",
+      "host": "5.75.183.193",
+      "port": 5060,
+      "username": "14",
+      "password": "n5qluS8qHB",
+      "register": true,
+      "transport": "udp",
+      "auth_username": "Qh4wiCIKg9",
+      "enabled": true
+    },
+    {
+      "type": "sip",
+      "name": "agfeo-rt",
+      "host": "voip.agfeotel.xyz",
+      "port": 5060,
+      "username": "422047",
+      "password": "lRspTDoe7t",
+      "register": true,
+      "transport": "udp",
+      "auth_username": "",
+      "enabled": true
+    },
+    {
+      "type": "sip",
+      "name": "sipgate-rt",
+      "host": "sipgate.de",
+      "port": 5060,
+      "username": "2595211e0",
+      "password": "k9acjd2fikR1",
+      "register": true,
+      "transport": "udp",
+      "auth_username": "",
+      "enabled": true
+    },
+    {
+      "type": "sip",
+      "name": "plusnet-rt",
+      "host": "sip.plusnet.de",
+      "port": 5060,
+      "username": "fo348474ip252021_00",
+      "password": "3qawRrgaKQ",
+      "register": true,
+      "transport": "udp",
+      "auth_username": "",
+      "enabled": true
+    }
+  ],
+  "routes": {
+    "default_gateway": "fritz-rt",
+    "default_extension": "1001",
+    "outbound_caller_id": "+4932221803989",
+    "inbound": [
+      { "gateway": "fritz-rt", "extension": "1001" },
+      { "gateway": "3cx-rt", "extension": "1002" },
+      { "gateway": "sipgate-rt", "extension": "1005" },
+      { "gateway": "placetel-rt", "extension": "1004" },
+      { "gateway": "plusnet-rt", "extension": "1006" }
+    ],
+    "outbound": [],
+    "user_routes": [
+      { "username": "fritz", "gateway": "fritz-rt" },
+      { "username": "3cx", "gateway": "3cx-rt" },
+      { "username": "agfeo", "gateway": "agfeo-rt" },
+      { "username": "placetel", "gateway": "placetel-rt" },
+      { "username": "vapi1", "gateway": "agfeo-rt" },
+      { "username": "sipgate", "gateway": "sipgate-rt" },
+      { "username": "plusnet", "gateway": "plusnet-rt" }
+    ]
+  }
+}

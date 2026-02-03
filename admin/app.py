@@ -838,6 +838,146 @@ def crud_update_settings():
     return jsonify({'success': success, 'message': msg})
 
 ################################################################################
+# CRUD API - Full Config
+################################################################################
+
+@app.route('/api/crud/full-config', methods=['GET'])
+@login_required
+def crud_get_full_config():
+    """Get the full JSON configuration"""
+    return jsonify(config_store.get_full_config())
+
+################################################################################
+# CRUD API - License
+################################################################################
+
+@app.route('/api/crud/license', methods=['GET'])
+@login_required
+def crud_get_license():
+    """Get license info"""
+    config = config_store.load_config()
+    return jsonify(config.get('license', {'key': '', 'client_name': ''}))
+
+@app.route('/api/crud/license', methods=['PUT'])
+@login_required
+def crud_update_license():
+    """Update license info"""
+    data = request.json
+    config = config_store.load_config()
+    config['license'] = {
+        'key': data.get('key', ''),
+        'client_name': data.get('client_name', '')
+    }
+    config_store.save_config(config)
+    return jsonify({'success': True, 'message': 'License updated'})
+
+################################################################################
+# CRUD API - Inbound Routes (by gateway)
+################################################################################
+
+@app.route('/api/crud/inbound-routes', methods=['GET'])
+@login_required
+def crud_get_inbound_routes():
+    """Get all inbound routes"""
+    return jsonify(config_store.get_inbound_routes())
+
+@app.route('/api/crud/inbound-routes', methods=['POST'])
+@login_required
+def crud_add_inbound_route_gw():
+    """Add inbound route (gateway -> extension)"""
+    data = request.json
+    success, msg = config_store.add_inbound_route_gw(
+        data.get('gateway'),
+        data.get('extension')
+    )
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/inbound-routes/<gateway>', methods=['PUT'])
+@login_required
+def crud_update_inbound_route_gw(gateway):
+    """Update inbound route"""
+    data = request.json
+    success, msg = config_store.update_inbound_route(gateway, data.get('extension'))
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/inbound-routes/<gateway>', methods=['DELETE'])
+@login_required
+def crud_delete_inbound_route_gw(gateway):
+    """Delete inbound route by gateway"""
+    success, msg = config_store.delete_inbound_route_gw(gateway)
+    return jsonify({'success': success, 'message': msg})
+
+################################################################################
+# CRUD API - User Routes (user -> gateway)
+################################################################################
+
+@app.route('/api/crud/user-routes', methods=['GET'])
+@login_required
+def crud_get_user_routes():
+    """Get all user outbound routes"""
+    return jsonify(config_store.get_outbound_user_routes())
+
+@app.route('/api/crud/user-routes', methods=['POST'])
+@login_required
+def crud_add_user_route_new():
+    """Add/update user route"""
+    data = request.json
+    success, msg = config_store.add_outbound_user_route(
+        data.get('username'),
+        data.get('gateway')
+    )
+    return jsonify({'success': success, 'message': msg})
+
+@app.route('/api/crud/user-routes/<username>', methods=['DELETE'])
+@login_required
+def crud_delete_user_route_new(username):
+    """Delete user route"""
+    success, msg = config_store.delete_outbound_user_route(username)
+    return jsonify({'success': success, 'message': msg})
+
+################################################################################
+# CRUD API - Defaults
+################################################################################
+
+@app.route('/api/crud/defaults', methods=['GET'])
+@login_required
+def crud_get_defaults():
+    """Get default gateway/extension"""
+    return jsonify({
+        'default_gateway': config_store.get_default_gateway(),
+        'default_extension': config_store.get_default_extension(),
+        'outbound_caller_id': config_store.get_outbound_caller_id()
+    })
+
+@app.route('/api/crud/defaults', methods=['PUT'])
+@login_required
+def crud_update_defaults():
+    """Update defaults"""
+    data = request.json
+    if 'default_gateway' in data:
+        config_store.set_default_gateway(data['default_gateway'])
+    if 'default_extension' in data:
+        config_store.set_default_extension(data['default_extension'])
+    if 'outbound_caller_id' in data:
+        config_store.set_outbound_caller_id(data['outbound_caller_id'])
+    return jsonify({'success': True, 'message': 'Defaults updated'})
+
+################################################################################
+# Import from ENV
+################################################################################
+
+@app.route('/api/crud/import-env', methods=['POST'])
+@login_required
+def crud_import_from_env():
+    """Import configuration from environment variables to JSON"""
+    imported = config_store.import_from_env()
+    return jsonify({
+        'success': True,
+        'message': 'Imported from environment',
+        'imported': imported
+    })
+
+################################################################################
 # CRUD API - Export & Apply
 ################################################################################
 
