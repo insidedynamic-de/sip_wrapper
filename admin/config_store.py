@@ -45,6 +45,11 @@ DEFAULT_CONFIG = {
         "inbound": [],
         "outbound": [],
         "user_routes": []
+    },
+    "security": {
+        "blacklist": [],
+        "whitelist": [],
+        "whitelist_enabled": False
     }
 }
 
@@ -688,5 +693,114 @@ def export_for_provision():
         'outbound_routes': routes.get('outbound', []),
         'default_gateway': routes.get('default_gateway', ''),
         'default_extension': routes.get('default_extension', ''),
-        'outbound_caller_id': routes.get('outbound_caller_id', '')
+        'outbound_caller_id': routes.get('outbound_caller_id', ''),
+
+        # Security
+        'blacklist': config.get('security', {}).get('blacklist', []),
+        'whitelist': config.get('security', {}).get('whitelist', []),
+        'whitelist_enabled': config.get('security', {}).get('whitelist_enabled', False)
     }
+
+
+# =============================================================================
+# Security - Blacklist / Whitelist
+# =============================================================================
+
+def get_security():
+    """Get security settings"""
+    config = load_config()
+    return config.get('security', DEFAULT_CONFIG['security'])
+
+
+def update_security(security_data):
+    """Update security settings"""
+    config = load_config()
+    if 'security' not in config:
+        config['security'] = DEFAULT_CONFIG['security'].copy()
+    config['security'].update(security_data)
+    save_config(config)
+    return True, "Security settings updated"
+
+
+def add_to_blacklist(ip, comment=""):
+    """Add IP to blacklist"""
+    config = load_config()
+    if 'security' not in config:
+        config['security'] = DEFAULT_CONFIG['security'].copy()
+
+    # Check if already exists
+    for entry in config['security']['blacklist']:
+        if entry.get('ip') == ip:
+            return False, "IP already in blacklist"
+
+    config['security']['blacklist'].append({
+        'ip': ip,
+        'comment': comment,
+        'added_at': datetime.now().isoformat()
+    })
+    save_config(config)
+    return True, "IP added to blacklist"
+
+
+def remove_from_blacklist(ip):
+    """Remove IP from blacklist"""
+    config = load_config()
+    if 'security' not in config:
+        return False, "IP not found"
+
+    original_len = len(config['security']['blacklist'])
+    config['security']['blacklist'] = [
+        e for e in config['security']['blacklist']
+        if e.get('ip') != ip
+    ]
+    if len(config['security']['blacklist']) < original_len:
+        save_config(config)
+        return True, "IP removed from blacklist"
+    return False, "IP not found"
+
+
+def add_to_whitelist(ip, comment=""):
+    """Add IP to whitelist"""
+    config = load_config()
+    if 'security' not in config:
+        config['security'] = DEFAULT_CONFIG['security'].copy()
+
+    # Check if already exists
+    for entry in config['security']['whitelist']:
+        if entry.get('ip') == ip:
+            return False, "IP already in whitelist"
+
+    config['security']['whitelist'].append({
+        'ip': ip,
+        'comment': comment,
+        'added_at': datetime.now().isoformat()
+    })
+    save_config(config)
+    return True, "IP added to whitelist"
+
+
+def remove_from_whitelist(ip):
+    """Remove IP from whitelist"""
+    config = load_config()
+    if 'security' not in config:
+        return False, "IP not found"
+
+    original_len = len(config['security']['whitelist'])
+    config['security']['whitelist'] = [
+        e for e in config['security']['whitelist']
+        if e.get('ip') != ip
+    ]
+    if len(config['security']['whitelist']) < original_len:
+        save_config(config)
+        return True, "IP removed from whitelist"
+    return False, "IP not found"
+
+
+def set_whitelist_enabled(enabled):
+    """Enable or disable whitelist mode"""
+    config = load_config()
+    if 'security' not in config:
+        config['security'] = DEFAULT_CONFIG['security'].copy()
+    config['security']['whitelist_enabled'] = enabled
+    save_config(config)
+    return True, "Whitelist mode " + ("enabled" if enabled else "disabled")

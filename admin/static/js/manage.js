@@ -64,7 +64,8 @@ async function loadAll() {
         loadAclUsers(),
         loadGateways(),
         loadRoutes(),
-        loadSettings()
+        loadSettings(),
+        loadSecurity()
     ]);
     updateGatewaySelects();
     updateUserSelects();
@@ -725,3 +726,165 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Handle back/forward navigation
 window.addEventListener('hashchange', handleHashNavigation);
+
+// =============================================================================
+// Security - Blacklist / Whitelist
+// =============================================================================
+
+let securityData = { blacklist: [], whitelist: [], whitelist_enabled: false };
+
+async function loadSecurity() {
+    try {
+        securityData = await apiGet('/api/security');
+        renderBlacklist();
+        renderWhitelist();
+
+        // Update whitelist mode toggle
+        const toggle = document.getElementById('whitelist-enabled');
+        if (toggle) {
+            toggle.checked = securityData.whitelist_enabled || false;
+        }
+    } catch (e) {
+        console.error('Failed to load security:', e);
+    }
+}
+
+function renderBlacklist() {
+    const container = document.getElementById('blacklist-container');
+    if (!container) return;
+
+    const list = securityData.blacklist || [];
+    if (list.length === 0) {
+        container.innerHTML = '<div class="p-3 text-center text-muted"><i class="bi bi-shield-check me-2"></i>No blocked IPs</div>';
+        return;
+    }
+
+    let html = '<table class="table table-sm table-hover mb-0"><tbody>';
+    list.forEach(entry => {
+        html += `<tr>
+            <td>
+                <code class="text-danger">${entry.ip}</code>
+                ${entry.comment ? `<small class="text-muted d-block">${entry.comment}</small>` : ''}
+            </td>
+            <td class="text-end">
+                <button class="btn btn-sm btn-outline-danger" onclick="removeFromBlacklist('${entry.ip}')" title="Remove">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function renderWhitelist() {
+    const container = document.getElementById('whitelist-container');
+    if (!container) return;
+
+    const list = securityData.whitelist || [];
+    if (list.length === 0) {
+        container.innerHTML = '<div class="p-3 text-center text-muted"><i class="bi bi-list-check me-2"></i>No allowed IPs</div>';
+        return;
+    }
+
+    let html = '<table class="table table-sm table-hover mb-0"><tbody>';
+    list.forEach(entry => {
+        html += `<tr>
+            <td>
+                <code class="text-success">${entry.ip}</code>
+                ${entry.comment ? `<small class="text-muted d-block">${entry.comment}</small>` : ''}
+            </td>
+            <td class="text-end">
+                <button class="btn btn-sm btn-outline-danger" onclick="removeFromWhitelist('${entry.ip}')" title="Remove">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function showAddBlacklistModal() {
+    document.getElementById('blacklist-ip').value = '';
+    document.getElementById('blacklist-comment').value = '';
+    new bootstrap.Modal(document.getElementById('blacklistModal')).show();
+}
+
+function showAddWhitelistModal() {
+    document.getElementById('whitelist-ip').value = '';
+    document.getElementById('whitelist-comment').value = '';
+    new bootstrap.Modal(document.getElementById('whitelistModal')).show();
+}
+
+async function addToBlacklist() {
+    const ip = document.getElementById('blacklist-ip').value.trim();
+    const comment = document.getElementById('blacklist-comment').value.trim();
+
+    if (!ip) {
+        showToast('Error', 'IP address required', 'error');
+        return;
+    }
+
+    const result = await apiPost('/api/security/blacklist', { ip, comment });
+    if (result.success) {
+        bootstrap.Modal.getInstance(document.getElementById('blacklistModal')).hide();
+        showToast('Success', result.message, 'success');
+        await loadSecurity();
+    } else {
+        showToast('Error', result.message, 'error');
+    }
+}
+
+async function addToWhitelist() {
+    const ip = document.getElementById('whitelist-ip').value.trim();
+    const comment = document.getElementById('whitelist-comment').value.trim();
+
+    if (!ip) {
+        showToast('Error', 'IP address required', 'error');
+        return;
+    }
+
+    const result = await apiPost('/api/security/whitelist', { ip, comment });
+    if (result.success) {
+        bootstrap.Modal.getInstance(document.getElementById('whitelistModal')).hide();
+        showToast('Success', result.message, 'success');
+        await loadSecurity();
+    } else {
+        showToast('Error', result.message, 'error');
+    }
+}
+
+async function removeFromBlacklist(ip) {
+    if (!confirm(`Remove ${ip} from blacklist?`)) return;
+
+    const result = await apiDelete(`/api/security/blacklist/${encodeURIComponent(ip)}`);
+    if (result.success) {
+        showToast('Success', result.message, 'success');
+        await loadSecurity();
+    } else {
+        showToast('Error', result.message, 'error');
+    }
+}
+
+async function removeFromWhitelist(ip) {
+    if (!confirm(`Remove ${ip} from whitelist?`)) return;
+
+    const result = await apiDelete(`/api/security/whitelist/${encodeURIComponent(ip)}`);
+    if (result.success) {
+        showToast('Success', result.message, 'success');
+        await loadSecurity();
+    } else {
+        showToast('Error', result.message, 'error');
+    }
+}
+
+async function toggleWhitelistMode() {
+    const enabled = document.getElementById('whitelist-enabled').checked;
+    const result = await apiPost('/api/security/whitelist-enabled', { enabled });
+    if (result.success) {
+        showToast('Success', result.message, 'success');
+    } else {
+        showToast('Error', result.message, 'error');
+    }
+}

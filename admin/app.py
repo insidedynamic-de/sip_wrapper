@@ -148,6 +148,7 @@ TRANSLATIONS = {
         'did': 'DID/Rufnummer',
         'no_routes': 'Keine Routen konfiguriert',
         'active_calls': 'Aktive Anrufe',
+        'call_flow': 'Verbindung',
         'call_logs': 'Anrufverlauf',
         'no_call_logs': 'Keine Anrufe aufgezeichnet',
         'direction': 'Richtung',
@@ -207,6 +208,7 @@ TRANSLATIONS = {
         'did': 'DID/Number',
         'no_routes': 'No routes configured',
         'active_calls': 'Active Calls',
+        'call_flow': 'Connection',
         'call_logs': 'Call Logs',
         'no_call_logs': 'No calls recorded',
         'direction': 'Direction',
@@ -742,6 +744,15 @@ def api_cdr():
     calls = get_call_logs(count)
     return jsonify({'calls': calls, 'count': len(calls)})
 
+@app.route('/api/active-calls')
+@login_required
+def api_active_calls():
+    if not fs_allowed():
+        return jsonify({'error': 'Access denied', 'calls': [], 'count': 0})
+    calls = parse_active_calls()
+    count = parse_channels_count()
+    return jsonify({'calls': calls, 'count': count})
+
 @app.route('/api/gateways')
 @login_required
 def api_gateways():
@@ -1230,6 +1241,81 @@ def crud_apply():
         return jsonify({'success': True, 'message': 'Config applied and FreeSWITCH reloaded'})
 
     return jsonify({'success': False, 'error': 'Config saved but failed to reload FreeSWITCH'})
+
+################################################################################
+# Security API - Blacklist / Whitelist
+################################################################################
+
+@app.route('/api/security')
+@login_required
+def api_security():
+    """Get security settings"""
+    return jsonify(config_store.get_security())
+
+@app.route('/api/security/blacklist', methods=['GET'])
+@login_required
+def api_blacklist_get():
+    """Get blacklist"""
+    security = config_store.get_security()
+    return jsonify({'blacklist': security.get('blacklist', [])})
+
+@app.route('/api/security/blacklist', methods=['POST'])
+@login_required
+def api_blacklist_add():
+    """Add IP to blacklist"""
+    data = request.get_json()
+    ip = data.get('ip', '').strip()
+    comment = data.get('comment', '').strip()
+
+    if not ip:
+        return jsonify({'success': False, 'message': 'IP address required'})
+
+    success, message = config_store.add_to_blacklist(ip, comment)
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/api/security/blacklist/<ip>', methods=['DELETE'])
+@login_required
+def api_blacklist_delete(ip):
+    """Remove IP from blacklist"""
+    success, message = config_store.remove_from_blacklist(ip)
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/api/security/whitelist', methods=['GET'])
+@login_required
+def api_whitelist_get():
+    """Get whitelist"""
+    security = config_store.get_security()
+    return jsonify({'whitelist': security.get('whitelist', [])})
+
+@app.route('/api/security/whitelist', methods=['POST'])
+@login_required
+def api_whitelist_add():
+    """Add IP to whitelist"""
+    data = request.get_json()
+    ip = data.get('ip', '').strip()
+    comment = data.get('comment', '').strip()
+
+    if not ip:
+        return jsonify({'success': False, 'message': 'IP address required'})
+
+    success, message = config_store.add_to_whitelist(ip, comment)
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/api/security/whitelist/<ip>', methods=['DELETE'])
+@login_required
+def api_whitelist_delete(ip):
+    """Remove IP from whitelist"""
+    success, message = config_store.remove_from_whitelist(ip)
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/api/security/whitelist-enabled', methods=['POST'])
+@login_required
+def api_whitelist_enabled():
+    """Enable/disable whitelist mode"""
+    data = request.get_json()
+    enabled = data.get('enabled', False)
+    success, message = config_store.set_whitelist_enabled(enabled)
+    return jsonify({'success': success, 'message': message})
 
 ################################################################################
 # Main
