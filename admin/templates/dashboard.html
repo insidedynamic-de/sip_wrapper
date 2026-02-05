@@ -253,22 +253,41 @@
 </div>
 
 <!-- Recent Logs -->
-{% if recent_logs %}
 <div class="card mt-4">
-    <div class="card-header py-2">
-        <i class="bi bi-journal-text me-2"></i>{{ t('logs') }} ({{ recent_logs|length }})
+    <div class="card-header py-2 d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-journal-text me-2"></i>{{ t('logs') }} (<span id="log-count">{{ recent_logs|length }}</span>)</span>
+        <div class="d-flex align-items-center gap-2">
+            <select id="log-limit" class="form-select form-select-sm" style="width: auto;" onchange="refreshLogs()">
+                <option value="15" selected>15</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="500">500</option>
+            </select>
+            <select id="log-refresh" class="form-select form-select-sm" style="width: auto;" onchange="updateLogRefresh()">
+                <option value="0">Off</option>
+                <option value="5">5s</option>
+                <option value="10" selected>10s</option>
+                <option value="15">15s</option>
+                <option value="60">60s</option>
+            </select>
+            <button class="btn btn-sm btn-outline-secondary" onclick="refreshLogs()" title="Refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+        </div>
     </div>
     <div class="card-body p-0">
-        <div class="log-container" style="max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.75rem;">
+        <div id="log-container" class="log-container" style="max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.75rem;">
             {% for log in recent_logs %}
             <div class="px-2 py-1 border-bottom {% if log.level == 'error' %}bg-danger bg-opacity-10 text-danger{% elif log.level == 'warning' %}bg-warning bg-opacity-10{% elif log.level == 'debug' %}text-muted{% endif %}">
                 {{ log.text }}
             </div>
             {% endfor %}
+            {% if not recent_logs %}
+            <div class="p-3 text-center text-muted">No logs available</div>
+            {% endif %}
         </div>
     </div>
 </div>
-{% endif %}
 
 <!-- FS Connection Info (small) -->
 <div class="mt-4 text-center">
@@ -282,4 +301,63 @@
         {% endif %}
     </small>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let logRefreshInterval = null;
+
+async function refreshLogs() {
+    const limit = document.getElementById('log-limit').value;
+    try {
+        const response = await fetch(`/api/logs?count=${limit}`);
+        const data = await response.json();
+
+        const container = document.getElementById('log-container');
+        document.getElementById('log-count').textContent = data.count;
+
+        if (data.logs && data.logs.length > 0) {
+            container.innerHTML = data.logs.map(log => {
+                let levelClass = '';
+                if (log.level === 'error') levelClass = 'bg-danger bg-opacity-10 text-danger';
+                else if (log.level === 'warning') levelClass = 'bg-warning bg-opacity-10';
+                else if (log.level === 'debug') levelClass = 'text-muted';
+                return `<div class="px-2 py-1 border-bottom ${levelClass}">${escapeHtml(log.text)}</div>`;
+            }).join('');
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        } else {
+            container.innerHTML = '<div class="p-3 text-center text-muted">No logs available</div>';
+        }
+    } catch (e) {
+        console.error('Failed to refresh logs:', e);
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function updateLogRefresh() {
+    const interval = parseInt(document.getElementById('log-refresh').value);
+
+    // Clear existing interval
+    if (logRefreshInterval) {
+        clearInterval(logRefreshInterval);
+        logRefreshInterval = null;
+    }
+
+    // Set new interval if not 0
+    if (interval > 0) {
+        logRefreshInterval = setInterval(refreshLogs, interval * 1000);
+    }
+}
+
+// Initialize auto-refresh on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateLogRefresh();
+});
+</script>
 {% endblock %}

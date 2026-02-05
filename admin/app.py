@@ -630,6 +630,15 @@ def api_status():
         'fs_access': True
     })
 
+@app.route('/api/logs')
+@login_required
+def api_logs():
+    count = request.args.get('count', 15, type=int)
+    # Limit to reasonable values
+    count = min(max(count, 1), 1000)
+    logs = get_recent_logs(count)
+    return jsonify({'logs': logs, 'count': len(logs)})
+
 @app.route('/api/gateways')
 @login_required
 def api_gateways():
