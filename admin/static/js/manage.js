@@ -744,6 +744,10 @@ async function loadSecurity() {
         if (toggle) {
             toggle.checked = securityData.whitelist_enabled || false;
         }
+
+        // Load auto-blacklist settings and failed attempts
+        await loadAutoBlacklistSettings();
+        await loadFailedAttempts();
     } catch (e) {
         console.error('Failed to load security:', e);
     }
@@ -884,6 +888,142 @@ async function toggleWhitelistMode() {
     const result = await apiPost('/api/security/whitelist-enabled', { enabled });
     if (result.success) {
         showToast('Success', result.message, 'success');
+    } else {
+        showToast('Error', result.message, 'error');
+    }
+}
+
+// =============================================================================
+// Auto-Blacklist
+// =============================================================================
+
+async function loadAutoBlacklistSettings() {
+    try {
+        const settings = await apiGet('/api/security/auto-blacklist');
+        document.getElementById('auto-blacklist-enabled').checked = settings.enabled || false;
+        document.getElementById('auto-blacklist-max-attempts').value = settings.max_attempts || 10;
+        document.getElementById('auto-blacklist-time-window').value = settings.time_window || 300;
+        document.getElementById('auto-blacklist-duration').value = settings.block_duration || 3600;
+    } catch (e) {
+        console.error('Failed to load auto-blacklist settings:', e);
+    }
+}
+
+async function saveAutoBlacklistSettings() {
+    const data = {
+        enabled: document.getElementById('auto-blacklist-enabled').checked,
+        max_attempts: parseInt(document.getElementById('auto-blacklist-max-attempts').value) || 10,
+        time_window: parseInt(document.getElementById('auto-blacklist-time-window').value) || 300,
+        block_duration: parseInt(document.getElementById('auto-blacklist-duration').value) || 3600
+    };
+
+    const result = await apiPost('/api/security/auto-blacklist', data);
+    if (result.success) {
+        showToast('Success', result.message, 'success');
+    } else {
+        showToast('Error', result.message, 'error');
+    }
+}
+
+async function loadFailedAttempts() {
+    const container = document.getElementById('failed-attempts-container');
+    if (!container) return;
+
+    try {
+        const data = await apiGet('/api/security/failed-attempts');
+        const attempts = data.attempts || [];
+        const settings = data.settings || {};
+
+        if (attempts.length === 0) {
+            container.innerHTML = '<div class="p-3 text-center text-muted"><i class="bi bi-shield-check me-2"></i>No suspicious activity detected</div>';
+            return;
+        }
+
+        let html = '<table class="table table-sm table-hover mb-0"><thead><tr>';
+        html += '<th>IP Address</th>';
+        html += '<th>Attempts</th>';
+        html += '<th>Status</th>';
+        html += '<th>Action</th>';
+        html += '</tr></thead><tbody>';
+
+        attempts.forEach(a => {
+            const count = a.count || 0;
+            const maxAttempts = settings.max_attempts || 10;
+            const percent = Math.min(100, Math.round((count / maxAttempts) * 100));
+            const isWarning = count >= maxAttempts * 0.5;
+            const isDanger = count >= maxAttempts * 0.8;
+
+            html += '<tr>';
+            html += `<td><code class="${isDanger ? 'text-danger' : isWarning ? 'text-warning' : ''}">${a.ip}</code></td>`;
+            html += `<td>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="progress flex-grow-1" style="height: 6px; width: 60px;">
+                        <div class="progress-bar ${isDanger ? 'bg-danger' : isWarning ? 'bg-warning' : 'bg-info'}" style="width: ${percent}%"></div>
+                    </div>
+                    <small class="${isDanger ? 'text-danger fw-bold' : isWarning ? 'text-warning' : ''}">${count}/${maxAttempts}</small>
+                </div>
+            </td>`;
+            html += `<td>`;
+            if (isDanger) {
+                html += '<span class="badge bg-danger">Critical</span>';
+            } else if (isWarning) {
+                html += '<span class="badge bg-warning text-dark">Warning</span>';
+            } else {
+                html += '<span class="badge bg-secondary">Monitoring</span>';
+            }
+            html += '</td>';
+            html += `<td>
+                <button class="btn btn-sm btn-outline-danger" onclick="quickBlockIp('${a.ip}')" title="Block immediately">
+                    <i class="bi bi-x-octagon"></i>
+                </button>
+            </td>`;
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+        // Show blocked count if any
+        if (data.blocked && data.blocked.length > 0) {
+            showToast('Auto-Blocked', `${data.blocked.length} IP(s) have been blocked`, 'success');
+            await loadSecurity(); // Refresh blacklist
+        }
+    } catch (e) {
+        console.error('Failed to load failed attempts:', e);
+        container.innerHTML = '<div class="p-3 text-center text-danger">Failed to load data</div>';
+    }
+}
+
+async function checkAutoBlacklist() {
+    try {
+        const result = await apiPost('/api/security/check-blacklist', {});
+        if (result.success) {
+            if (result.blocked && result.blocked.length > 0) {
+                showToast('Success', `Blocked ${result.blocked.length} IP(s): ${result.blocked.join(', ')}`, 'success');
+                await loadSecurity();
+            } else {
+                showToast('Info', 'No IPs exceeded the threshold', 'info');
+            }
+            await loadFailedAttempts();
+        } else {
+            showToast('Error', result.message, 'error');
+        }
+    } catch (e) {
+        showToast('Error', 'Check failed: ' + e.message, 'error');
+    }
+}
+
+async function quickBlockIp(ip) {
+    if (!confirm(`Block IP ${ip} immediately?`)) return;
+
+    const result = await apiPost('/api/security/blacklist', {
+        ip: ip,
+        comment: 'Manually blocked from monitor'
+    });
+    if (result.success) {
+        showToast('Success', `IP ${ip} has been blocked`, 'success');
+        await loadSecurity();
+        await loadFailedAttempts();
     } else {
         showToast('Error', result.message, 'error');
     }
