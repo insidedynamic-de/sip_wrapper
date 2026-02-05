@@ -1412,14 +1412,722 @@ public function handle()
 
 ---
 
+---
+
+## Полный список deliverables
+
+### 1. License Server (Backend)
+
+```
+license-server/
+├── API Endpoints
+│   ├── POST /api/verify              - Проверка лицензии
+│   ├── PUT /api/packages/{id}/server - Смена IP
+│   └── POST /webhook/order           - Webhook от партнёра
+│
+├── Admin Panel (Web UI)
+│   ├── Dashboard                     - Статистика, алерты
+│   ├── Licenses List                 - Таблица с фильтрами
+│   ├── License Detail                - Пакеты, история
+│   ├── Create/Edit License           - Форма
+│   ├── Create/Edit Package           - Форма
+│   └── Settings                      - Webhook, SMTP, уведомления
+│
+├── Database
+│   ├── licenses                      - Партнёры/клиенты
+│   ├── license_packages              - Trial/NFR/Paid пакеты
+│   ├── license_checks                - Аудит успешных проверок
+│   └── license_attempts              - Аудит неудачных попыток
+│
+├── Email Templates
+│   ├── license-created.blade.php     - Лицензия создана
+│   ├── trial-started.blade.php       - Trial начат
+│   ├── expiring-soon.blade.php       - Истекает через X дней
+│   ├── license-expired.blade.php     - Лицензия истекла
+│   ├── ip-changed.blade.php          - IP изменён
+│   └── suspicious-activity.blade.php - Алерт для админа
+│
+├── Cron Jobs
+│   ├── licenses:remind               - Напоминания об истечении
+│   ├── licenses:expire               - Автоматическое истечение
+│   └── licenses:cleanup              - Очистка старых логов
+│
+└── Infrastructure
+    ├── Dockerfile
+    ├── docker-compose.yml
+    └── .env.example
+```
+
+### 2. SIP Wrapper Integration
+
+```
+sip_wrapper/ (изменения)
+├── admin/
+│   ├── license_client.py             - Клиент для License Server
+│   └── app.py                        - Интеграция проверки лицензии
+│
+├── provision.sh                      - Проверка при старте
+│
+└── ENV Variables
+    ├── LICENSE_KEY                   - Ключ лицензии
+    ├── LICENSE_SERVER                - URL сервера
+    └── LICENSE_GRACE_DAYS            - Offline grace period
+```
+
+---
+
+## Landing Page (для клиентов)
+
+**URL:** `https://insidedynamic.de/wrapper` или `https://sip-wrapper.de`
+
+### Структура страниц
+
+```
+Landing/
+├── index.html                - Главная
+├── features.html             - Функции
+├── pricing.html              - Цены
+├── integrations.html         - Интеграции
+├── docs.html                 - Документация (ссылка)
+├── contact.html              - Контакт/Trial
+└── legal/
+    ├── imprint.html          - Impressum
+    ├── privacy.html          - Datenschutz
+    └── terms.html            - AGB
+```
+
+### Главная страница (index.html)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ [Logo]  Features  Pricing  Integrations  Docs  [Try Free]      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│           SIP Wrapper                                            │
+│           Connect AI Voice Platforms to German Carriers          │
+│                                                                  │
+│           VAPI • Retell • Bland AI → Placetel • Sipgate • 3CX   │
+│                                                                  │
+│           [Start Free Trial]    [View Demo]                      │
+│                                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Why SIP Wrapper?                                                │
+│                                                                  │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐        │
+│  │ No Twilio│  │ German   │  │ Direct   │  │ Simple   │        │
+│  │ Needed   │  │ Numbers  │  │ Connect  │  │ Setup    │        │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘        │
+│                                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Trusted Integrations                                            │
+│                                                                  │
+│  [Placetel] [Easybell] [Sipgate] [Zadarma] [3CX] [VAPI]        │
+│                                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  "SIP Wrapper reduced our telephony costs by 60%"               │
+│                                           - Customer Quote       │
+│                                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Simple Pricing                                                  │
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │ Starter      │  │ Business     │  │ Enterprise   │          │
+│  │ 10 conn      │  │ 30 conn      │  │ 100+ conn    │          │
+│  │ 99€/mo       │  │ 297€/mo      │  │ Custom       │          │
+│  │ [Start]      │  │ [Start]      │  │ [Contact]    │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│                                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│  Footer: Impressum | Datenschutz | AGB | Contact                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Features Page (features.html)
+
+```
+Sections:
+├── Core Features
+│   ├── SIP Trunk Bridging
+│   ├── Inbound/Outbound Routing
+│   ├── Multi-Gateway Support
+│   └── Codec Transcoding
+│
+├── AI Platform Integration
+│   ├── VAPI Integration
+│   ├── Retell Integration
+│   └── Bland AI Integration
+│
+├── Admin Portal
+│   ├── Web-based Configuration
+│   ├── Real-time Monitoring
+│   ├── Call Statistics
+│   └── Gateway Management
+│
+├── Security
+│   ├── IP-based Access Control
+│   ├── Encrypted SIP (TLS/SRTP)
+│   └── Audit Logging
+│
+└── Deployment
+    ├── Docker Ready
+    ├── Coolify Compatible
+    └── Self-hosted or Managed
+```
+
+### Pricing Page (pricing.html)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│  Choose Your Plan                                                │
+│                                                                  │
+│  Toggle: [Monthly] [Yearly -20%]                                │
+│                                                                  │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐    │
+│  │ Starter        │  │ Business ⭐    │  │ Enterprise     │    │
+│  │                │  │                │  │                │    │
+│  │ 10 connections │  │ 30 connections │  │ 100+ conn      │    │
+│  │                │  │                │  │                │    │
+│  │ ✓ All features │  │ ✓ All features │  │ ✓ All features │    │
+│  │ ✓ Email support│  │ ✓ Priority     │  │ ✓ Dedicated    │    │
+│  │                │  │   support      │  │   support      │    │
+│  │                │  │ ✓ SLA 99.9%    │  │ ✓ SLA 99.99%   │    │
+│  │                │  │                │  │ ✓ Custom dev   │    │
+│  │                │  │                │  │                │    │
+│  │ 99€/mo         │  │ 297€/mo        │  │ Contact us     │    │
+│  │ (36 month)     │  │ (36 month)     │  │                │    │
+│  │                │  │                │  │                │    │
+│  │ [Start Trial]  │  │ [Start Trial]  │  │ [Contact]      │    │
+│  └────────────────┘  └────────────────┘  └────────────────┘    │
+│                                                                  │
+│  All plans include:                                              │
+│  ✓ 14-day free trial                                            │
+│  ✓ No setup fees                                                │
+│  ✓ Cancel anytime                                               │
+│  ✓ Free updates                                                 │
+│                                                                  │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                  │
+│  Volume Discounts                                                │
+│                                                                  │
+│  │ Connections │ 12 months │ 24 months │ 36 months │            │
+│  │─────────────│───────────│───────────│───────────│            │
+│  │ 10          │ 149€/mo   │ 119€/mo   │ 99€/mo    │            │
+│  │ 20          │ 298€/mo   │ 238€/mo   │ 198€/mo   │            │
+│  │ 30          │ 447€/mo   │ 357€/mo   │ 297€/mo   │            │
+│  │ 50          │ 745€/mo   │ 595€/mo   │ 495€/mo   │            │
+│  │ 100         │ Contact   │ Contact   │ Contact   │            │
+│                                                                  │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                  │
+│  FAQ                                                             │
+│  ├── What is a connection?                                      │
+│  ├── Can I upgrade later?                                       │
+│  ├── What happens after trial?                                  │
+│  └── Do you offer refunds?                                      │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Integrations Page (integrations.html)
+
+```
+Sections:
+├── AI Voice Platforms
+│   ├── VAPI          - ✅ Tested
+│   ├── Retell        - ✅ Tested
+│   └── Bland AI      - ✅ Tested
+│
+├── German SIP Providers
+│   ├── Placetel      - ✅ Production
+│   ├── Easybell      - ✅ Production
+│   ├── Sipgate       - ✅ Production
+│   ├── Zadarma       - ✅ Production
+│   └── Plusnet/Fonio - ✅ Production
+│
+├── PBX Systems
+│   ├── 3CX           - ✅ Tested
+│   ├── Fritzbox      - ✅ Tested
+│   └── AGFEOtel      - ✅ Tested
+│
+└── Coming Soon
+    └── OpenAI Realtime API
+```
+
+### Contact/Trial Page (contact.html)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│  Start Your Free Trial                                           │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                                                          │   │
+│  │  Name:     [________________________]                    │   │
+│  │  Email:    [________________________]                    │   │
+│  │  Company:  [________________________]                    │   │
+│  │  Phone:    [________________________] (optional)         │   │
+│  │                                                          │   │
+│  │  Server IP: [________________________]                   │   │
+│  │  (where you'll install SIP Wrapper)                      │   │
+│  │                                                          │   │
+│  │  Use case:                                               │   │
+│  │  [ ] AI Voice Assistant                                  │   │
+│  │  [ ] Call Center                                         │   │
+│  │  [ ] PBX Integration                                     │   │
+│  │  [ ] Other: [____________]                               │   │
+│  │                                                          │   │
+│  │  [✓] I agree to Terms & Privacy Policy                   │   │
+│  │                                                          │   │
+│  │                     [Start Free Trial]                   │   │
+│  │                                                          │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│  What you get:                                                   │
+│  ✓ 14 days free                                                 │
+│  ✓ 2 connections                                                │
+│  ✓ Full features                                                │
+│  ✓ Email support                                                │
+│                                                                  │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                  │
+│  Questions? Contact us:                                          │
+│  📧 info@insidedynamic.de                                       │
+│  📞 +49 621 123 456                                             │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Documentation (System Docs)
+
+**URL:** `https://docs.insidedynamic.de/sip-wrapper` или `docs.html`
+
+### Структура документации
+
+```
+Documentation/
+├── Getting Started
+│   ├── Quick Start Guide
+│   ├── Requirements
+│   ├── Installation
+│   └── First Configuration
+│
+├── Configuration
+│   ├── Environment Variables
+│   ├── Gateways (SIP Trunks)
+│   ├── Users (Extensions)
+│   ├── Routing (Inbound/Outbound)
+│   └── ACL (IP-based access)
+│
+├── Integrations
+│   ├── AI Platforms
+│   │   ├── VAPI Setup
+│   │   ├── Retell Setup
+│   │   └── Bland AI Setup
+│   │
+│   ├── Providers
+│   │   ├── Placetel Setup
+│   │   ├── Easybell Setup
+│   │   ├── Sipgate Setup
+│   │   ├── Zadarma Setup
+│   │   └── Plusnet/Fonio Setup
+│   │
+│   └── PBX
+│       ├── 3CX Setup
+│       ├── Fritzbox Setup
+│       └── AGFEOtel Setup
+│
+├── Admin Portal
+│   ├── Accessing the Portal
+│   ├── Dashboard Overview
+│   ├── Managing Gateways
+│   ├── Managing Users
+│   ├── Routing Configuration
+│   └── System Settings
+│
+├── Advanced
+│   ├── Codec Configuration
+│   ├── Transcoding (CPU Impact)
+│   ├── NAT Traversal
+│   ├── TLS/SRTP Security
+│   └── Custom Dialplans
+│
+├── Deployment
+│   ├── Docker Compose
+│   ├── Coolify Deployment
+│   ├── Manual Installation
+│   └── High Availability
+│
+├── Troubleshooting
+│   ├── Common Errors
+│   ├── SIP Debug
+│   ├── Log Analysis
+│   └── FAQ
+│
+├── API Reference
+│   ├── Admin API
+│   ├── ESL Commands
+│   └── Webhooks
+│
+└── Resources
+    ├── Resource Calculator
+    ├── Changelog
+    └── Support Contacts
+```
+
+### Quick Start Guide
+
+```markdown
+# Quick Start Guide
+
+## 1. Get Your License
+
+1. Request a trial at https://sip-wrapper.de/trial
+2. You'll receive:
+   - LICENSE_KEY
+   - Docker registry token
+   - This documentation
+
+## 2. Install Docker
+
+\`\`\`bash
+curl -fsSL https://get.docker.com | sh
+\`\`\`
+
+## 3. Create docker-compose.yml
+
+\`\`\`yaml
+version: '3.9'
+services:
+  sip-wrapper:
+    image: ghcr.io/insidedynamic-de/sip-wrapper:latest
+    environment:
+      LICENSE_KEY: your-license-key
+      FS_DOMAIN: sip.example.com
+      EXTERNAL_SIP_IP: your-server-ip
+      EXTERNAL_RTP_IP: your-server-ip
+      GATEWAYS: "trunk:placetel:sip.placetel.de:5060:user:pass:yes:udp"
+      USERS: "1001:password123:VAPI"
+    network_mode: host
+    restart: unless-stopped
+\`\`\`
+
+## 4. Start
+
+\`\`\`bash
+docker compose up -d
+\`\`\`
+
+## 5. Access Admin Portal
+
+Open http://your-server-ip:8888
+Login: admin / admin
+
+## 6. Configure Your Integration
+
+See integration guides for:
+- [VAPI Setup](./integrations/vapi.md)
+- [Placetel Setup](./integrations/placetel.md)
+```
+
+### Environment Variables Reference
+
+```markdown
+# Environment Variables
+
+## Required
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| LICENSE_KEY | Your license key | abc-def-123-456 |
+| FS_DOMAIN | SIP domain | sip.example.com |
+| EXTERNAL_SIP_IP | Public IP for SIP | 195.168.1.100 |
+| EXTERNAL_RTP_IP | Public IP for RTP | 195.168.1.100 |
+
+## Gateways
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| GATEWAYS | SIP trunk config | type:name:host:port:user:pass:register:transport |
+| DEFAULT_GATEWAY | Default outbound gateway | placetel |
+
+## Users
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| USERS | User accounts | 1001:pass:CallerID,1002:pass:CallerID |
+| ACL_USERS | IP-based users | username:ip:extension:callerid |
+
+## Routing
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| INBOUND_ROUTES | DID → Extension | gateway:extension |
+| OUTBOUND_ROUTES | Pattern → Gateway | ^49:placetel:0:2 |
+| OUTBOUND_USER_ROUTES | User → Gateway | vapi:placetel |
+
+## Optional
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| INTERNAL_SIP_PORT | 5060 | Internal SIP port |
+| EXTERNAL_SIP_PORT | 5080 | External SIP port |
+| RTP_START_PORT | 16384 | RTP port range start |
+| RTP_END_PORT | 32768 | RTP port range end |
+| CODEC_PREFS | PCMU,PCMA,G729,opus | Codec priority |
+| SIP_DEBUG | 0 | Enable SIP debug (0/1) |
+
+## Admin Portal
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| ADMIN_PORT | 8888 | Admin UI port |
+| ADMIN_USER | admin | Admin username |
+| ADMIN_PASS | admin | Admin password |
+```
+
+### Transcoding Documentation
+
+```markdown
+# Transcoding - CPU Impact
+
+## What is Transcoding?
+
+When two endpoints use different audio codecs, FreeSWITCH must convert
+(transcode) the audio in real-time.
+
+## Example
+
+\`\`\`
+VAPI (Opus) ←→ FreeSWITCH ←→ Placetel (G.711)
+              ↑
+         Transcoding here
+         = More CPU usage
+\`\`\`
+
+## CPU Impact
+
+| Scenario | CPU Usage |
+|----------|-----------|
+| No transcoding (same codec) | ~1% per call |
+| With transcoding | ~2-3% per call |
+| Opus ↔ G.711 | High (+100%) |
+| G.729 ↔ G.711 | Medium (+50%) |
+
+## Recommendations
+
+1. **Match codecs when possible**
+   - Configure VAPI to use G.711 (PCMU/PCMA)
+   - Most German providers support G.711
+
+2. **Plan for transcoding**
+   - Add 50-100% CPU overhead in calculations
+   - Use Resource Calculator: https://sip-wrapper.de/calculator
+
+3. **Codec priority**
+   \`\`\`
+   CODEC_PREFS=PCMU,PCMA,G729,opus
+   \`\`\`
+   Put commonly used codecs first.
+
+## Resource Calculator
+
+| Calls | Without Transcoding | With Transcoding |
+|-------|---------------------|------------------|
+| 10 | 1 vCPU, 1 GB | 2 vCPU, 2 GB |
+| 30 | 1 vCPU, 2 GB | 2 vCPU, 4 GB |
+| 50 | 2 vCPU, 4 GB | 4 vCPU, 8 GB |
+| 100 | 4 vCPU, 8 GB | 8 vCPU, 16 GB |
+```
+
+### Integration Guide: VAPI
+
+```markdown
+# VAPI Integration
+
+## Overview
+
+Connect VAPI AI voice agents to German phone numbers via SIP Wrapper.
+
+## Architecture
+
+\`\`\`
+VAPI Cloud → SIP → SIP Wrapper → SIP → Placetel → PSTN
+                    (your server)
+\`\`\`
+
+## Step 1: Configure SIP Wrapper
+
+\`\`\`yaml
+environment:
+  GATEWAYS: "trunk:placetel:sip.placetel.de:5060:user:pass:yes:udp"
+  USERS: "vapi:secure-password:+4962112345"
+  INBOUND_ROUTES: "placetel:vapi"
+  OUTBOUND_USER_ROUTES: "vapi:placetel"
+\`\`\`
+
+## Step 2: Configure VAPI
+
+1. Go to VAPI Dashboard → Phone Numbers
+2. Add SIP Trunk:
+   - SIP Server: your-server-ip:5060
+   - Username: vapi
+   - Password: secure-password
+   - Transport: UDP
+
+3. Assign to your assistant
+
+## Step 3: Test
+
+1. Call your German number
+2. VAPI agent should answer
+3. Check SIP Wrapper logs if issues
+
+## Codec Settings
+
+VAPI supports:
+- Opus (default)
+- G.711 (PCMU/PCMA)
+
+For best compatibility with German providers:
+\`\`\`
+CODEC_PREFS=PCMU,PCMA,opus
+\`\`\`
+
+## Troubleshooting
+
+### "403 Forbidden"
+- Check username/password
+- Verify USERS variable
+
+### "488 Not Acceptable"
+- Codec mismatch
+- Add G.711 to CODEC_PREFS
+
+### One-way audio
+- Check EXTERNAL_RTP_IP
+- Verify firewall allows UDP 16384-32768
+```
+
+---
+
+## Resource Calculator (Landing Page Widget)
+
+### HTML/JS виджет
+
+```html
+<div id="resource-calculator">
+  <h3>Resource Calculator</h3>
+
+  <label>Concurrent Calls</label>
+  <input type="range" id="calls" min="10" max="300" value="30">
+  <span id="calls-value">30</span>
+
+  <label>
+    <input type="checkbox" id="transcoding"> Transcoding needed
+  </label>
+
+  <div id="results">
+    <div class="result">
+      <span class="label">CPU</span>
+      <span class="value" id="cpu">1 vCPU</span>
+    </div>
+    <div class="result">
+      <span class="label">RAM</span>
+      <span class="value" id="ram">2 GB</span>
+    </div>
+    <div class="result">
+      <span class="label">Bandwidth</span>
+      <span class="value" id="bandwidth">30 Mbps</span>
+    </div>
+    <div class="result">
+      <span class="label">Recommended</span>
+      <span class="value" id="vm">Hetzner CX21</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const specs = {
+  10:  { cpu: 1, ram: 1, bw: 10, vm: 'Hetzner CX11' },
+  30:  { cpu: 1, ram: 2, bw: 30, vm: 'Hetzner CX21' },
+  50:  { cpu: 2, ram: 4, bw: 50, vm: 'Hetzner CX31' },
+  100: { cpu: 4, ram: 8, bw: 100, vm: 'Hetzner CX41' },
+  300: { cpu: 8, ram: 16, bw: 300, vm: 'Hetzner CX51' }
+};
+
+function calculate() {
+  const calls = parseInt(document.getElementById('calls').value);
+  const transcoding = document.getElementById('transcoding').checked;
+
+  // Find nearest spec
+  const keys = Object.keys(specs).map(Number);
+  const nearest = keys.reduce((a, b) =>
+    Math.abs(b - calls) < Math.abs(a - calls) ? b : a
+  );
+
+  let spec = {...specs[nearest]};
+
+  // Apply transcoding multiplier
+  if (transcoding) {
+    spec.cpu = Math.ceil(spec.cpu * 1.5);
+    spec.ram = Math.ceil(spec.ram * 1.5);
+  }
+
+  document.getElementById('calls-value').textContent = calls;
+  document.getElementById('cpu').textContent = spec.cpu + ' vCPU';
+  document.getElementById('ram').textContent = spec.ram + ' GB';
+  document.getElementById('bandwidth').textContent = spec.bw + ' Mbps';
+  document.getElementById('vm').textContent = spec.vm;
+}
+
+document.getElementById('calls').addEventListener('input', calculate);
+document.getElementById('transcoding').addEventListener('change', calculate);
+calculate();
+</script>
+```
+
+---
+
 ## Следующие шаги
 
-1. Создать репозиторий `license-server`
-2. Инициализировать Lumen проект
-3. Создать миграции
-4. Реализовать API verify
-5. Создать admin panel
-6. Deploy на сервер
-7. Интегрировать в SIP Wrapper
-8. Документация: транскодинг
-9. Resource Calculator на landing
+### Phase 1: License Server (MVP)
+1. [ ] Создать репозиторий `license-server`
+2. [ ] Инициализировать Lumen проект
+3. [ ] Создать миграции (4 таблицы)
+4. [ ] Реализовать API `/api/verify`
+5. [ ] Реализовать API `/api/packages/{id}/server`
+6. [ ] Создать Admin Panel (Dashboard, Licenses, Packages)
+7. [ ] Email templates (6 шаблонов)
+8. [ ] Cron jobs (remind, expire)
+9. [ ] Deploy на сервер
+
+### Phase 2: SIP Wrapper Integration
+10. [ ] Создать `license_client.py`
+11. [ ] Интегрировать проверку при старте
+12. [ ] Интегрировать heartbeat (24h)
+13. [ ] Показать статус лицензии в Admin UI
+14. [ ] Enforce лимитов (connections)
+
+### Phase 3: Partner Integration
+15. [ ] Реализовать Webhook `/webhook/order`
+16. [ ] Документация для партнёров
+17. [ ] Тестирование с партнёром
+
+### Phase 4: Landing & Docs
+18. [ ] Landing Page (главная, features, pricing)
+19. [ ] Documentation site (все guides)
+20. [ ] Resource Calculator виджет
+21. [ ] Trial form + автоматическое создание
+
+### Phase 5: Production
+22. [ ] Мониторинг (Uptime, Alerts)
+23. [ ] Backup стратегия
+24. [ ] Rate limiting
+25. [ ] GHCR setup + токены клиентов
