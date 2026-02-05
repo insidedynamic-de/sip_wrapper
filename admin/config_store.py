@@ -49,7 +49,13 @@ DEFAULT_CONFIG = {
     "security": {
         "blacklist": [],
         "whitelist": [],
-        "whitelist_enabled": False
+        "whitelist_enabled": False,
+        "auto_blacklist": {
+            "enabled": False,
+            "max_attempts": 10,
+            "time_window": 300,
+            "block_duration": 3600
+        }
     }
 }
 
@@ -804,3 +810,22 @@ def set_whitelist_enabled(enabled):
     config['security']['whitelist_enabled'] = enabled
     save_config(config)
     return True, "Whitelist mode " + ("enabled" if enabled else "disabled")
+
+
+def get_auto_blacklist_settings():
+    """Get auto-blacklist settings"""
+    config = load_config()
+    security = config.get('security', {})
+    return security.get('auto_blacklist', DEFAULT_CONFIG['security']['auto_blacklist'])
+
+
+def update_auto_blacklist_settings(settings):
+    """Update auto-blacklist settings"""
+    config = load_config()
+    if 'security' not in config:
+        config['security'] = DEFAULT_CONFIG['security'].copy()
+    if 'auto_blacklist' not in config['security']:
+        config['security']['auto_blacklist'] = DEFAULT_CONFIG['security']['auto_blacklist'].copy()
+    config['security']['auto_blacklist'].update(settings)
+    save_config(config)
+    return True, "Auto-blacklist settings updated"

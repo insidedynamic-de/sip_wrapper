@@ -356,6 +356,61 @@
             </div>
         </div>
 
+        <!-- Auto-Blacklist Settings -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning bg-opacity-10">
+                <i class="bi bi-robot me-2 text-warning"></i>Auto-Blacklist (Fail2Ban-like)
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="auto-blacklist-enabled" onchange="saveAutoBlacklistSettings()">
+                            <label class="form-check-label" for="auto-blacklist-enabled">
+                                <strong>Enable Auto-Blacklist</strong>
+                            </label>
+                        </div>
+                        <p class="text-muted small mt-1 mb-0">
+                            Automatically block IPs after too many failed registration attempts.
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Max Attempts</label>
+                        <input type="number" class="form-control" id="auto-blacklist-max-attempts" value="10" min="1" max="100">
+                        <small class="text-muted">Block after N failed attempts</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Time Window (seconds)</label>
+                        <input type="number" class="form-control" id="auto-blacklist-time-window" value="300" min="60" max="86400">
+                        <small class="text-muted">Count attempts within this time</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Block Duration (seconds)</label>
+                        <input type="number" class="form-control" id="auto-blacklist-duration" value="3600" min="60" max="604800">
+                        <small class="text-muted">0 = permanent</small>
+                    </div>
+                </div>
+                <button class="btn btn-warning mt-3" onclick="saveAutoBlacklistSettings()">
+                    <i class="bi bi-save me-1"></i>Save Auto-Blacklist Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Failed Attempts Monitor -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center bg-danger bg-opacity-10">
+                <span><i class="bi bi-exclamation-triangle me-2 text-danger"></i>Failed Attempts Monitor</span>
+                <button class="btn btn-outline-danger btn-sm" onclick="checkAutoBlacklist()">
+                    <i class="bi bi-shield-exclamation me-1"></i>Check & Block Now
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div id="failed-attempts-container">
+                    <div class="p-3 text-center text-muted">Loading...</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Info -->
         <div class="alert alert-info">
             <i class="bi bi-info-circle me-2"></i>

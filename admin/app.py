@@ -94,6 +94,119 @@ def fs_allowed():
         return True
 
 ################################################################################
+# Auto-Blacklist: Failed Attempts Tracker
+################################################################################
+import re
+from datetime import datetime, timedelta
+from collections import defaultdict
+import threading
+
+# In-memory storage for failed attempts: {ip: [(timestamp, user), ...]}
+failed_attempts = defaultdict(list)
+failed_attempts_lock = threading.Lock()
+last_log_position = 0  # Track where we left off in the log file
+
+def parse_failed_attempts_from_logs():
+    """Parse FreeSWITCH logs for failed auth attempts"""
+    global last_log_position
+
+    log_paths = [
+        '/var/log/freeswitch/freeswitch.log',
+        '/usr/local/freeswitch/log/freeswitch.log',
+        '/var/log/freeswitch.log'
+    ]
+
+    # Pattern to match failed auth: "SIP auth failure ... from ip X.X.X.X"
+    auth_failure_pattern = re.compile(
+        r'SIP auth (?:failure|challenge).*from ip (\d+\.\d+\.\d+\.\d+)'
+    )
+
+    for log_path in log_paths:
+        if os.path.exists(log_path):
+            try:
+                with open(log_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    # Seek to last position
+                    f.seek(last_log_position)
+                    new_lines = f.readlines()
+                    last_log_position = f.tell()
+
+                    now = datetime.now()
+                    with failed_attempts_lock:
+                        for line in new_lines:
+                            match = auth_failure_pattern.search(line)
+                            if match:
+                                ip = match.group(1)
+                                failed_attempts[ip].append(now)
+
+                    return True
+            except Exception as e:
+                print(f"Error parsing logs: {e}")
+    return False
+
+
+def check_and_auto_blacklist():
+    """Check failed attempts and auto-blacklist if threshold exceeded"""
+    settings = config_store.get_auto_blacklist_settings()
+    if not settings.get('enabled', False):
+        return []
+
+    max_attempts = settings.get('max_attempts', 10)
+    time_window = settings.get('time_window', 300)  # seconds
+
+    now = datetime.now()
+    cutoff = now - timedelta(seconds=time_window)
+    blocked_ips = []
+
+    # Get current blacklist
+    security = config_store.get_security()
+    current_blacklist = [e.get('ip') for e in security.get('blacklist', [])]
+
+    with failed_attempts_lock:
+        for ip, attempts in list(failed_attempts.items()):
+            # Filter to recent attempts only
+            recent = [ts for ts in attempts if ts > cutoff]
+            failed_attempts[ip] = recent
+
+            # Check if exceeds threshold
+            if len(recent) >= max_attempts and ip not in current_blacklist:
+                # Add to blacklist
+                success, msg = config_store.add_to_blacklist(
+                    ip,
+                    f"Auto-blocked: {len(recent)} failed attempts in {time_window}s"
+                )
+                if success:
+                    blocked_ips.append(ip)
+                    # Clear attempts for this IP
+                    failed_attempts[ip] = []
+
+    return blocked_ips
+
+
+def get_failed_attempts_summary():
+    """Get summary of recent failed attempts"""
+    settings = config_store.get_auto_blacklist_settings()
+    time_window = settings.get('time_window', 300)
+
+    now = datetime.now()
+    cutoff = now - timedelta(seconds=time_window)
+
+    summary = []
+    with failed_attempts_lock:
+        for ip, attempts in failed_attempts.items():
+            recent = [ts for ts in attempts if ts > cutoff]
+            if recent:
+                summary.append({
+                    'ip': ip,
+                    'count': len(recent),
+                    'last_attempt': recent[-1].isoformat() if recent else None
+                })
+
+    # Sort by count descending
+    summary.sort(key=lambda x: x['count'], reverse=True)
+    return summary
+
+
+################################################################################
 # Translations
 ################################################################################
 
@@ -1316,6 +1429,59 @@ def api_whitelist_enabled():
     enabled = data.get('enabled', False)
     success, message = config_store.set_whitelist_enabled(enabled)
     return jsonify({'success': success, 'message': message})
+
+################################################################################
+# Auto-Blacklist API
+################################################################################
+
+@app.route('/api/security/auto-blacklist', methods=['GET'])
+@login_required
+def api_auto_blacklist_get():
+    """Get auto-blacklist settings"""
+    settings = config_store.get_auto_blacklist_settings()
+    return jsonify(settings)
+
+@app.route('/api/security/auto-blacklist', methods=['POST'])
+@login_required
+def api_auto_blacklist_update():
+    """Update auto-blacklist settings"""
+    data = request.get_json()
+    settings = {
+        'enabled': data.get('enabled', False),
+        'max_attempts': int(data.get('max_attempts', 10)),
+        'time_window': int(data.get('time_window', 300)),
+        'block_duration': int(data.get('block_duration', 3600))
+    }
+    success, message = config_store.update_auto_blacklist_settings(settings)
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/api/security/failed-attempts', methods=['GET'])
+@login_required
+def api_failed_attempts():
+    """Get failed attempts summary"""
+    # First, parse new log entries
+    parse_failed_attempts_from_logs()
+    # Then check and auto-blacklist
+    blocked = check_and_auto_blacklist()
+    # Return summary
+    summary = get_failed_attempts_summary()
+    return jsonify({
+        'attempts': summary,
+        'auto_blocked': blocked,
+        'settings': config_store.get_auto_blacklist_settings()
+    })
+
+@app.route('/api/security/check-blacklist', methods=['POST'])
+@login_required
+def api_check_blacklist():
+    """Manually trigger auto-blacklist check"""
+    parse_failed_attempts_from_logs()
+    blocked = check_and_auto_blacklist()
+    return jsonify({
+        'success': True,
+        'blocked': blocked,
+        'message': f"Blocked {len(blocked)} IPs" if blocked else "No IPs blocked"
+    })
 
 ################################################################################
 # Main
