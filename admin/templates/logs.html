@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-journal-text me-2"></i>{{ t('logs') }}</h4>
+    <div class="d-flex align-items-center gap-2">
+        <select id="log-limit" class="form-select form-select-sm" style="width: auto;" onchange="refreshLogs()">
+            <option value="50">50</option>
+            <option value="100" selected>100</option>
+            <option value="250">250</option>
+            <option value="500">500</option>
+            <option value="1000">1000</option>
+        </select>
+        <select id="log-refresh" class="form-select form-select-sm" style="width: auto;" onchange="updateLogRefresh()">
+            <option value="0">Auto: Off</option>
+            <option value="5">Auto: 5s</option>
+            <option value="10" selected>Auto: 10s</option>
+            <option value="30">Auto: 30s</option>
+            <option value="60">Auto: 60s</option>
+        </select>
+        <button class="btn btn-sm btn-outline-primary" onclick="refreshLogs()" title="Refresh">
+            <i class="bi bi-arrow-clockwise me-1"></i>{{ t('reload') }}
+        </button>
+    </div>
+</div>
+
+<!-- Log Filter -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <label class="form-label mb-0 small">Filter:</label>
+            </div>
+            <div class="col">
+                <input type="text" id="log-filter" class="form-control form-control-sm" placeholder="Search logs..." oninput="filterLogs()">
+            </div>
+            <div class="col-auto">
+                <div class="btn-group btn-group-sm" role="group">
+                    <input type="checkbox" class="btn-check" id="filter-error" checked onchange="filterLogs()">
+                    <label class="btn btn-outline-danger" for="filter-error">Error</label>
+                    <input type="checkbox" class="btn-check" id="filter-warning" checked onchange="filterLogs()">
+                    <label class="btn btn-outline-warning" for="filter-warning">Warn</label>
+                    <input type="checkbox" class="btn-check" id="filter-info" checked onchange="filterLogs()">
+                    <label class="btn btn-outline-info" for="filter-info">Info</label>
+                    <input type="checkbox" class="btn-check" id="filter-debug" checked onchange="filterLogs()">
+                    <label class="btn btn-outline-secondary" for="filter-debug">Debug</label>
+                </div>
+            </div>
+            <div class="col-auto">
+                <span class="badge bg-secondary" id="log-count">0</span> entries
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Container -->
+<div class="card">
+    <div class="card-body p-0">
+        <div id="log-container" class="log-viewer" style="height: calc(100vh - 280px); overflow-y: auto; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.8rem; background: #1e1e1e; color: #d4d4d4;">
+            <div class="p-3 text-center text-muted">Loading logs...</div>
+        </div>
+    </div>
+</div>
+
+<style>
+.log-viewer .log-line {
+    padding: 2px 12px;
+    border-bottom: 1px solid #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+.log-viewer .log-line:hover {
+    background: #2d2d2d;
+}
+.log-viewer .log-error {
+    color: #f48771;
+    background: rgba(244, 135, 113, 0.1);
+}
+.log-viewer .log-warning {
+    color: #cca700;
+    background: rgba(204, 167, 0, 0.1);
+}
+.log-viewer .log-debug {
+    color: #808080;
+}
+.log-viewer .log-info {
+    color: #d4d4d4;
+}
+.log-viewer .log-hidden {
+    display: none;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let logRefreshInterval = null;
+let allLogs = [];
+
+async function refreshLogs() {
+    const limit = document.getElementById('log-limit').value;
+    try {
+        const response = await fetch(`/api/logs?count=${limit}`);
+        const data = await response.json();
+        allLogs = data.logs || [];
+        renderLogs();
+    } catch (e) {
+        console.error('Failed to refresh logs:', e);
+        document.getElementById('log-container').innerHTML =
+            '<div class="p-3 text-center text-danger">Failed to load logs</div>';
+    }
+}
+
+function renderLogs() {
+    const container = document.getElementById('log-container');
+    const filterText = document.getElementById('log-filter').value.toLowerCase();
+    const showError = document.getElementById('filter-error').checked;
+    const showWarning = document.getElementById('filter-warning').checked;
+    const showInfo = document.getElementById('filter-info').checked;
+    const showDebug = document.getElementById('filter-debug').checked;
+
+    let visibleCount = 0;
+
+    if (allLogs.length === 0) {
+        container.innerHTML = '<div class="p-3 text-center text-muted">No logs available</div>';
+        document.getElementById('log-count').textContent = '0';
+        return;
+    }
+
+    const html = allLogs.map(log => {
+        // Check level filter
+        let levelMatch = false;
+        if (log.level === 'error' && showError) levelMatch = true;
+        else if (log.level === 'warning' && showWarning) levelMatch = true;
+        else if (log.level === 'debug' && showDebug) levelMatch = true;
+        else if (log.level === 'info' && showInfo) levelMatch = true;
+
+        // Check text filter
+        const textMatch = !filterText || log.text.toLowerCase().includes(filterText);
+
+        const isVisible = levelMatch && textMatch;
+        if (isVisible) visibleCount++;
+
+        const levelClass = `log-${log.level}`;
+        const hiddenClass = isVisible ? '' : 'log-hidden';
+
+        return `<div class="log-line ${levelClass} ${hiddenClass}">${escapeHtml(log.text)}</div>`;
+    }).join('');
+
+    container.innerHTML = html;
+    document.getElementById('log-count').textContent = visibleCount;
+
+    // Scroll to bottom
+    container.scrollTop = container.scrollHeight;
+}
+
+function filterLogs() {
+    renderLogs();
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function updateLogRefresh() {
+    const interval = parseInt(document.getElementById('log-refresh').value);
+
+    if (logRefreshInterval) {
+        clearInterval(logRefreshInterval);
+        logRefreshInterval = null;
+    }
+
+    if (interval > 0) {
+        logRefreshInterval = setInterval(refreshLogs, interval * 1000);
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    refreshLogs();
+    updateLogRefresh();
+});
+</script>
+{% endblock %}

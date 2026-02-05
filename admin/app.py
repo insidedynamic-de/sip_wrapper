@@ -446,6 +446,11 @@ def dashboard():
 def manage():
     return render_template('manage.html')
 
+@app.route('/logs')
+@login_required
+def logs():
+    return render_template('logs.html')
+
 def parse_configured_users():
     """Parse USERS and ACL_USERS environment variables"""
     users_list = []

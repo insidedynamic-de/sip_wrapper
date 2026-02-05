@@ -683,7 +683,45 @@ async function importFromEnv() {
 }
 
 // =============================================================================
+// URL Hash Navigation
+// =============================================================================
+
+function handleHashNavigation() {
+    const hash = window.location.hash.substring(1); // Remove #
+    if (hash) {
+        // Find tab button with matching id (e.g., #gateways -> gateways-btn)
+        const btnId = hash + '-btn';
+        const tabButton = document.getElementById(btnId);
+        if (tabButton) {
+            const tab = new bootstrap.Tab(tabButton);
+            tab.show();
+        }
+    }
+}
+
+function updateHashOnTabChange() {
+    // Listen to tab changes and update URL hash
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function(e) {
+            const targetId = e.target.getAttribute('data-bs-target');
+            if (targetId) {
+                // Convert #users-tab to users
+                const hash = targetId.replace('#', '').replace('-tab', '');
+                history.replaceState(null, null, '#' + hash);
+            }
+        });
+    });
+}
+
+// =============================================================================
 // Init
 // =============================================================================
 
-document.addEventListener('DOMContentLoaded', loadAll);
+document.addEventListener('DOMContentLoaded', function() {
+    loadAll();
+    handleHashNavigation();
+    updateHashOnTabChange();
+});
+
+// Handle back/forward navigation
+window.addEventListener('hashchange', handleHashNavigation);

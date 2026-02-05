@@ -154,6 +154,7 @@ services:
           wget --no-cache -qO /opt/admin/templates/login.html $$ADMIN_BASE/templates/login.html
           wget --no-cache -qO /opt/admin/templates/dashboard.html $$ADMIN_BASE/templates/dashboard.html
           wget --no-cache -qO /opt/admin/templates/manage.html $$ADMIN_BASE/templates/manage.html
+          wget --no-cache -qO /opt/admin/templates/logs.html $$ADMIN_BASE/templates/logs.html
 
           # Download static CSS
           wget --no-cache -qO /opt/admin/static/css/admin.css $$ADMIN_BASE/static/css/admin.css
