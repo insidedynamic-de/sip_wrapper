@@ -282,6 +282,12 @@ def parse_gateway_status():
         line = line.strip()
         if not line or line.startswith('=') or 'Name' in line:
             continue
+        # Skip summary lines like "6 total" or lines starting with numbers
+        if line[0].isdigit():
+            continue
+        # Skip lines containing "total" or other summary keywords
+        if 'total' in line.lower():
+            continue
         parts = line.split()
         if len(parts) >= 3:
             gateways.append({
