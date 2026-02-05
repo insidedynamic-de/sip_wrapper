@@ -148,6 +148,14 @@ TRANSLATIONS = {
         'did': 'DID/Rufnummer',
         'no_routes': 'Keine Routen konfiguriert',
         'active_calls': 'Aktive Anrufe',
+        'call_logs': 'Anrufverlauf',
+        'no_call_logs': 'Keine Anrufe aufgezeichnet',
+        'direction': 'Richtung',
+        'from': 'Von',
+        'to': 'Zu',
+        'duration': 'Dauer',
+        'result': 'Ergebnis',
+        'time': 'Zeit',
     },
     'en': {
         'title': 'InsideDynamic Wrapper - Admin',
@@ -199,6 +207,14 @@ TRANSLATIONS = {
         'did': 'DID/Number',
         'no_routes': 'No routes configured',
         'active_calls': 'Active Calls',
+        'call_logs': 'Call Logs',
+        'no_call_logs': 'No calls recorded',
+        'direction': 'Direction',
+        'from': 'From',
+        'to': 'To',
+        'duration': 'Duration',
+        'result': 'Result',
+        'time': 'Time',
     }
 }
 
@@ -404,6 +420,76 @@ def get_recent_logs(count=15):
                 pass
     return []
 
+def get_call_logs(count=50):
+    """Get call detail records (CDR) from FreeSWITCH"""
+    cdr_paths = [
+        '/var/log/freeswitch/cdr-csv',
+        '/usr/local/freeswitch/log/cdr-csv',
+        '/var/log/cdr-csv'
+    ]
+
+    calls = []
+
+    for cdr_dir in cdr_paths:
+        if os.path.isdir(cdr_dir):
+            try:
+                # Find all CSV files in CDR directory
+                csv_files = []
+                for f in os.listdir(cdr_dir):
+                    if f.endswith('.csv'):
+                        csv_files.append(os.path.join(cdr_dir, f))
+
+                # Sort by modification time (newest first)
+                csv_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+
+                # Read CDR entries
+                for csv_file in csv_files[:5]:  # Check last 5 files
+                    if len(calls) >= count:
+                        break
+                    try:
+                        with open(csv_file, 'r', encoding='utf-8', errors='ignore') as f:
+                            lines = f.readlines()
+                            # Process lines in reverse (newest first)
+                            for line in reversed(lines):
+                                if len(calls) >= count:
+                                    break
+                                line = line.strip()
+                                if not line:
+                                    continue
+                                # Parse CSV - FreeSWITCH CDR format
+                                # Typical fields: caller_id_name,caller_id_number,destination_number,context,start_stamp,answer_stamp,end_stamp,duration,billsec,hangup_cause,...
+                                parts = line.split(',')
+                                if len(parts) >= 10:
+                                    # Extract key fields
+                                    call = {
+                                        'caller_name': parts[0].strip('"') if parts[0] else '-',
+                                        'caller_num': parts[1].strip('"') if parts[1] else '-',
+                                        'dest': parts[2].strip('"') if parts[2] else '-',
+                                        'context': parts[3].strip('"') if parts[3] else '-',
+                                        'start': parts[4].strip('"') if parts[4] else '-',
+                                        'answer': parts[5].strip('"') if parts[5] else '-',
+                                        'end': parts[6].strip('"') if parts[6] else '-',
+                                        'duration': parts[7].strip('"') if parts[7] else '0',
+                                        'billsec': parts[8].strip('"') if parts[8] else '0',
+                                        'hangup_cause': parts[9].strip('"') if parts[9] else '-'
+                                    }
+                                    # Skip header lines
+                                    if call['caller_name'].lower() in ['caller_id_name', 'calleridname']:
+                                        continue
+                                    # Determine direction
+                                    call['direction'] = 'inbound' if 'public' in call['context'].lower() else 'outbound'
+                                    calls.append(call)
+                    except Exception as e:
+                        continue
+
+                if calls:
+                    break  # Found CDR files, stop searching
+
+            except Exception:
+                pass
+
+    return calls
+
 ################################################################################
 # Routes
 ################################################################################
@@ -421,12 +507,15 @@ def dashboard():
     channels_count = parse_channels_count() if fs_access else 0
     recent_logs = get_recent_logs(15)
 
+    call_logs = get_call_logs(10) if fs_access else []
+
     return render_template('dashboard.html',
         profiles=profiles,
         gateways=gateways,
         registrations=registrations,
         active_calls=active_calls,
         channels_count=channels_count,
+        call_logs=call_logs,
         recent_logs=recent_logs,
         fs_access=fs_access,
         client_ip=request.remote_addr,
@@ -643,6 +732,15 @@ def api_logs():
     count = min(max(count, 1), 1000)
     logs = get_recent_logs(count)
     return jsonify({'logs': logs, 'count': len(logs)})
+
+@app.route('/api/cdr')
+@login_required
+def api_cdr():
+    count = request.args.get('count', 50, type=int)
+    # Limit to reasonable values
+    count = min(max(count, 1), 500)
+    calls = get_call_logs(count)
+    return jsonify({'calls': calls, 'count': len(calls)})
 
 @app.route('/api/gateways')
 @login_required

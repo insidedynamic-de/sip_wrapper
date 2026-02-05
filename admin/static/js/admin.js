@@ -170,6 +170,77 @@ function manualRefresh() {
     }, 500);
 }
 
+// Refresh CDR (Call Logs)
+function refreshCDR() {
+    const container = document.getElementById('cdr-container');
+    if (!container) return;
+
+    container.innerHTML = '<div class="p-3 text-center text-muted"><i class="bi bi-arrow-clockwise spin me-2"></i>Loading...</div>';
+
+    fetch('/api/cdr?count=10')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.calls || data.calls.length === 0) {
+                container.innerHTML = '<div class="p-4 text-center text-muted"><i class="bi bi-telephone-x fs-1 d-block mb-2"></i>No calls recorded</div>';
+                return;
+            }
+
+            let html = '<div class="table-responsive"><table class="table table-sm table-hover mb-0"><thead><tr>';
+            html += '<th style="width: 100px;">Direction</th>';
+            html += '<th>From</th>';
+            html += '<th>To</th>';
+            html += '<th style="width: 80px;">Duration</th>';
+            html += '<th style="width: 100px;">Result</th>';
+            html += '<th style="width: 150px;">Time</th>';
+            html += '</tr></thead><tbody>';
+
+            data.calls.forEach(call => {
+                html += '<tr>';
+                // Direction
+                if (call.direction === 'inbound') {
+                    html += '<td><span class="badge bg-success"><i class="bi bi-telephone-inbound me-1"></i>In</span></td>';
+                } else {
+                    html += '<td><span class="badge bg-primary"><i class="bi bi-telephone-outbound me-1"></i>Out</span></td>';
+                }
+                // From / To
+                html += `<td><code>${call.caller_num}</code></td>`;
+                html += `<td><code>${call.dest}</code></td>`;
+                // Duration
+                const dur = parseInt(call.billsec) || 0;
+                const mins = Math.floor(dur / 60);
+                const secs = dur % 60;
+                const durStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+                html += dur > 0
+                    ? `<td><span class="text-success">${durStr}</span></td>`
+                    : '<td><span class="text-muted">0:00</span></td>';
+                // Result
+                const cause = call.hangup_cause || '';
+                if (cause.includes('NORMAL') || cause.includes('SUCCESS')) {
+                    html += '<td><span class="badge bg-success">OK</span></td>';
+                } else if (cause.includes('BUSY')) {
+                    html += '<td><span class="badge bg-warning text-dark">Busy</span></td>';
+                } else if (cause.includes('NO_ANSWER')) {
+                    html += '<td><span class="badge bg-secondary">No Answer</span></td>';
+                } else if (cause.includes('CANCEL')) {
+                    html += '<td><span class="badge bg-secondary">Cancelled</span></td>';
+                } else {
+                    html += `<td><span class="badge bg-danger" title="${cause}">Failed</span></td>`;
+                }
+                // Time
+                const time = call.start && call.start.length > 19 ? call.start.slice(-19) : call.start;
+                html += `<td><small class="text-muted">${time}</small></td>`;
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        })
+        .catch(err => {
+            console.error('CDR refresh failed:', err);
+            container.innerHTML = '<div class="p-3 text-center text-danger">Failed to load call logs</div>';
+        });
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     const savedInterval = localStorage.getItem(STORAGE_KEY);

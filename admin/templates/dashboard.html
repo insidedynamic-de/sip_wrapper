@@ -122,38 +122,62 @@
     <div class="card-header py-2 bg-warning bg-opacity-10">
         <i class="bi bi-telephone-forward me-2"></i>{{ t('active_calls') }} ({{ active_calls|length }})
     </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-sm table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th>Direction</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>State</th>
-                        <th>Created</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for call in active_calls %}
-                    <tr>
-                        <td>
-                            {% if call.direction == 'inbound' %}
-                            <i class="bi bi-telephone-inbound text-success"></i>
-                            {% else %}
-                            <i class="bi bi-telephone-outbound text-primary"></i>
-                            {% endif %}
-                            {{ call.direction }}
-                        </td>
-                        <td><code>{{ call.cid_num }}</code></td>
-                        <td><code>{{ call.dest }}</code></td>
-                        <td><span class="badge bg-success">{{ call.state }}</span></td>
-                        <td><small class="text-muted">{{ call.created }}</small></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="card-body py-3">
+        {% for call in active_calls %}
+        <div class="call-flow d-flex align-items-center flex-wrap gap-2 {% if not loop.last %}mb-3 pb-3 border-bottom{% endif %}">
+            <!-- Direction Icon -->
+            {% if call.direction == 'inbound' %}
+            <span class="badge bg-success rounded-pill px-3 py-2">
+                <i class="bi bi-telephone-inbound me-1"></i> Inbound
+            </span>
+            {% else %}
+            <span class="badge bg-primary rounded-pill px-3 py-2">
+                <i class="bi bi-telephone-outbound me-1"></i> Outbound
+            </span>
+            {% endif %}
+
+            <!-- Call Flow Visualization -->
+            <div class="d-flex align-items-center flex-wrap gap-1">
+                {% if call.direction == 'inbound' %}
+                <!-- Inbound: External → Gateway → Extension -->
+                <span class="badge bg-secondary px-2 py-1">
+                    <i class="bi bi-globe me-1"></i>{{ call.cid_num or 'External' }}
+                </span>
+                <i class="bi bi-arrow-right text-muted"></i>
+                <span class="badge bg-info px-2 py-1">
+                    <i class="bi bi-diagram-3 me-1"></i>{{ call.name or 'Gateway' }}
+                </span>
+                <i class="bi bi-arrow-right text-muted"></i>
+                <span class="badge bg-success px-2 py-1">
+                    <i class="bi bi-person me-1"></i>{{ call.dest or 'Extension' }}
+                </span>
+                {% else %}
+                <!-- Outbound: Extension → Gateway → External -->
+                <span class="badge bg-success px-2 py-1">
+                    <i class="bi bi-person me-1"></i>{{ call.cid_num or 'User' }}
+                </span>
+                <i class="bi bi-arrow-right text-muted"></i>
+                <span class="badge bg-info px-2 py-1">
+                    <i class="bi bi-diagram-3 me-1"></i>{{ call.name or 'Gateway' }}
+                </span>
+                <i class="bi bi-arrow-right text-muted"></i>
+                <span class="badge bg-secondary px-2 py-1">
+                    <i class="bi bi-globe me-1"></i>{{ call.dest or 'External' }}
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- State & Duration -->
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <span class="badge bg-warning text-dark">
+                    <i class="bi bi-activity me-1"></i>{{ call.state }}
+                </span>
+                <small class="text-muted">
+                    <i class="bi bi-clock me-1"></i>{{ call.created }}
+                </small>
+            </div>
         </div>
+        {% endfor %}
     </div>
 </div>
 {% endif %}
@@ -249,6 +273,76 @@
                 {% endif %}
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Call Logs (CDR) -->
+<div class="card mt-4">
+    <div class="card-header py-2 d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-telephone me-2"></i>{{ t('call_logs') }} ({{ call_logs|length }})</span>
+        <button class="btn btn-sm btn-link py-0" onclick="refreshCDR()">
+            <i class="bi bi-arrow-clockwise me-1"></i>{{ t('reload') }}
+        </button>
+    </div>
+    <div class="card-body p-0" id="cdr-container">
+        {% if call_logs %}
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 100px;">{{ t('direction') }}</th>
+                        <th>{{ t('from') }}</th>
+                        <th>{{ t('to') }}</th>
+                        <th style="width: 80px;">{{ t('duration') }}</th>
+                        <th style="width: 100px;">{{ t('result') }}</th>
+                        <th style="width: 150px;">{{ t('time') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for call in call_logs %}
+                    <tr>
+                        <td>
+                            {% if call.direction == 'inbound' %}
+                            <span class="badge bg-success"><i class="bi bi-telephone-inbound me-1"></i>In</span>
+                            {% else %}
+                            <span class="badge bg-primary"><i class="bi bi-telephone-outbound me-1"></i>Out</span>
+                            {% endif %}
+                        </td>
+                        <td><code>{{ call.caller_num }}</code></td>
+                        <td><code>{{ call.dest }}</code></td>
+                        <td>
+                            {% set dur = call.billsec|int %}
+                            {% if dur > 0 %}
+                            <span class="text-success">{{ '%d:%02d'|format(dur // 60, dur % 60) }}</span>
+                            {% else %}
+                            <span class="text-muted">0:00</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if 'NORMAL' in call.hangup_cause or 'SUCCESS' in call.hangup_cause %}
+                            <span class="badge bg-success">OK</span>
+                            {% elif 'BUSY' in call.hangup_cause %}
+                            <span class="badge bg-warning text-dark">Busy</span>
+                            {% elif 'NO_ANSWER' in call.hangup_cause %}
+                            <span class="badge bg-secondary">No Answer</span>
+                            {% elif 'CANCEL' in call.hangup_cause %}
+                            <span class="badge bg-secondary">Cancelled</span>
+                            {% else %}
+                            <span class="badge bg-danger" title="{{ call.hangup_cause }}">Failed</span>
+                            {% endif %}
+                        </td>
+                        <td><small class="text-muted">{{ call.start[-19:] if call.start|length > 19 else call.start }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-4 text-center text-muted">
+            <i class="bi bi-telephone-x fs-1 d-block mb-2"></i>
+            {{ t('no_call_logs') }}
+        </div>
+        {% endif %}
     </div>
 </div>
 
