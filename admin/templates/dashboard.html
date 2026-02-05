@@ -9,60 +9,79 @@
 </div>
 
 <!-- Status Cards -->
-<div class="row g-4 mb-4">
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
+<div class="row g-3 mb-4">
+    <!-- Active Calls -->
+    <div class="col-6 col-md-3">
+        <div class="card h-100 border-warning">
+            <div class="card-body py-3">
                 <div class="d-flex align-items-center">
                     <div class="flex-shrink-0">
-                        <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                        <div class="bg-warning bg-opacity-10 rounded-3 p-2">
+                            <i class="bi bi-telephone-forward text-warning fs-4"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-0 small">{{ t('active_calls') }}</h6>
+                        <h3 class="mb-0" data-stat="calls">{{ channels_count }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gateways -->
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-primary bg-opacity-10 rounded-3 p-2">
                             <i class="bi bi-diagram-3 text-primary fs-4"></i>
                         </div>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h6 class="text-muted mb-1">{{ t('gateways') }}</h6>
-                        <h3 class="mb-0">{{ gateways|length }}</h3>
+                        <h6 class="text-muted mb-0 small">{{ t('gateways') }}</h6>
                         {% set online_gateways = gateways|selectattr('status', 'equalto', 'online')|list|length %}
-                        <small class="text-success"><span data-stat="gateways">{{ online_gateways }}/{{ gateways|length }}</span> {{ t('online') }}</small>
+                        <h3 class="mb-0"><span class="text-success">{{ online_gateways }}</span><small class="text-muted">/{{ gateways|length }}</small></h3>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
+    <!-- Users -->
+    <div class="col-6 col-md-3">
         <div class="card h-100">
-            <div class="card-body">
+            <div class="card-body py-3">
                 <div class="d-flex align-items-center">
                     <div class="flex-shrink-0">
-                        <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                        <div class="bg-success bg-opacity-10 rounded-3 p-2">
                             <i class="bi bi-people text-success fs-4"></i>
                         </div>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h6 class="text-muted mb-1">{{ t('users') }}</h6>
+                        <h6 class="text-muted mb-0 small">{{ t('users') }}</h6>
                         <h3 class="mb-0" data-stat="users">{{ registrations|length }}</h3>
-                        <small class="text-muted">{{ t('registered') }}</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
+    <!-- Profiles -->
+    <div class="col-6 col-md-3">
         <div class="card h-100">
-            <div class="card-body">
+            <div class="card-body py-3">
                 <div class="d-flex align-items-center">
                     <div class="flex-shrink-0">
-                        <div class="bg-info bg-opacity-10 rounded-3 p-3">
+                        <div class="bg-info bg-opacity-10 rounded-3 p-2">
                             <i class="bi bi-hdd-network text-info fs-4"></i>
                         </div>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h6 class="text-muted mb-1">{{ t('profile') }}</h6>
-                        <h3 class="mb-0">{{ profiles|length }}</h3>
+                        <h6 class="text-muted mb-0 small">{{ t('profile') }}</h6>
                         {% set online_profiles = profiles|selectattr('status', 'equalto', 'online')|list|length %}
-                        <small class="text-success"><span data-stat="profiles">{{ online_profiles }}</span> {{ t('online') }}</small>
+                        <h3 class="mb-0"><span class="text-success">{{ online_profiles }}</span><small class="text-muted">/{{ profiles|length }}</small></h3>
                     </div>
                 </div>
             </div>
@@ -72,24 +91,24 @@
 
 <!-- License Info -->
 <div class="card mb-4">
-    <div class="card-header">
+    <div class="card-header py-2">
         <i class="bi bi-shield-check me-2"></i>{{ t('license') }}
     </div>
-    <div class="card-body">
+    <div class="card-body py-2">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <small class="text-muted d-block">{{ t('license') }}</small>
                 <strong>{{ config.LICENSE_KEY }}</strong>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <small class="text-muted d-block">{{ t('client') }}</small>
                 <strong>{{ config.CLIENT_NAME or '-' }}</strong>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <small class="text-muted d-block">{{ t('domain') }}</small>
                 <strong>{{ config.FS_DOMAIN }}</strong>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <small class="text-muted d-block">{{ t('external_ip') }}</small>
                 <strong>{{ config.EXTERNAL_SIP_IP }}</strong>
             </div>
@@ -97,18 +116,60 @@
     </div>
 </div>
 
+<!-- Active Calls -->
+{% if active_calls %}
+<div class="card mb-4 border-warning">
+    <div class="card-header py-2 bg-warning bg-opacity-10">
+        <i class="bi bi-telephone-forward me-2"></i>{{ t('active_calls') }} ({{ active_calls|length }})
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Direction</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>State</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for call in active_calls %}
+                    <tr>
+                        <td>
+                            {% if call.direction == 'inbound' %}
+                            <i class="bi bi-telephone-inbound text-success"></i>
+                            {% else %}
+                            <i class="bi bi-telephone-outbound text-primary"></i>
+                            {% endif %}
+                            {{ call.direction }}
+                        </td>
+                        <td><code>{{ call.cid_num }}</code></td>
+                        <td><code>{{ call.dest }}</code></td>
+                        <td><span class="badge bg-success">{{ call.state }}</span></td>
+                        <td><small class="text-muted">{{ call.created }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <div class="row g-4">
     <!-- Gateway Status -->
     <div class="col-lg-6">
         <div class="card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header py-2 d-flex justify-content-between align-items-center">
                 <span><i class="bi bi-diagram-3 me-2"></i>{{ t('gateway_status') }}</span>
-                <a href="/gateways" class="btn btn-sm btn-link">{{ t('gateways') }} &rarr;</a>
+                <a href="/manage" class="btn btn-sm btn-link py-0">{{ t('config') }} &rarr;</a>
             </div>
             <div class="card-body p-0">
                 {% if gateways %}
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+                    <table class="table table-sm table-hover mb-0">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -150,14 +211,14 @@
     <!-- User Registrations -->
     <div class="col-lg-6">
         <div class="card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header py-2 d-flex justify-content-between align-items-center">
                 <span><i class="bi bi-people me-2"></i>{{ t('user_registrations') }}</span>
-                <a href="/users" class="btn btn-sm btn-link">{{ t('users') }} &rarr;</a>
+                <a href="/manage" class="btn btn-sm btn-link py-0">{{ t('config') }} &rarr;</a>
             </div>
             <div class="card-body p-0">
                 {% if registrations %}
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+                    <table class="table table-sm table-hover mb-0">
                         <thead>
                             <tr>
                                 <th>User</th>
@@ -170,7 +231,7 @@
                             <tr>
                                 <td><strong>{{ reg.user or '-' }}</strong></td>
                                 <td>
-                                    <span class="status-badge status-online">
+                                    <span class="badge bg-success">
                                         {{ t('registered') }}
                                     </span>
                                 </td>
@@ -189,5 +250,36 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Recent Logs -->
+{% if recent_logs %}
+<div class="card mt-4">
+    <div class="card-header py-2">
+        <i class="bi bi-journal-text me-2"></i>{{ t('logs') }} ({{ recent_logs|length }})
+    </div>
+    <div class="card-body p-0">
+        <div class="log-container" style="max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.75rem;">
+            {% for log in recent_logs %}
+            <div class="px-2 py-1 border-bottom {% if log.level == 'error' %}bg-danger bg-opacity-10 text-danger{% elif log.level == 'warning' %}bg-warning bg-opacity-10{% elif log.level == 'debug' %}text-muted{% endif %}">
+                {{ log.text }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- FS Connection Info (small) -->
+<div class="mt-4 text-center">
+    <small class="text-muted">
+        <i class="bi bi-hdd-network me-1"></i>
+        FreeSWITCH: {{ config.FS_HOST }}:{{ config.FS_PORT }}
+        {% if fs_access %}
+        <span class="text-success"><i class="bi bi-check-circle ms-2"></i> Connected</span>
+        {% else %}
+        <span class="text-danger"><i class="bi bi-x-circle ms-2"></i> Access Denied ({{ client_ip }})</span>
+        {% endif %}
+    </small>
 </div>
 {% endblock %}

@@ -147,6 +147,7 @@ TRANSLATIONS = {
         'destination': 'Ziel',
         'did': 'DID/Rufnummer',
         'no_routes': 'Keine Routen konfiguriert',
+        'active_calls': 'Aktive Anrufe',
     },
     'en': {
         'title': 'InsideDynamic Wrapper - Admin',
@@ -197,6 +198,7 @@ TRANSLATIONS = {
         'destination': 'Destination',
         'did': 'DID/Number',
         'no_routes': 'No routes configured',
+        'active_calls': 'Active Calls',
     }
 }
 
@@ -324,6 +326,84 @@ def parse_registrations():
 
     return registrations
 
+def parse_active_calls():
+    """Parse active calls from FreeSWITCH"""
+    output = fs_cli('show calls')
+    if not output:
+        return []
+
+    calls = []
+    for line in output.split('\n'):
+        line = line.strip()
+        # Skip headers and empty lines
+        if not line or 'uuid' in line.lower() or line.startswith('=') or line.startswith('-'):
+            continue
+        # Skip summary lines
+        if 'total' in line.lower() or line[0].isdigit() and 'row' in line.lower():
+            continue
+
+        parts = line.split(',')
+        if len(parts) >= 7:
+            calls.append({
+                'uuid': parts[0][:8] + '...' if len(parts[0]) > 8 else parts[0],
+                'direction': parts[1] if len(parts) > 1 else '-',
+                'created': parts[2] if len(parts) > 2 else '-',
+                'name': parts[3] if len(parts) > 3 else '-',
+                'state': parts[4] if len(parts) > 4 else '-',
+                'cid_name': parts[5] if len(parts) > 5 else '-',
+                'cid_num': parts[6] if len(parts) > 6 else '-',
+                'dest': parts[9] if len(parts) > 9 else '-'
+            })
+    return calls
+
+def parse_channels_count():
+    """Get count of active channels"""
+    output = fs_cli('show channels count')
+    if not output:
+        return 0
+    # Output format: "X total."
+    for line in output.split('\n'):
+        if 'total' in line.lower():
+            parts = line.split()
+            if parts and parts[0].isdigit():
+                return int(parts[0])
+    return 0
+
+def get_recent_logs(count=15):
+    """Get recent FreeSWITCH log entries"""
+    log_paths = [
+        '/var/log/freeswitch/freeswitch.log',
+        '/usr/local/freeswitch/log/freeswitch.log',
+        '/var/log/freeswitch.log'
+    ]
+
+    for log_path in log_paths:
+        if os.path.exists(log_path):
+            try:
+                with open(log_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    lines = f.readlines()
+                    # Get last N lines
+                    recent = lines[-count:] if len(lines) >= count else lines
+                    # Parse and format
+                    logs = []
+                    for line in recent:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        # Determine log level
+                        level = 'info'
+                        if 'ERR' in line or 'ERROR' in line:
+                            level = 'error'
+                        elif 'WARN' in line or 'WARNING' in line:
+                            level = 'warning'
+                        elif 'DEBUG' in line:
+                            level = 'debug'
+                        logs.append({'text': line[:200], 'level': level})
+                    return logs
+            except Exception:
+                pass
+    return []
+
 ################################################################################
 # Routes
 ################################################################################
@@ -337,11 +417,17 @@ def dashboard():
     profiles = parse_sofia_status() if fs_access else []
     gateways = parse_gateway_status() if fs_access else []
     registrations = parse_registrations() if fs_access else []
+    active_calls = parse_active_calls() if fs_access else []
+    channels_count = parse_channels_count() if fs_access else 0
+    recent_logs = get_recent_logs(15)
 
     return render_template('dashboard.html',
         profiles=profiles,
         gateways=gateways,
         registrations=registrations,
+        active_calls=active_calls,
+        channels_count=channels_count,
+        recent_logs=recent_logs,
         fs_access=fs_access,
         client_ip=request.remote_addr,
         config={
