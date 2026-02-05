@@ -102,12 +102,12 @@ services:
           echo "✓ Config directories prepared"
         fi
 
-        # Install bash, python and flask (needed for provision script and admin portal)
+        # Install bash, python, jq and flask (needed for provision script and admin portal)
         echo ""
         echo "[STEP 4/8] Installing dependencies..."
-        apk add --no-cache bash python3 py3-flask py3-gunicorn >/dev/null 2>&1 || {
+        apk add --no-cache bash python3 py3-flask py3-gunicorn jq >/dev/null 2>&1 || {
           echo "Trying with apt-get..."
-          apt-get update -qq && apt-get install -y -qq bash python3 python3-pip python3-venv || {
+          apt-get update -qq && apt-get install -y -qq bash python3 python3-pip python3-venv jq || {
             echo "ERROR: Cannot install dependencies"
             exit 1
           }
@@ -268,6 +268,7 @@ services:
 
     volumes:
       - freeswitch_backups:/var/backups/freeswitch
+      - wrapper_config:/var/lib/freeswitch
 
     healthcheck:
       test: ["CMD", "sh", "-c", "pidof freeswitch || exit 1"]
@@ -278,6 +279,8 @@ services:
 
 volumes:
   freeswitch_backups:
+    driver: local
+  wrapper_config:
     driver: local
 
 ################################################################################

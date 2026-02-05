@@ -31,23 +31,32 @@ USE_JSON_CONFIG=false
 ################################################################################
 
 check_json_config() {
-  if [ -f "$CONFIG_FILE" ]; then
-    # Verify jq is available
-    if command -v jq >/dev/null 2>&1; then
-      # Verify JSON is valid
-      if jq empty "$CONFIG_FILE" 2>/dev/null; then
-        USE_JSON_CONFIG=true
-        echo_log "Using JSON config: $CONFIG_FILE"
-        return 0
-      else
-        echo_log "WARNING: JSON config exists but is invalid, using ENV fallback"
-      fi
-    else
-      echo_log "WARNING: jq not installed, using ENV fallback"
-    fi
-  else
-    echo_log "No JSON config found at $CONFIG_FILE, using ENV variables"
+  # Verify jq is available
+  if ! command -v jq >/dev/null 2>&1; then
+    echo_log "WARNING: jq not installed, using ENV fallback"
+    return 1
   fi
+
+  if [ -f "$CONFIG_FILE" ]; then
+    # Verify JSON is valid
+    if jq empty "$CONFIG_FILE" 2>/dev/null; then
+      USE_JSON_CONFIG=true
+      echo_log "Using JSON config: $CONFIG_FILE"
+      return 0
+    else
+      echo_log "WARNING: JSON config exists but is invalid, using ENV fallback"
+      return 1
+    fi
+  fi
+
+  # No JSON config - try to create from ENV if variables are set
+  if [ -n "$USERS" ] || [ -n "$GATEWAYS" ]; then
+    echo_log "No JSON config found, creating from ENV variables..."
+    create_json_from_env
+    return 0
+  fi
+
+  echo_log "No JSON config and no USERS/GATEWAYS in ENV"
   return 1
 }
 
@@ -85,6 +94,159 @@ get_json_array_item() {
   if [ "$USE_JSON_CONFIG" = true ]; then
     jq -r "${path}[$index].${field} // empty" "$CONFIG_FILE" 2>/dev/null
   fi
+}
+
+create_json_from_env() {
+  # Create JSON config from ENV variables if it doesn't exist
+  echo_log "Creating JSON config from ENV variables..."
+
+  # Ensure directory exists
+  mkdir -p "$(dirname "$CONFIG_FILE")"
+
+  # Start building JSON
+  local json='{"version":1,"license":{},"settings":{},"users":[],"acl_users":[],"gateways":[],"routes":{}}'
+
+  # License
+  if [ -n "$LICENSE_KEY" ]; then
+    json=$(echo "$json" | jq --arg k "$LICENSE_KEY" --arg c "${CLIENT_NAME:-}" '.license = {key:$k,client_name:$c}')
+  fi
+
+  # Settings
+  json=$(echo "$json" | jq \
+    --arg domain "${FS_DOMAIN:-}" \
+    --arg sip_ip "${EXTERNAL_SIP_IP:-}" \
+    --arg rtp_ip "${EXTERNAL_RTP_IP:-}" \
+    --arg int_port "${INTERNAL_SIP_PORT:-5060}" \
+    --arg ext_port "${EXTERNAL_SIP_PORT:-5080}" \
+    --arg rtp_start "${RTP_START_PORT:-16384}" \
+    --arg rtp_end "${RTP_END_PORT:-32768}" \
+    --arg codecs "${CODEC_PREFS:-PCMU,PCMA,G729,opus}" \
+    --arg country "${DEFAULT_COUNTRY_CODE:-49}" \
+    '.settings = {
+      fs_domain:$domain,
+      external_sip_ip:$sip_ip,
+      external_rtp_ip:$rtp_ip,
+      internal_sip_port:($int_port|tonumber),
+      external_sip_port:($ext_port|tonumber),
+      rtp_start_port:($rtp_start|tonumber),
+      rtp_end_port:($rtp_end|tonumber),
+      codec_prefs:$codecs,
+      default_country_code:$country
+    }')
+
+  # Users (format: username:password:extension:enabled,...)
+  if [ -n "$USERS" ]; then
+    local users_json="[]"
+    IFS=',' read -ra USER_ARRAY <<< "$USERS"
+    for user in "${USER_ARRAY[@]}"; do
+      IFS=':' read -r u_name u_pass u_ext u_enabled <<< "$user"
+      if [ -n "$u_name" ]; then
+        users_json=$(echo "$users_json" | jq \
+          --arg name "$u_name" \
+          --arg pass "${u_pass:-}" \
+          --arg ext "${u_ext:-}" \
+          --arg en "${u_enabled:-true}" \
+          '. += [{username:$name,password:$pass,extension:$ext,enabled:($en=="true" or $en=="1")}]')
+      fi
+    done
+    json=$(echo "$json" | jq --argjson users "$users_json" '.users = $users')
+  fi
+
+  # ACL Users (format: username:ip:extension:callerid,...)
+  if [ -n "$ACL_USERS" ]; then
+    local acl_json="[]"
+    IFS=',' read -ra ACL_ARRAY <<< "$ACL_USERS"
+    for acl in "${ACL_ARRAY[@]}"; do
+      IFS=':' read -r a_name a_ip a_ext a_cid <<< "$acl"
+      if [ -n "$a_name" ]; then
+        acl_json=$(echo "$acl_json" | jq \
+          --arg name "$a_name" \
+          --arg ip "${a_ip:-}" \
+          --arg ext "${a_ext:-}" \
+          --arg cid "${a_cid:-}" \
+          '. += [{username:$name,ip_address:$ip,extension:$ext,caller_id:$cid}]')
+      fi
+    done
+    json=$(echo "$json" | jq --argjson acl "$acl_json" '.acl_users = $acl')
+  fi
+
+  # Gateways (format: type:name:host:port:username:password:register:transport:auth_user,...)
+  if [ -n "$GATEWAYS" ]; then
+    local gw_json="[]"
+    IFS=',' read -ra GW_ARRAY <<< "$GATEWAYS"
+    for gw in "${GW_ARRAY[@]}"; do
+      IFS=':' read -r g_type g_name g_host g_port g_user g_pass g_reg g_trans g_auth <<< "$gw"
+      if [ -n "$g_name" ] && [ -n "$g_host" ]; then
+        gw_json=$(echo "$gw_json" | jq \
+          --arg type "${g_type:-sip}" \
+          --arg name "$g_name" \
+          --arg host "$g_host" \
+          --arg port "${g_port:-5060}" \
+          --arg user "${g_user:-}" \
+          --arg pass "${g_pass:-}" \
+          --arg reg "${g_reg:-true}" \
+          --arg trans "${g_trans:-udp}" \
+          --arg auth "${g_auth:-}" \
+          '. += [{
+            type:$type,name:$name,host:$host,
+            port:($port|tonumber),username:$user,password:$pass,
+            register:($reg=="true" or $reg=="1"),
+            transport:$trans,auth_username:$auth,enabled:true
+          }]')
+      fi
+    done
+    json=$(echo "$json" | jq --argjson gw "$gw_json" '.gateways = $gw')
+  fi
+
+  # Routes
+  local routes_json='{}'
+  routes_json=$(echo "$routes_json" | jq \
+    --arg dg "${DEFAULT_GATEWAY:-}" \
+    --arg de "${DEFAULT_EXTENSION:-}" \
+    --arg oc "${OUTBOUND_CALLER_ID:-}" \
+    '.default_gateway=$dg|.default_extension=$de|.outbound_caller_id=$oc')
+
+  # Inbound routes (format: gateway:extension,...)
+  if [ -n "$INBOUND_ROUTES" ]; then
+    local inbound_json="[]"
+    IFS=',' read -ra IN_ARRAY <<< "$INBOUND_ROUTES"
+    for route in "${IN_ARRAY[@]}"; do
+      IFS=':' read -r r_did r_dest r_type <<< "$route"
+      if [ -n "$r_did" ] && [ -n "$r_dest" ]; then
+        inbound_json=$(echo "$inbound_json" | jq \
+          --arg did "$r_did" \
+          --arg dest "$r_dest" \
+          --arg type "${r_type:-extension}" \
+          '. += [{did:$did,destination:$dest,destination_type:$type}]')
+      fi
+    done
+    routes_json=$(echo "$routes_json" | jq --argjson inb "$inbound_json" '.inbound = $inb')
+  fi
+
+  # User routes (format: username:gateway,...)
+  if [ -n "$OUTBOUND_USER_ROUTES" ]; then
+    local ur_json="[]"
+    IFS=',' read -ra UR_ARRAY <<< "$OUTBOUND_USER_ROUTES"
+    for ur in "${UR_ARRAY[@]}"; do
+      IFS=':' read -r ur_user ur_gw <<< "$ur"
+      if [ -n "$ur_user" ] && [ -n "$ur_gw" ]; then
+        ur_json=$(echo "$ur_json" | jq \
+          --arg user "$ur_user" \
+          --arg gw "$ur_gw" \
+          '. += [{username:$user,gateway:$gw}]')
+      fi
+    done
+    routes_json=$(echo "$routes_json" | jq --argjson ur "$ur_json" '.user_routes = $ur')
+  fi
+
+  json=$(echo "$json" | jq --argjson routes "$routes_json" '.routes = $routes')
+
+  # Write JSON file
+  echo "$json" | jq '.' > "$CONFIG_FILE"
+  echo_log "Created JSON config: $CONFIG_FILE"
+
+  # Now use JSON config
+  USE_JSON_CONFIG=true
 }
 
 ################################################################################
