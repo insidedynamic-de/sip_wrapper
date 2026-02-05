@@ -715,6 +715,35 @@ function updateHashOnTabChange() {
 }
 
 // =============================================================================
+// Auto-Refresh for Manage Page
+// =============================================================================
+
+let manageRefreshIntervalId = null;
+const MANAGE_REFRESH_KEY = 'manageRefreshInterval';
+
+function refreshManagePage() {
+    // Only refresh if on Security tab
+    const securityTab = document.getElementById('security-tab');
+    if (securityTab && securityTab.classList.contains('active')) {
+        loadFailedAttempts();
+    }
+}
+
+function updateManageRefreshInterval(interval) {
+    interval = parseInt(interval);
+    localStorage.setItem(MANAGE_REFRESH_KEY, interval);
+
+    if (manageRefreshIntervalId) {
+        clearInterval(manageRefreshIntervalId);
+        manageRefreshIntervalId = null;
+    }
+
+    if (interval > 0) {
+        manageRefreshIntervalId = setInterval(refreshManagePage, interval);
+    }
+}
+
+// =============================================================================
 // Init
 // =============================================================================
 
@@ -722,10 +751,21 @@ document.addEventListener('DOMContentLoaded', function() {
     loadAll();
     handleHashNavigation();
     updateHashOnTabChange();
+
+    // Start auto-refresh (use same interval as dashboard, default 5s)
+    const savedInterval = localStorage.getItem('adminRefreshInterval') || 5000;
+    updateManageRefreshInterval(parseInt(savedInterval));
 });
 
 // Handle back/forward navigation
 window.addEventListener('hashchange', handleHashNavigation);
+
+// Sync refresh interval when changed on another page (dashboard)
+window.addEventListener('storage', function(e) {
+    if (e.key === 'adminRefreshInterval') {
+        updateManageRefreshInterval(parseInt(e.newValue) || 5000);
+    }
+});
 
 // =============================================================================
 // Security - Blacklist / Whitelist

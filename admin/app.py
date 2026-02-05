@@ -190,9 +190,17 @@ def get_failed_attempts_summary():
     now = datetime.now()
     cutoff = now - timedelta(seconds=time_window)
 
+    # Get current blacklist to exclude already blocked IPs
+    security = config_store.get_security()
+    blacklisted_ips = {e.get('ip') for e in security.get('blacklist', [])}
+
     summary = []
     with failed_attempts_lock:
         for ip, attempts in failed_attempts.items():
+            # Skip already blacklisted IPs
+            if ip in blacklisted_ips:
+                continue
+
             recent = [ts for ts in attempts if ts > cutoff]
             if recent:
                 summary.append({
