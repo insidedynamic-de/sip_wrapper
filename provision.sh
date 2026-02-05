@@ -556,12 +556,29 @@ generate_internal_profile() {
     has_acl_users=true
   fi
 
+  # Check for blacklist
+  local has_blacklist=false
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    local bl_len
+    bl_len=$(jq -r '.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
+    if [ "$bl_len" -gt 0 ]; then
+      has_blacklist=true
+    fi
+  fi
+
+  # Build ACL chain: blacklist first (to deny), then domains/acl_users (to allow)
+  local inbound_acl=""
+  if [ "$has_blacklist" = true ]; then
+    inbound_acl="blacklist,"
+    echo_log "  Blacklist ACL enabled - blocked IPs will be rejected"
+  fi
+
   if [ "$has_acl_users" = true ]; then
-    local inbound_acl="domains,acl_users"
+    inbound_acl="${inbound_acl}domains,acl_users"
     local blind_auth="false"
     local blind_reg="false"
   else
-    local inbound_acl="domains"
+    inbound_acl="${inbound_acl}domains"
     local blind_auth="false"
     local blind_reg="false"
   fi
@@ -667,6 +684,19 @@ EOF
 generate_external_profile() {
   echo_log "Generating external SIP profile..."
 
+  # Check for blacklist
+  local blacklist_acl=""
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    local bl_len
+    bl_len=$(jq -r '.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
+    if [ "$bl_len" -gt 0 ]; then
+      blacklist_acl='
+    <!-- Blacklist ACL -->
+    <param name="apply-inbound-acl" value="blacklist"/>'
+      echo_log "  Blacklist ACL enabled for external profile"
+    fi
+  fi
+
   cat > "$FS_CONF/sip_profiles/external.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <profile name="external">
@@ -696,7 +726,7 @@ generate_external_profile() {
     <!-- NAT -->
     <param name="apply-nat-acl" value="rfc1918.auto"/>
     <param name="local-network-acl" value="localnet.auto"/>
-
+$blacklist_acl
     <!-- Context -->
     <param name="context" value="public"/>
     <param name="dialplan" value="XML"/>
@@ -880,19 +910,26 @@ EOF
 ################################################################################
 
 generate_acl_users() {
-  echo_log "Generating ACL users..."
+  echo_log "Generating ACL configuration..."
 
   local acl_count=0
   local outbound_caller_id
   local has_acl_users=false
+  local has_blacklist=false
 
-  # Get default outbound caller ID
+  # Get default outbound caller ID and check for ACL users / blacklist
   if [ "$USE_JSON_CONFIG" = true ]; then
     outbound_caller_id=$(get_json_value '.routes.outbound_caller_id' '')
     local acl_len
     acl_len=$(get_json_array_length '.acl_users')
     if [ "$acl_len" -gt 0 ]; then
       has_acl_users=true
+    fi
+    # Check for blacklist
+    local bl_len
+    bl_len=$(jq -r '.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
+    if [ "$bl_len" -gt 0 ]; then
+      has_blacklist=true
     fi
   else
     outbound_caller_id="${OUTBOUND_CALLER_ID:-}"
@@ -901,8 +938,8 @@ generate_acl_users() {
     fi
   fi
 
-  if [ "$has_acl_users" = false ]; then
-    echo_log "No ACL users defined, skipping..."
+  if [ "$has_acl_users" = false ] && [ "$has_blacklist" = false ]; then
+    echo_log "No ACL users or blacklist defined, skipping..."
     return
   fi
 
@@ -1061,9 +1098,56 @@ EOF
     done
   fi
 
-  # Close ACL users list and configuration
+  # Close ACL users list
   cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<'EOF'
     </list>
+EOF
+
+  # Add blacklist if present (from JSON config)
+  local blacklist_count=0
+  if [ "$USE_JSON_CONFIG" = true ]; then
+    local bl_len
+    bl_len=$(jq -r '.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
+
+    if [ "$bl_len" -gt 0 ]; then
+      echo_log "Adding blacklist ACL ($bl_len IPs)..."
+
+      cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<'EOF'
+    <!-- Blacklist - blocked IPs -->
+    <list name="blacklist" default="allow">
+EOF
+
+      for ((i=0; i<bl_len; i++)); do
+        local ip comment
+        ip=$(jq -r ".blacklist[$i].ip // empty" "$CONFIG_FILE")
+
+        if [ -n "$ip" ]; then
+          # If IP already contains /, use as-is (CIDR). Otherwise add /32 (single IP)
+          if [[ "$ip" == *"/"* ]]; then
+            local cidr="$ip"
+          else
+            local cidr="$ip/32"
+          fi
+
+          comment=$(jq -r ".blacklist[$i].comment // empty" "$CONFIG_FILE")
+          echo_log "  Blocking IP: $cidr ${comment:+($comment)}"
+
+          cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<EOF
+      <node type="deny" cidr="$cidr"/>
+EOF
+          blacklist_count=$((blacklist_count + 1))
+        fi
+      done
+
+      cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<'EOF'
+    </list>
+EOF
+      echo_log "Added $blacklist_count IPs to blacklist"
+    fi
+  fi
+
+  # Close network-lists and configuration
+  cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<'EOF'
   </network-lists>
 </configuration>
 EOF
