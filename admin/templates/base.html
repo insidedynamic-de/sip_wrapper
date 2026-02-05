@@ -24,28 +24,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'config' %}active{% endif %}" href="/config">
-                            <i class="bi bi-gear"></i> {{ t('config') }}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'gateways' %}active{% endif %}" href="/gateways">
-                            <i class="bi bi-diagram-3"></i> {{ t('gateways') }}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'users' %}active{% endif %}" href="/users">
-                            <i class="bi bi-people"></i> {{ t('users') }}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'routing' %}active{% endif %}" href="/routing">
-                            <i class="bi bi-signpost-split"></i> {{ t('routing') }}
-                        </a>
-                    </li>
-                    <li class="nav-item mt-3">
                         <a class="nav-link {% if request.endpoint == 'manage' %}active{% endif %}" href="/manage">
-                            <i class="bi bi-pencil-square"></i> Manage
+                            <i class="bi bi-gear"></i> {{ t('config') }}
                         </a>
                     </li>
                     <li class="nav-item mt-3">

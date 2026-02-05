@@ -153,10 +153,6 @@ services:
           wget --no-cache -qO /opt/admin/templates/base.html $$ADMIN_BASE/templates/base.html
           wget --no-cache -qO /opt/admin/templates/login.html $$ADMIN_BASE/templates/login.html
           wget --no-cache -qO /opt/admin/templates/dashboard.html $$ADMIN_BASE/templates/dashboard.html
-          wget --no-cache -qO /opt/admin/templates/config.html $$ADMIN_BASE/templates/config.html
-          wget --no-cache -qO /opt/admin/templates/gateways.html $$ADMIN_BASE/templates/gateways.html
-          wget --no-cache -qO /opt/admin/templates/users.html $$ADMIN_BASE/templates/users.html
-          wget --no-cache -qO /opt/admin/templates/routing.html $$ADMIN_BASE/templates/routing.html
           wget --no-cache -qO /opt/admin/templates/manage.html $$ADMIN_BASE/templates/manage.html
 
           # Download static CSS
