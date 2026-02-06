@@ -656,7 +656,6 @@ generate_internal_profile() {
 
     <!-- SIP -->
     <param name="nonce-ttl" value="60"/>
-    <param name="inbound-reg-force-matching-username" value="true"/>
     <param name="aggressive-nat-detection" value="true"/>
     <param name="disable-register" value="false"/>
     <param name="disable-transfer" value="false"/>
