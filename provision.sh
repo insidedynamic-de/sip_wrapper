@@ -568,8 +568,10 @@ generate_internal_profile() {
 
   # Build ACL chain: blacklist first (to deny), then domains/acl_users (to allow)
   local inbound_acl=""
+  local register_acl=""
   if [ "$has_blacklist" = true ]; then
     inbound_acl="blacklist,"
+    register_acl="blacklist"
     echo_log "  Blacklist ACL enabled - blocked IPs will be rejected"
   fi
 
@@ -584,6 +586,13 @@ generate_internal_profile() {
   fi
 
   echo_log "  Internal profile ACL chain: $inbound_acl"
+
+  # Build register ACL line (only if blacklist exists)
+  local register_acl_line=""
+  if [ -n "$register_acl" ]; then
+    register_acl_line="<param name=\"apply-register-acl\" value=\"$register_acl\"/>"
+    echo_log "  Register ACL: $register_acl"
+  fi
 
   cat > "$FS_CONF/sip_profiles/internal.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -609,7 +618,7 @@ generate_internal_profile() {
     <!-- NAT Handling -->
     <param name="apply-nat-acl" value="rfc1918.auto"/>
     <param name="apply-inbound-acl" value="$inbound_acl"/>
-    <param name="apply-register-acl" value="$inbound_acl"/>
+    $register_acl_line
     <param name="local-network-acl" value="localnet.auto"/>
 
     <!-- NAT Traversal - CRITICAL: Fix audio for clients behind NAT -->
