@@ -614,6 +614,9 @@ generate_internal_profile() {
     <param name="auth-all-packets" value="false"/>
     <param name="accept-blind-auth" value="$blind_auth"/>
     <param name="accept-blind-reg" value="$blind_reg"/>
+    <!-- CRITICAL: Force username to match directory entry -->
+    <!-- Without this, ANY password from directory may work for ANY username -->
+    <param name="inbound-reg-force-matching-username" value="true"/>
 
     <!-- NAT Handling -->
     <param name="apply-nat-acl" value="rfc1918.auto"/>
