@@ -1545,6 +1545,89 @@ def api_blacklist_reset_count(ip):
     return jsonify({'success': success, 'message': message})
 
 ################################################################################
+# FreeSWITCH XML CURL Directory (Strict User Authentication)
+################################################################################
+
+@app.route('/api/freeswitch/directory', methods=['POST'])
+def freeswitch_directory():
+    """
+    XML CURL endpoint for FreeSWITCH directory lookups.
+
+    This enables STRICT username validation - only users that exist in the
+    config can register. Without this, FreeSWITCH's digest auth can accept
+    any username if the password matches ANY user in the directory.
+
+    FreeSWITCH sends POST with:
+    - user: the username trying to authenticate
+    - domain: the SIP domain
+    - action: auth-check, user_call, etc.
+    """
+    # Get POST data from FreeSWITCH
+    user = request.form.get('user', '')
+    domain = request.form.get('domain', '')
+    action = request.form.get('action', '')
+    purpose = request.form.get('purpose', '')
+
+    # Log the request for debugging
+    app.logger.info(f"[XML_CURL] Directory lookup: user={user}, domain={domain}, action={action}, purpose={purpose}")
+
+    # Load config and find user
+    config = config_store.load_config()
+    users = config.get('users', [])
+
+    # Find user by username
+    user_data = None
+    for u in users:
+        if u.get('username') == user and u.get('enabled', True):
+            user_data = u
+            break
+
+    if not user_data:
+        # User not found - return "not found" response
+        app.logger.warning(f"[XML_CURL] REJECTED: User '{user}' not found in directory")
+        return '''<?xml version="1.0" encoding="UTF-8"?>
+<document type="freeswitch/xml">
+  <section name="result">
+    <result status="not found"/>
+  </section>
+</document>''', 200, {'Content-Type': 'text/xml'}
+
+    # User found - return directory entry with password
+    password = user_data.get('password', '')
+    extension = user_data.get('extension', user)
+
+    app.logger.info(f"[XML_CURL] User '{user}' found, returning directory entry")
+
+    xml_response = f'''<?xml version="1.0" encoding="UTF-8"?>
+<document type="freeswitch/xml">
+  <section name="directory">
+    <domain name="{domain}">
+      <params>
+        <param name="dial-string" value="{{^^:sip_invite_domain=${{domain}}:presence_id=${{dialed_user}}@${{domain}}}}{{${{sofia_contact(${{dialed_user}}@${{domain}})}}}}"/>
+      </params>
+      <user id="{user}">
+        <params>
+          <param name="password" value="{password}"/>
+          <param name="vm-password" value="{password}"/>
+        </params>
+        <variables>
+          <variable name="toll_allow" value="domestic,international,local"/>
+          <variable name="accountcode" value="{user}"/>
+          <variable name="user_context" value="default"/>
+          <variable name="effective_caller_id_name" value="{user}"/>
+          <variable name="effective_caller_id_number" value="{extension}"/>
+          <variable name="outbound_caller_id_name" value="{user}"/>
+          <variable name="outbound_caller_id_number" value="{extension}"/>
+        </variables>
+      </user>
+    </domain>
+  </section>
+</document>'''
+
+    return xml_response, 200, {'Content-Type': 'text/xml'}
+
+
+################################################################################
 # Main
 ################################################################################
 

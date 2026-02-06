@@ -535,6 +535,92 @@ EOF
 }
 
 ################################################################################
+# Generate XML CURL Configuration (Strict User Authentication)
+################################################################################
+
+generate_xml_curl() {
+  echo_log "Generating xml_curl.conf.xml..."
+
+  # Get admin portal URL from environment or use default
+  local admin_host="${ADMIN_HOST:-127.0.0.1}"
+  local admin_port="${ADMIN_PORT:-8888}"
+  local directory_url="http://${admin_host}:${admin_port}/api/freeswitch/directory"
+
+  cat > "$FS_CONF/autoload_configs/xml_curl.conf.xml" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration name="xml_curl.conf" description="XML CURL for Dynamic Directory">
+  <bindings>
+    <!-- Directory binding for strict user authentication -->
+    <!-- Only users that exist in the config can register -->
+    <binding name="directory">
+      <param name="gateway-url" value="$directory_url" bindings="directory"/>
+      <param name="method" value="POST"/>
+      <param name="timeout" value="5"/>
+      <!-- Disable caching to always get fresh user data -->
+      <param name="disable-100-continue" value="true"/>
+    </binding>
+  </bindings>
+</configuration>
+EOF
+
+  echo_log "  Directory URL: $directory_url"
+  echo_log "xml_curl.conf.xml generated"
+}
+
+################################################################################
+# Generate Modules Configuration (ensure mod_xml_curl is loaded)
+################################################################################
+
+generate_modules_config() {
+  echo_log "Generating modules.conf.xml..."
+
+  cat > "$FS_CONF/autoload_configs/modules.conf.xml" <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration name="modules.conf" description="Modules">
+  <modules>
+    <!-- Loggers -->
+    <load module="mod_console"/>
+    <load module="mod_logfile"/>
+
+    <!-- XML Interfaces - CRITICAL: mod_xml_curl for strict user auth -->
+    <load module="mod_xml_curl"/>
+
+    <!-- Event Handlers -->
+    <load module="mod_event_socket"/>
+
+    <!-- Applications -->
+    <load module="mod_commands"/>
+    <load module="mod_dptools"/>
+    <load module="mod_dialplan_xml"/>
+    <load module="mod_sofia"/>
+    <load module="mod_db"/>
+    <load module="mod_hash"/>
+
+    <!-- Codecs -->
+    <load module="mod_g711"/>
+    <load module="mod_g729"/>
+    <load module="mod_opus"/>
+    <load module="mod_amr"/>
+
+    <!-- File Formats -->
+    <load module="mod_sndfile"/>
+    <load module="mod_native_file"/>
+    <load module="mod_tone_stream"/>
+
+    <!-- Speech -->
+    <load module="mod_spandsp"/>
+
+    <!-- Languages -->
+    <load module="mod_say_en"/>
+    <load module="mod_say_de"/>
+  </modules>
+</configuration>
+EOF
+
+  echo_log "modules.conf.xml generated (includes mod_xml_curl)"
+}
+
+################################################################################
 # Generate Internal Profile (for authenticated users)
 ################################################################################
 
@@ -2040,6 +2126,8 @@ show_summary() {
   echo_log ""
   echo_log "Generated:"
   echo_log "  - vars.xml (global variables)"
+  echo_log "  - modules.conf.xml (includes mod_xml_curl)"
+  echo_log "  - xml_curl.conf.xml (strict user auth via Admin Portal)"
   echo_log "  - internal.xml (authenticated users profile)"
   echo_log "  - external.xml (gateways and inbound profile)"
   echo_log "  - directory/default.xml (user directory)"
@@ -2182,7 +2270,9 @@ main() {
   clean_config
 
   generate_vars
+  generate_modules_config
   generate_event_socket
+  generate_xml_curl
   generate_internal_profile
   generate_external_profile
   generate_directory
