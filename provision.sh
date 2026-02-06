@@ -1202,6 +1202,13 @@ EOF
 generate_gateways() {
   echo_log "Generating gateways..."
 
+  # Clean up old gateway XML files to prevent duplicates
+  local gw_dir="$FS_CONF/sip_profiles/external"
+  if [ -d "$gw_dir" ]; then
+    echo_log "Cleaning up old gateway files in $gw_dir..."
+    rm -f "$gw_dir"/*.xml 2>/dev/null || true
+  fi
+
   local gw_count=0
 
   if [ "$USE_JSON_CONFIG" = true ]; then
