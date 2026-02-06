@@ -583,6 +583,8 @@ generate_internal_profile() {
     local blind_reg="false"
   fi
 
+  echo_log "  Internal profile ACL chain: $inbound_acl"
+
   cat > "$FS_CONF/sip_profiles/internal.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <profile name="internal">
@@ -607,6 +609,7 @@ generate_internal_profile() {
     <!-- NAT Handling -->
     <param name="apply-nat-acl" value="rfc1918.auto"/>
     <param name="apply-inbound-acl" value="$inbound_acl"/>
+    <param name="apply-register-acl" value="$inbound_acl"/>
     <param name="local-network-acl" value="localnet.auto"/>
 
     <!-- NAT Traversal - CRITICAL: Fix audio for clients behind NAT -->
