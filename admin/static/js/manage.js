@@ -788,6 +788,9 @@ async function loadSecurity() {
         // Load auto-blacklist settings and failed attempts
         await loadAutoBlacklistSettings();
         await loadFailedAttempts();
+
+        // Load Fail2Ban settings
+        await loadFail2banSettings();
     } catch (e) {
         console.error('Failed to load security:', e);
     }
@@ -803,14 +806,34 @@ function renderBlacklist() {
         return;
     }
 
-    let html = '<table class="table table-sm table-hover mb-0"><tbody>';
+    let html = '<table class="table table-sm table-hover mb-0"><thead><tr>';
+    html += '<th>IP</th><th>Blocked</th><th>Status</th><th>Actions</th>';
+    html += '</tr></thead><tbody>';
     list.forEach(entry => {
+        const blockedCount = entry.blocked_count || 1;
+        const isFail2banned = entry.fail2ban_banned || false;
+
         html += `<tr>
             <td>
                 <code class="text-danger">${entry.ip}</code>
                 ${entry.comment ? `<small class="text-muted d-block">${entry.comment}</small>` : ''}
             </td>
+            <td>
+                <span class="badge ${blockedCount >= 50 ? 'bg-danger' : blockedCount >= 20 ? 'bg-warning text-dark' : 'bg-secondary'}">${blockedCount}x</span>
+            </td>
+            <td>
+                ${isFail2banned
+                    ? '<span class="badge bg-dark"><i class="bi bi-fire me-1"></i>Fail2Ban</span>'
+                    : '<span class="badge bg-info">ACL only</span>'}
+            </td>
             <td class="text-end">
+                ${!isFail2banned
+                    ? `<button class="btn btn-sm btn-outline-dark" onclick="banInFail2ban('${entry.ip}')" title="Add to Fail2Ban">
+                        <i class="bi bi-fire"></i>
+                    </button>`
+                    : `<button class="btn btn-sm btn-outline-warning" onclick="unbanFromFail2ban('${entry.ip}')" title="Remove from Fail2Ban">
+                        <i class="bi bi-unlock"></i>
+                    </button>`}
                 <button class="btn btn-sm btn-outline-danger" onclick="removeFromBlacklist('${entry.ip}')" title="Remove">
                     <i class="bi bi-trash"></i>
                 </button>
@@ -1064,6 +1087,107 @@ async function quickBlockIp(ip) {
         showToast('Success', `IP ${ip} has been blocked`, 'success');
         await loadSecurity();
         await loadFailedAttempts();
+    } else {
+        showToast('Error', result.message, 'error');
+    }
+}
+
+// =============================================================================
+// Fail2Ban Integration
+// =============================================================================
+
+async function loadFail2banSettings() {
+    try {
+        const data = await apiGet('/api/security/fail2ban');
+        const settings = data.settings || {};
+
+        document.getElementById('fail2ban-enabled').checked = settings.enabled || false;
+        document.getElementById('fail2ban-threshold').value = settings.threshold || 50;
+        document.getElementById('fail2ban-jail').value = settings.jail_name || 'sip-blacklist';
+
+        // Update status display
+        updateFail2banStatusDisplay(data.status);
+    } catch (e) {
+        console.error('Failed to load Fail2Ban settings:', e);
+    }
+}
+
+function updateFail2banStatusDisplay(status) {
+    const container = document.getElementById('fail2ban-status');
+    if (!container) return;
+
+    if (!status) {
+        container.innerHTML = '<span class="badge bg-secondary">Unknown</span>';
+        return;
+    }
+
+    if (status.error) {
+        container.innerHTML = `<span class="badge bg-danger" title="${status.error}"><i class="bi bi-x-circle me-1"></i>Error</span>
+            <small class="text-danger d-block mt-1">${status.error}</small>`;
+        return;
+    }
+
+    if (!status.available) {
+        container.innerHTML = '<span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Not installed</span>';
+        return;
+    }
+
+    if (!status.jail_exists) {
+        container.innerHTML = `<span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Jail not found</span>
+            <small class="text-muted d-block mt-1">Create the jail in Fail2Ban config</small>`;
+        return;
+    }
+
+    const bannedCount = (status.banned_ips || []).length;
+    container.innerHTML = `<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Active</span>
+        <small class="text-success d-block mt-1">${bannedCount} IP(s) banned</small>`;
+}
+
+async function loadFail2banStatus() {
+    try {
+        const data = await apiGet('/api/security/fail2ban');
+        updateFail2banStatusDisplay(data.status);
+        showToast('Info', 'Fail2Ban status refreshed', 'info');
+    } catch (e) {
+        showToast('Error', 'Failed to load Fail2Ban status', 'error');
+    }
+}
+
+async function saveFail2banSettings() {
+    const data = {
+        enabled: document.getElementById('fail2ban-enabled').checked,
+        threshold: parseInt(document.getElementById('fail2ban-threshold').value) || 50,
+        jail_name: document.getElementById('fail2ban-jail').value || 'sip-blacklist'
+    };
+
+    const result = await apiPost('/api/security/fail2ban', data);
+    if (result.success) {
+        showToast('Success', result.message, 'success');
+        await loadFail2banStatus();
+    } else {
+        showToast('Error', result.message, 'error');
+    }
+}
+
+async function banInFail2ban(ip) {
+    if (!confirm(`Add IP ${ip} to Fail2Ban (firewall block)?`)) return;
+
+    const result = await apiPost(`/api/security/fail2ban/ban/${encodeURIComponent(ip)}`, {});
+    if (result.success) {
+        showToast('Success', result.message, 'success');
+        await loadSecurity();
+    } else {
+        showToast('Error', result.message, 'error');
+    }
+}
+
+async function unbanFromFail2ban(ip) {
+    if (!confirm(`Remove IP ${ip} from Fail2Ban?`)) return;
+
+    const result = await apiPost(`/api/security/fail2ban/unban/${encodeURIComponent(ip)}`, {});
+    if (result.success) {
+        showToast('Success', result.message, 'success');
+        await loadSecurity();
     } else {
         showToast('Error', result.message, 'error');
     }

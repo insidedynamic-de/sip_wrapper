@@ -1,0 +1,10 @@
+# Fail2Ban filter for SIP Wrapper
+# Copy this file to /etc/fail2ban/filter.d/sip-blacklist.conf
+#
+# This is a dummy filter - actual banning is done via:
+# fail2ban-client set sip-blacklist banip <ip>
+
+[Definition]
+# This regex won't match anything - we use manual banning
+failregex = ^MANUAL_BAN_ONLY_NO_LOG_MATCHING$
+ignoreregex =

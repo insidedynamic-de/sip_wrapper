@@ -411,11 +411,88 @@
             </div>
         </div>
 
+        <!-- Fail2Ban Integration -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark bg-opacity-10">
+                <i class="bi bi-fire me-2 text-danger"></i>Fail2Ban Integration (Firewall Level)
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="fail2ban-enabled" onchange="saveFail2banSettings()">
+                            <label class="form-check-label" for="fail2ban-enabled">
+                                <strong>Enable Fail2Ban Integration</strong>
+                            </label>
+                        </div>
+                        <p class="text-muted small mt-1 mb-0">
+                            When an IP is blocked repeatedly, add it to Fail2Ban for firewall-level blocking (iptables).
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Threshold (blocked count)</label>
+                        <input type="number" class="form-control" id="fail2ban-threshold" value="50" min="10" max="1000">
+                        <small class="text-muted">Add to Fail2Ban after N blocks</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Jail Name</label>
+                        <input type="text" class="form-control" id="fail2ban-jail" value="sip-blacklist">
+                        <small class="text-muted">Fail2Ban jail for SIP blocking</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Status</label>
+                        <div id="fail2ban-status" class="mt-2">
+                            <span class="badge bg-secondary">Checking...</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-dark mt-3" onclick="saveFail2banSettings()">
+                    <i class="bi bi-save me-1"></i>Save Fail2Ban Settings
+                </button>
+                <button class="btn btn-outline-secondary mt-3 ms-2" onclick="loadFail2banStatus()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refresh Status
+                </button>
+                <button class="btn btn-outline-info mt-3 ms-2" data-bs-toggle="collapse" data-bs-target="#fail2ban-setup">
+                    <i class="bi bi-question-circle me-1"></i>Setup Help
+                </button>
+
+                <div class="collapse mt-3" id="fail2ban-setup">
+                    <div class="card card-body bg-light">
+                        <h6><i class="bi bi-terminal me-2"></i>Fail2Ban Setup</h6>
+                        <p class="small mb-2">Create the jail configuration:</p>
+                        <pre class="bg-dark text-light p-2 rounded small mb-2"><code># Create jail config
+cat > /etc/fail2ban/jail.d/sip-blacklist.conf << 'EOF'
+[sip-blacklist]
+enabled = true
+filter = sip-blacklist
+action = iptables-allports[name=sip-blacklist, protocol=all]
+logpath = /var/log/freeswitch/freeswitch.log
+maxretry = 1
+findtime = 86400
+bantime = -1
+EOF
+
+# Create filter (dummy - we use manual banning)
+cat > /etc/fail2ban/filter.d/sip-blacklist.conf << 'EOF'
+[Definition]
+failregex = ^MANUAL_BAN_ONLY$
+ignoreregex =
+EOF
+
+# Reload fail2ban
+fail2ban-client reload</code></pre>
+                        <p class="small text-muted mb-0">After setup, the admin panel will add IPs to Fail2Ban automatically when they exceed the threshold.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Info -->
         <div class="alert alert-info">
             <i class="bi bi-info-circle me-2"></i>
             <strong>Note:</strong> After making changes, click "Apply Config" to reload FreeSWITCH with new ACL rules.
             Blacklist IPs are always blocked. Whitelist only takes effect when Whitelist Mode is enabled.
+            Fail2Ban provides permanent firewall-level blocking for persistent attackers.
         </div>
     </div>
 </div>

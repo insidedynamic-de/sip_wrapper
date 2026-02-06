@@ -55,6 +55,11 @@ DEFAULT_CONFIG = {
             "max_attempts": 10,
             "time_window": 300,
             "block_duration": 3600
+        },
+        "fail2ban": {
+            "enabled": False,
+            "threshold": 50,
+            "jail_name": "sip-blacklist"
         }
     }
 }
@@ -729,20 +734,30 @@ def update_security(security_data):
 
 
 def add_to_blacklist(ip, comment=""):
-    """Add IP to blacklist"""
+    """Add IP to blacklist or increment blocked_count if exists"""
     config = load_config()
     if 'security' not in config:
         config['security'] = DEFAULT_CONFIG['security'].copy()
 
-    # Check if already exists
+    # Check if already exists - increment blocked_count
     for entry in config['security']['blacklist']:
         if entry.get('ip') == ip:
-            return False, "IP already in blacklist"
+            entry['blocked_count'] = entry.get('blocked_count', 1) + 1
+            entry['last_blocked'] = datetime.now().isoformat()
+            save_config(config)
+
+            # Check if we should trigger fail2ban
+            check_fail2ban_threshold(ip, entry['blocked_count'])
+
+            return True, f"IP blocked again (count: {entry['blocked_count']})"
 
     config['security']['blacklist'].append({
         'ip': ip,
         'comment': comment,
-        'added_at': datetime.now().isoformat()
+        'added_at': datetime.now().isoformat(),
+        'blocked_count': 1,
+        'last_blocked': datetime.now().isoformat(),
+        'fail2ban_banned': False
     })
     save_config(config)
     return True, "IP added to blacklist"
@@ -829,3 +844,188 @@ def update_auto_blacklist_settings(settings):
     config['security']['auto_blacklist'].update(settings)
     save_config(config)
     return True, "Auto-blacklist settings updated"
+
+
+# =============================================================================
+# Fail2Ban Integration
+# =============================================================================
+
+def get_fail2ban_settings():
+    """Get Fail2Ban integration settings"""
+    config = load_config()
+    security = config.get('security', {})
+    return security.get('fail2ban', DEFAULT_CONFIG['security']['fail2ban'])
+
+
+def update_fail2ban_settings(settings):
+    """Update Fail2Ban integration settings"""
+    config = load_config()
+    if 'security' not in config:
+        config['security'] = DEFAULT_CONFIG['security'].copy()
+    if 'fail2ban' not in config['security']:
+        config['security']['fail2ban'] = DEFAULT_CONFIG['security']['fail2ban'].copy()
+    config['security']['fail2ban'].update(settings)
+    save_config(config)
+    return True, "Fail2Ban settings updated"
+
+
+def check_fail2ban_threshold(ip, blocked_count):
+    """Check if IP should be added to Fail2Ban based on blocked_count"""
+    settings = get_fail2ban_settings()
+
+    if not settings.get('enabled', False):
+        return False
+
+    threshold = settings.get('threshold', 50)
+
+    if blocked_count >= threshold:
+        return trigger_fail2ban(ip)
+
+    return False
+
+
+def trigger_fail2ban(ip):
+    """Add IP to Fail2Ban jail"""
+    import subprocess
+
+    settings = get_fail2ban_settings()
+    jail_name = settings.get('jail_name', 'sip-blacklist')
+
+    try:
+        # Use fail2ban-client to ban the IP
+        result = subprocess.run(
+            ['fail2ban-client', 'set', jail_name, 'banip', ip],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+
+        if result.returncode == 0:
+            # Mark as banned in our blacklist
+            config = load_config()
+            for entry in config.get('security', {}).get('blacklist', []):
+                if entry.get('ip') == ip:
+                    entry['fail2ban_banned'] = True
+                    entry['fail2ban_banned_at'] = datetime.now().isoformat()
+                    save_config(config)
+                    break
+
+            print(f"Fail2Ban: Banned IP {ip} in jail {jail_name}")
+            return True
+        else:
+            print(f"Fail2Ban error: {result.stderr}")
+            return False
+
+    except FileNotFoundError:
+        print("Fail2Ban: fail2ban-client not found")
+        return False
+    except subprocess.TimeoutExpired:
+        print("Fail2Ban: Command timed out")
+        return False
+    except Exception as e:
+        print(f"Fail2Ban error: {e}")
+        return False
+
+
+def unban_from_fail2ban(ip):
+    """Remove IP from Fail2Ban jail"""
+    import subprocess
+
+    settings = get_fail2ban_settings()
+    jail_name = settings.get('jail_name', 'sip-blacklist')
+
+    try:
+        result = subprocess.run(
+            ['fail2ban-client', 'set', jail_name, 'unbanip', ip],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+
+        if result.returncode == 0:
+            # Update our blacklist
+            config = load_config()
+            for entry in config.get('security', {}).get('blacklist', []):
+                if entry.get('ip') == ip:
+                    entry['fail2ban_banned'] = False
+                    save_config(config)
+                    break
+
+            print(f"Fail2Ban: Unbanned IP {ip}")
+            return True
+        else:
+            print(f"Fail2Ban unban error: {result.stderr}")
+            return False
+
+    except Exception as e:
+        print(f"Fail2Ban unban error: {e}")
+        return False
+
+
+def get_fail2ban_status():
+    """Get Fail2Ban jail status"""
+    import subprocess
+
+    settings = get_fail2ban_settings()
+    jail_name = settings.get('jail_name', 'sip-blacklist')
+
+    status = {
+        'available': False,
+        'jail_exists': False,
+        'banned_ips': [],
+        'error': None
+    }
+
+    try:
+        # Check if fail2ban is running
+        result = subprocess.run(
+            ['fail2ban-client', 'status'],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+
+        if result.returncode == 0:
+            status['available'] = True
+
+            # Check if our jail exists
+            if jail_name in result.stdout:
+                status['jail_exists'] = True
+
+                # Get jail status
+                jail_result = subprocess.run(
+                    ['fail2ban-client', 'status', jail_name],
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+
+                if jail_result.returncode == 0:
+                    # Parse banned IPs from output
+                    for line in jail_result.stdout.split('\n'):
+                        if 'Banned IP list:' in line:
+                            ips = line.split(':')[-1].strip()
+                            if ips:
+                                status['banned_ips'] = [ip.strip() for ip in ips.split()]
+        else:
+            status['error'] = result.stderr or "fail2ban-client not responding"
+
+    except FileNotFoundError:
+        status['error'] = "fail2ban-client not installed"
+    except subprocess.TimeoutExpired:
+        status['error'] = "Command timed out"
+    except Exception as e:
+        status['error'] = str(e)
+
+    return status
+
+
+def reset_blocked_count(ip):
+    """Reset blocked_count for an IP in blacklist"""
+    config = load_config()
+    for entry in config.get('security', {}).get('blacklist', []):
+        if entry.get('ip') == ip:
+            entry['blocked_count'] = 0
+            save_config(config)
+            return True, "Blocked count reset"
+    return False, "IP not found"

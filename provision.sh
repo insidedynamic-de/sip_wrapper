@@ -754,7 +754,10 @@ $blacklist_acl
 
     <!-- SIP -->
     <param name="aggressive-nat-detection" value="true"/>
-    <param name="disable-register" value="false"/>
+    <!-- SECURITY: Disable registrations on external profile (port 5080) -->
+    <!-- Gateways/trunks don't register TO us - we register TO them -->
+    <!-- All user registrations must go through internal profile (port 5060) with auth -->
+    <param name="disable-register" value="true"/>
     <param name="disable-transfer" value="false"/>
     <param name="manual-redirect" value="false"/>
     <!-- Custom User-Agent: hide FreeSWITCH identity -->

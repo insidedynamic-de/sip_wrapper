@@ -1492,6 +1492,59 @@ def api_check_blacklist():
     })
 
 ################################################################################
+# Fail2Ban Integration API
+################################################################################
+
+@app.route('/api/security/fail2ban', methods=['GET'])
+@login_required
+def api_fail2ban_get():
+    """Get Fail2Ban settings and status"""
+    settings = config_store.get_fail2ban_settings()
+    status = config_store.get_fail2ban_status()
+    return jsonify({
+        'settings': settings,
+        'status': status
+    })
+
+@app.route('/api/security/fail2ban', methods=['POST'])
+@login_required
+def api_fail2ban_update():
+    """Update Fail2Ban settings"""
+    data = request.get_json()
+    settings = {
+        'enabled': data.get('enabled', False),
+        'threshold': int(data.get('threshold', 50)),
+        'jail_name': data.get('jail_name', 'sip-blacklist')
+    }
+    success, message = config_store.update_fail2ban_settings(settings)
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/api/security/fail2ban/ban/<ip>', methods=['POST'])
+@login_required
+def api_fail2ban_ban(ip):
+    """Manually add IP to Fail2Ban jail"""
+    success = config_store.trigger_fail2ban(ip)
+    if success:
+        return jsonify({'success': True, 'message': f'IP {ip} banned in Fail2Ban'})
+    return jsonify({'success': False, 'message': 'Failed to ban IP in Fail2Ban'})
+
+@app.route('/api/security/fail2ban/unban/<ip>', methods=['POST'])
+@login_required
+def api_fail2ban_unban(ip):
+    """Remove IP from Fail2Ban jail"""
+    success = config_store.unban_from_fail2ban(ip)
+    if success:
+        return jsonify({'success': True, 'message': f'IP {ip} unbanned from Fail2Ban'})
+    return jsonify({'success': False, 'message': 'Failed to unban IP from Fail2Ban'})
+
+@app.route('/api/security/blacklist/<ip>/reset-count', methods=['POST'])
+@login_required
+def api_blacklist_reset_count(ip):
+    """Reset blocked_count for an IP"""
+    success, message = config_store.reset_blocked_count(ip)
+    return jsonify({'success': success, 'message': message})
+
+################################################################################
 # Main
 ################################################################################
 
