@@ -560,7 +560,7 @@ generate_internal_profile() {
   local has_blacklist=false
   if [ "$USE_JSON_CONFIG" = true ]; then
     local bl_len
-    bl_len=$(jq -r '.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
+    bl_len=$(jq -r '.security.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
     if [ "$bl_len" -gt 0 ]; then
       has_blacklist=true
     fi
@@ -688,7 +688,7 @@ generate_external_profile() {
   local blacklist_acl=""
   if [ "$USE_JSON_CONFIG" = true ]; then
     local bl_len
-    bl_len=$(jq -r '.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
+    bl_len=$(jq -r '.security.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
     if [ "$bl_len" -gt 0 ]; then
       blacklist_acl='
     <!-- Blacklist ACL -->
@@ -927,7 +927,7 @@ generate_acl_users() {
     fi
     # Check for blacklist
     local bl_len
-    bl_len=$(jq -r '.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
+    bl_len=$(jq -r '.security.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
     if [ "$bl_len" -gt 0 ]; then
       has_blacklist=true
     fi
@@ -1107,7 +1107,7 @@ EOF
   local blacklist_count=0
   if [ "$USE_JSON_CONFIG" = true ]; then
     local bl_len
-    bl_len=$(jq -r '.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
+    bl_len=$(jq -r '.security.blacklist | length // 0' "$CONFIG_FILE" 2>/dev/null || echo 0)
 
     if [ "$bl_len" -gt 0 ]; then
       echo_log "Adding blacklist ACL ($bl_len IPs)..."
@@ -1119,7 +1119,7 @@ EOF
 
       for ((i=0; i<bl_len; i++)); do
         local ip comment
-        ip=$(jq -r ".blacklist[$i].ip // empty" "$CONFIG_FILE")
+        ip=$(jq -r ".security.blacklist[$i].ip // empty" "$CONFIG_FILE")
 
         if [ -n "$ip" ]; then
           # If IP already contains /, use as-is (CIDR). Otherwise add /32 (single IP)
@@ -1129,7 +1129,7 @@ EOF
             local cidr="$ip/32"
           fi
 
-          comment=$(jq -r ".blacklist[$i].comment // empty" "$CONFIG_FILE")
+          comment=$(jq -r ".security.blacklist[$i].comment // empty" "$CONFIG_FILE")
           echo_log "  Blocking IP: $cidr ${comment:+($comment)}"
 
           cat >> "$FS_CONF/autoload_configs/acl.conf.xml" <<EOF
