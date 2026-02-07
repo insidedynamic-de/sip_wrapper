@@ -39,16 +39,20 @@ services:
           set -x
         fi
 
+        # Download VERSION file
+        WRAPPER_VERSION=$$(wget -qO- https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/VERSION 2>/dev/null || echo "dev")
+        GIT_BRANCH="main"
+
         # Show banner
         echo ""
         echo "================================================================================"
         if [ -n "$CLIENT_NAME" ]; then
-          echo "  InsideDynamic Wrapper - ($LICENSE_KEY) für $CLIENT_NAME"
+          echo "  InsideDynamic Wrapper v$$WRAPPER_VERSION - ($LICENSE_KEY) für $CLIENT_NAME"
         else
-          echo "  InsideDynamic Wrapper - ($LICENSE_KEY)"
+          echo "  InsideDynamic Wrapper v$$WRAPPER_VERSION - ($LICENSE_KEY)"
         fi
         echo "================================================================================"
-        echo "  https://insidedynamic.de/wrapper"
+        echo "  https://github.com/insidedynamic-de/sip_wrapper"
         echo "  (c) 2025 InsideDynamic GmbH - Mannheim, Germany"
         echo "================================================================================"
         echo ""
@@ -144,6 +148,10 @@ services:
 
           ADMIN_BASE="https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin"
 
+          # Download VERSION file for admin portal
+          mkdir -p /app
+          echo "$$WRAPPER_VERSION" > /app/VERSION
+
           # Download admin Python files
           wget --no-cache -qO /opt/admin/app.py $$ADMIN_BASE/app.py
           wget --no-cache -qO /opt/admin/config_store.py $$ADMIN_BASE/config_store.py
@@ -199,6 +207,7 @@ services:
         echo ""
         echo "[STEP 8/8] Starting FreeSWITCH..."
         echo "=========================================="
+        echo "InsideDynamic Wrapper v$$WRAPPER_VERSION"
         echo "FreeSWITCH is starting..."
         echo "Admin Portal: http://localhost:$ADMIN_PORT"
         if [ -n "$SERVICE_FQDN_ADMIN_8888" ]; then

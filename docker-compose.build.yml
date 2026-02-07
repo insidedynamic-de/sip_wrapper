@@ -1,0 +1,45 @@
+################################################################################
+# InsideDynamic Wrapper - Build with Version
+# Use: docker-compose -f docker-compose.build.yml build
+################################################################################
+
+version: '3.9'
+
+services:
+  insidedynamic-wrapper:
+    build:
+      context: .
+      dockerfile: Dockerfile.coolify
+      args:
+        VERSION: ${VERSION:-1.0.0}
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+        BUILD_DATE: ${BUILD_DATE:-unknown}
+    image: insidedynamic-wrapper:${VERSION:-latest}
+    container_name: insidedynamic-wrapper
+
+    ports:
+      - "5060:5060/udp"
+      - "5060:5060/tcp"
+      - "5080:5080/udp"
+      - "5080:5080/tcp"
+      - "8021:8021/tcp"
+      - "8888:8888/tcp"
+      - "16384-16484:16384-16484/udp"
+
+    volumes:
+      - freeswitch-config:/var/lib/freeswitch
+      - freeswitch-backups:/var/backups/freeswitch
+
+    environment:
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASS=${ADMIN_PASS:-admin}
+      - ADMIN_HOST=127.0.0.1
+      - FS_HOST=127.0.0.1
+      - FS_PORT=8021
+      - FS_PASS=${FS_PASS:-ClueCon}
+
+    restart: unless-stopped
+
+volumes:
+  freeswitch-config:
+  freeswitch-backups:
