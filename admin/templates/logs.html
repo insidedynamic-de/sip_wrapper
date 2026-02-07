@@ -133,6 +133,11 @@
 <script>
 let allLogs = [];
 let logStatus = {};
+const clientName = "{{ config.CLIENT_NAME or 'FreeSWITCH' }}";
+const i18n = {
+    serverNotRunning: "{{ t('logs.server_not_running') }}",
+    debugDump: "{{ t('logs.debug_dump') }}"
+};
 
 async function refreshLogs() {
     const limit = document.getElementById('log-limit').value;
@@ -184,7 +189,7 @@ function renderLogs() {
             msg += '<div class="text-start mx-auto" style="max-width: 500px;">';
             msg += '<p class="small text-muted mb-1">Possible reasons:</p>';
             msg += '<ul class="small text-muted">';
-            msg += '<li>Server is not running</li>';
+            msg += `<li>${clientName} ${i18n.serverNotRunning}</li>`;
             msg += '<li>ESL connection failed (check FS_HOST, FS_PORT, FS_PASS)</li>';
             msg += '<li>greenswitch library not installed</li>';
             msg += '</ul>';
@@ -390,7 +395,7 @@ async function showDebugDump() {
 
         if (data.success && data.debug) {
             let html = '<div class="p-2" style="background: #1e1e1e;">';
-            html += `<div class="log-line log-info">═══ FreeSWITCH Debug Dump - ${new Date().toLocaleTimeString()} ═══</div>`;
+            html += `<div class="log-line log-info">═══ ${clientName} ${i18n.debugDump} - ${new Date().toLocaleTimeString()} ═══</div>`;
 
             for (const item of data.debug) {
                 html += `<div class="log-line log-warning">━━━ ${item.command.toUpperCase()} ━━━</div>`;

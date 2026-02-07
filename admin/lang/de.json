@@ -204,7 +204,9 @@
     "no_logs": "Keine Logs verfügbar",
     "esl_failed": "ESL-Verbindung fehlgeschlagen",
     "saved": "Gespeichert",
-    "failed_to_load": "Logs konnten nicht geladen werden"
+    "failed_to_load": "Logs konnten nicht geladen werden",
+    "server_not_running": "läuft nicht",
+    "debug_dump": "Debug-Ausgabe"
   },
 
   "security": {

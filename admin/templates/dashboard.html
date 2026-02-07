@@ -431,7 +431,7 @@
 <div class="mt-4 text-center">
     <small class="text-muted">
         <i class="bi bi-hdd-network me-1"></i>
-        FreeSWITCH: {{ config.FS_HOST }}:{{ config.FS_PORT }}
+        {{ config.CLIENT_NAME or 'FreeSWITCH' }}: {{ config.FS_HOST }}:{{ config.FS_PORT }}
         {% if fs_access %}
         <span class="text-success"><i class="bi bi-check-circle ms-2"></i> {{ t('status.connected') }}</span>
         {% else %}
