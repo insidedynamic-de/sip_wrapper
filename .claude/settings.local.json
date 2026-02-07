@@ -15,7 +15,8 @@
       "Bash(for f in app.py config_store.py requirements.txt templates/base.html templates/login.html templates/dashboard.html templates/manage.html static/css/admin.css static/js/admin.js static/js/manage.js)",
       "Bash(do echo -n \"$f: \")",
       "Bash(done)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(docker-compose:*)"
     ]
   }
 }

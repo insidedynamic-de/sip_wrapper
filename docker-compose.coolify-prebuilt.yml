@@ -163,6 +163,7 @@ services:
           # Download admin Python files
           wget --no-cache -qO /opt/admin/app.py $$ADMIN_BASE/app.py
           wget --no-cache -qO /opt/admin/config_store.py $$ADMIN_BASE/config_store.py
+          wget --no-cache -qO /opt/admin/esl_events.py $$ADMIN_BASE/esl_events.py
           wget --no-cache -qO /opt/admin/requirements.txt $$ADMIN_BASE/requirements.txt
 
           # Download templates
@@ -303,26 +304,27 @@ services:
           sleep 1
         done
 
-        # Set log level via ESL using Python
+        # Set log level via ESL using Python (write script to temp file to avoid YAML issues)
         sleep 2
-        python3 -c "
-import socket
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-try:
-    s.connect(('127.0.0.1', 8021))
-    s.recv(1024)  # auth/request
-    s.send(b'auth ClueCon\n\n')
-    s.recv(1024)  # +OK
-    s.send(b'api fsctl loglevel 7\n\n')  # DEBUG
-    s.recv(1024)
-    s.send(b'api sofia loglevel all 7\n\n')  # Sofia debug
-    s.recv(1024)
-    print('Log level set to DEBUG (7)')
-except Exception as e:
-    print(f'ESL setup: {e}')
-finally:
-    s.close()
-" 2>/dev/null || echo "Log level will be set from Admin Panel"
+        cat > /tmp/esl_setup.py << 'ESLPYEOF'
+        import socket
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            s.connect(('127.0.0.1', 8021))
+            s.recv(1024)
+            s.send(b'auth ClueCon\n\n')
+            s.recv(1024)
+            s.send(b'api fsctl loglevel 7\n\n')
+            s.recv(1024)
+            s.send(b'api sofia loglevel all 7\n\n')
+            s.recv(1024)
+            print('Log level set to DEBUG (7)')
+        except Exception as e:
+            print(f'ESL setup: {e}')
+        finally:
+            s.close()
+        ESLPYEOF
+        python3 /tmp/esl_setup.py 2>/dev/null || echo "Log level will be set from Admin Panel"
 
         echo ""
         echo "=========================================="
