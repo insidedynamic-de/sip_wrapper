@@ -206,7 +206,11 @@
     "saved": "Gespeichert",
     "failed_to_load": "Logs konnten nicht geladen werden",
     "server_not_running": "läuft nicht",
-    "debug_dump": "Debug-Ausgabe"
+    "debug_dump": "Debug-Ausgabe",
+    "esl_events": "ESL-Ereignisse",
+    "esl_connected": "Verbunden",
+    "esl_disconnected": "Getrennt",
+    "events_buffer": "Ereignis-Puffer"
   },
 
   "security": {

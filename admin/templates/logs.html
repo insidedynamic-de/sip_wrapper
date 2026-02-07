@@ -169,7 +169,12 @@ function renderLogs() {
     const showSip = document.getElementById('filter-sip').checked;
 
     // Update log sources display
-    if (logStatus.sources && logStatus.sources.length > 0) {
+    if (logStatus.mode === 'esl_events') {
+        document.getElementById('log-sources-info').style.display = 'block';
+        const status = logStatus.connected ? '🟢 Connected' : '🔴 Disconnected';
+        const bufferInfo = logStatus.buffer_stats ? ` (${logStatus.buffer_stats.buffer_size}/${logStatus.buffer_stats.max_size} events)` : '';
+        document.getElementById('log-sources-list').textContent = `ESL Events: ${logStatus.esl_host} ${status}${bufferInfo}`;
+    } else if (logStatus.sources && logStatus.sources.length > 0) {
         document.getElementById('log-sources-info').style.display = 'block';
         document.getElementById('log-sources-list').textContent = logStatus.sources.join(', ');
     } else if (logStatus.mode === 'esl') {
@@ -206,7 +211,11 @@ function renderLogs() {
 
     // Build mode indicator
     let modeIndicator = '';
-    if (logStatus.mode === 'file') {
+    if (logStatus.mode === 'esl_events') {
+        const statusIcon = logStatus.connected ? '🟢' : '🔴';
+        const statusClass = logStatus.connected ? 'alert-success' : 'alert-warning';
+        modeIndicator = `<div class="alert ${statusClass} py-1 px-2 mb-0 small" style="border-radius: 0;"><i class="bi bi-broadcast me-1"></i>${statusIcon} ESL Events: ${logStatus.esl_host || ''}</div>`;
+    } else if (logStatus.mode === 'file') {
         modeIndicator = '<div class="alert alert-success py-1 px-2 mb-0 small" style="border-radius: 0;"><i class="bi bi-file-text me-1"></i>Reading from log files</div>';
     } else if (logStatus.mode === 'esl') {
         modeIndicator = '<div class="alert alert-info py-1 px-2 mb-0 small" style="border-radius: 0;"><i class="bi bi-hdd-network me-1"></i>ESL: ' + (logStatus.esl_host || '') + '</div>';

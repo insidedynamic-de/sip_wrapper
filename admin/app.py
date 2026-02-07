@@ -14,6 +14,9 @@ from functools import wraps
 # Config store for CRUD operations
 import config_store
 
+# ESL Event Subscriber for real-time FreeSWITCH events
+import esl_events
+
 # Version info
 def get_version_info():
     """Get version info from VERSION file and git"""
@@ -761,242 +764,55 @@ def parse_call_statistics():
 
     return stats
 
-def get_recent_logs(count=15):
-    """Get recent FreeSWITCH log entries via ESL"""
-    # Always use ESL - no local log files available
-    if ESL_AVAILABLE and fs_allowed():
-        logs = get_logs_via_esl(count)
-        if logs:
-            return logs
-    return []
-
-
 ################################################################################
-# FreeSWITCH Log Reading - Multiple Log Sources
+# FreeSWITCH Logs - ESL Event Based (No File Access Needed)
 ################################################################################
 
 import time
 import re
 
-# Log file configurations: (name, paths, prefix)
-FS_LOG_SOURCES = [
-    ('main', [
-        '/var/log/freeswitch/freeswitch.log',
-        '/usr/local/freeswitch/log/freeswitch.log',
-    ], ''),
-    ('sofia', [
-        '/var/log/freeswitch/sofia.log',
-        '/var/log/freeswitch/sofia_sip.log',
-        '/usr/local/freeswitch/log/sofia.log',
-    ], '[SOFIA]'),
-    ('debug', [
-        '/var/log/freeswitch/debug.log',
-        '/usr/local/freeswitch/log/debug.log',
-    ], '[DEBUG]'),
-    ('sip', [
-        '/var/log/freeswitch/sip.log',
-        '/var/log/freeswitch/sip_trace.log',
-    ], '[SIP]'),
-]
-
-def parse_log_level(line):
-    """Detect log level from line content"""
-    line_upper = line.upper()
-    if '[ERR]' in line_upper or '[CRIT]' in line_upper or '[ALERT]' in line_upper or 'ERROR' in line_upper:
-        return 'error'
-    elif '[WARNING]' in line_upper or '[WARN]' in line_upper:
-        return 'warning'
-    elif '[DEBUG]' in line_upper:
-        return 'debug'
-    else:
-        return 'info'
-
-def parse_log_timestamp(line):
-    """Try to extract timestamp from log line for sorting"""
-    # FreeSWITCH format: 2024-01-15 10:30:45.123456
-    match = re.match(r'(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})', line)
-    if match:
-        try:
-            from datetime import datetime
-            dt = datetime.strptime(match.group(1), '%Y-%m-%d %H:%M:%S')
-            return dt.timestamp()
-        except:
-            pass
-    return time.time()
-
-def read_single_log_file(log_path, prefix='', count=100):
-    """Read last N lines from a single log file"""
-    if not os.path.isfile(log_path):
+def get_recent_logs(count=100):
+    """Get recent FreeSWITCH events via ESL Event Subscriber"""
+    if not fs_allowed():
         return []
 
-    try:
-        with open(log_path, 'rb') as f:
-            f.seek(0, 2)
-            file_size = f.tell()
-            read_size = min(file_size, 200 * 1024)  # Read last 200KB
-            f.seek(max(0, file_size - read_size))
-            content = f.read().decode('utf-8', errors='replace')
+    subscriber = esl_events.get_subscriber()
 
-        lines = content.split('\n')
-        logs = []
+    # Ensure subscriber is running
+    if not subscriber.running:
+        subscriber.start()
 
-        for line in lines[-count-1:]:
-            line = line.strip()
-            if line:
-                text = f'{prefix} {line}' if prefix else line
-                logs.append({
-                    'text': text[:500],
-                    'level': parse_log_level(line),
-                    'timestamp': parse_log_timestamp(line),
-                    'source': prefix or 'main'
-                })
+    # Get events from buffer
+    events = subscriber.get_events(count)
 
-        return logs
-    except Exception as e:
-        print(f"Error reading {log_path}: {e}")
-        return []
-
-def read_all_log_files(count=100):
-    """Read from all available FreeSWITCH log files"""
-    all_logs = []
-    found_sources = []
-
-    for source_name, paths, prefix in FS_LOG_SOURCES:
-        for log_path in paths:
-            logs = read_single_log_file(log_path, prefix, count // 2)
-            if logs:
-                all_logs.extend(logs)
-                found_sources.append(f'{source_name}:{log_path}')
-                break  # Found this source, move to next
-
-    # Sort by timestamp
-    all_logs.sort(key=lambda x: x.get('timestamp', 0))
-
-    # Return last N entries
-    return all_logs[-count:] if len(all_logs) > count else all_logs, found_sources
-
-def get_logs_via_esl(count=50):
-    """Get FreeSWITCH logs - try log files first, then ESL status fallback"""
-    from datetime import datetime
-
-    # Try reading from all log files
-    logs, sources = read_all_log_files(count)
-
-    if logs:
-        source_info = ', '.join(sources) if sources else 'unknown'
-        logs.insert(0, {
-            'text': f'--- Logs from: {source_info} ({len(logs)} entries) ---',
-            'level': 'info',
-            'timestamp': time.time()
-        })
-        return logs
-
-    # Fallback: get live data via ESL - comprehensive debug info
+    # Convert to log format
     logs = []
-    try:
-        # Get FreeSWITCH debug information
-        commands = [
-            # Basic status
-            ('status', 'info'),
-            # Sofia SIP stack
-            ('sofia status', 'info'),
-            ('sofia status profile internal', 'info'),
-            ('sofia status profile external', 'info'),
-            # Registrations with details
-            ('sofia status profile internal reg', 'debug'),
-            # Active calls
-            ('show calls', 'info'),
-            ('show channels', 'debug'),
-            # Current registrations
-            ('show registrations', 'info'),
-            # Gateway status
-            ('sofia status gateway', 'info'),
-            # Debug level info
-            ('fsctl loglevel', 'debug'),
-            # Memory/performance
-            ('status sessions', 'debug'),
-        ]
-
-        for cmd, level in commands:
-            result = fs_cli(cmd)
-            if result and not result.startswith('-ERR'):
-                # Add section header
-                logs.append({
-                    'text': f'━━━ {cmd.upper()} ━━━',
-                    'level': 'info',
-                    'timestamp': time.time()
-                })
-                for line in result.split('\n'):
-                    line = line.strip()
-                    if line:
-                        # Detect level from content
-                        line_level = level
-                        if 'error' in line.lower() or 'fail' in line.lower():
-                            line_level = 'error'
-                        elif 'warning' in line.lower() or 'warn' in line.lower():
-                            line_level = 'warning'
-                        logs.append({
-                            'text': line[:400],
-                            'level': line_level,
-                            'timestamp': time.time()
-                        })
-
-        if logs:
-            logs.insert(0, {
-                'text': f'═══ FreeSWITCH Debug ({FS_HOST}:{FS_PORT}) - {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} ═══',
-                'level': 'info',
-                'timestamp': time.time()
-            })
-            logs.insert(1, {
-                'text': '⚠ Log files not found. Showing ESL debug output. Mount /var/log/freeswitch/ for file logs.',
-                'level': 'warning',
-                'timestamp': time.time()
-            })
-            logs.insert(2, {
-                'text': '💡 Use "SIP Trace" button to enable detailed SIP message logging.',
-                'level': 'info',
-                'timestamp': time.time()
-            })
-
-    except Exception as e:
+    for event in events:
         logs.append({
-            'text': f'ESL Error: {e}',
-            'level': 'error',
-            'timestamp': time.time()
+            'text': event.get('text', ''),
+            'level': event.get('level', 'info'),
+            'timestamp': event.get('timestamp', time.time()),
+            'type': event.get('type', 'UNKNOWN'),
+            'subtype': event.get('subtype', ''),
         })
 
-    return logs[-count:] if len(logs) > count else logs
+    return logs
 
 def get_log_status():
-    """Get status info about log availability"""
-    status = {
-        'available': False,
-        'mode': 'none',  # none, file, esl
-        'esl_host': f'{FS_HOST}:{FS_PORT}',
-        'sources': []
+    """Get status info about ESL event subscriber"""
+    subscriber = esl_events.get_subscriber()
+    status = subscriber.get_status()
+
+    return {
+        'available': status['connected'] or status['running'],
+        'mode': 'esl_events',
+        'esl_host': status['host'],
+        'connected': status['connected'],
+        'running': status['running'],
+        'last_error': status['last_error'],
+        'buffer_stats': status['buffer_stats'],
+        'esl_available': status['esl_available']
     }
-
-    # Check for log files
-    for source_name, paths, _ in FS_LOG_SOURCES:
-        for log_path in paths:
-            if os.path.isfile(log_path):
-                status['sources'].append(f'{source_name}:{log_path}')
-                status['available'] = True
-                status['mode'] = 'file'
-                break
-
-    # Check if ESL is available as fallback
-    if ESL_AVAILABLE:
-        try:
-            if fs_allowed():
-                if not status['available']:
-                    status['available'] = True
-                    status['mode'] = 'esl'
-                status['esl_available'] = True
-        except Exception:
-            status['esl_available'] = False
-
-    return status
 
 def get_call_logs(count=50):
     """Get call detail records (CDR) from FreeSWITCH"""
@@ -1335,6 +1151,89 @@ def api_logs():
         'status': status,
         'fs_connected': fs_allowed() and ESL_AVAILABLE
     })
+
+@app.route('/api/esl/events')
+@login_required
+def api_esl_events():
+    """Get ESL events from buffer"""
+    if not fs_allowed():
+        return jsonify({'error': 'Access denied', 'events': []})
+
+    count = request.args.get('count', 100, type=int)
+    since = request.args.get('since', 0, type=float)
+    count = min(max(count, 1), 1000)
+
+    subscriber = esl_events.get_subscriber()
+
+    if since > 0:
+        events = subscriber.get_events_since(since)
+    else:
+        events = subscriber.get_events(count)
+
+    return jsonify({
+        'events': events,
+        'count': len(events),
+        'status': subscriber.get_status()
+    })
+
+@app.route('/api/esl/status')
+@login_required
+def api_esl_status():
+    """Get ESL subscriber status"""
+    subscriber = esl_events.get_subscriber()
+    return jsonify(subscriber.get_status())
+
+@app.route('/api/esl/command', methods=['POST'])
+@login_required
+def api_esl_command():
+    """Send command to FreeSWITCH via ESL"""
+    if not fs_allowed():
+        return jsonify({'success': False, 'error': 'Access denied'})
+
+    command = request.json.get('command', '')
+    if not command:
+        return jsonify({'success': False, 'error': 'No command provided'})
+
+    # Security: only allow safe read-only commands
+    safe_commands = ['status', 'sofia', 'show', 'fsctl loglevel', 'version', 'uptime']
+    is_safe = any(command.lower().startswith(cmd) for cmd in safe_commands)
+    if not is_safe:
+        return jsonify({'success': False, 'error': 'Command not allowed'})
+
+    subscriber = esl_events.get_subscriber()
+    result = subscriber.send_command(command)
+    return jsonify(result)
+
+@app.route('/api/esl/start', methods=['POST'])
+@login_required
+def api_esl_start():
+    """Start ESL subscriber"""
+    if not fs_allowed():
+        return jsonify({'success': False, 'error': 'Access denied'})
+
+    subscriber = esl_events.start_subscriber()
+    return jsonify({'success': True, 'status': subscriber.get_status()})
+
+@app.route('/api/esl/stop', methods=['POST'])
+@login_required
+def api_esl_stop():
+    """Stop ESL subscriber"""
+    if not fs_allowed():
+        return jsonify({'success': False, 'error': 'Access denied'})
+
+    esl_events.stop_subscriber()
+    return jsonify({'success': True, 'message': 'ESL subscriber stopped'})
+
+@app.route('/api/esl/clear', methods=['POST'])
+@login_required
+def api_esl_clear():
+    """Clear ESL event buffer"""
+    if not fs_allowed():
+        return jsonify({'success': False, 'error': 'Access denied'})
+
+    subscriber = esl_events.get_subscriber()
+    subscriber.buffer.clear()
+    return jsonify({'success': True, 'message': 'Event buffer cleared'})
 
 @app.route('/api/cdr')
 @login_required
@@ -2367,10 +2266,24 @@ if __name__ == '__main__':
   URL: http://localhost:{port}
   User: {ADMIN_USER}
   Pass: {'*' * len(ADMIN_PASS)}
+  ESL: {FS_HOST}:{FS_PORT}
 ================================================================================
 """)
+
+    # Start ESL Event Subscriber in background
+    if ESL_AVAILABLE:
+        print("[ESL] Starting event subscriber...")
+        esl_events.start_subscriber()
+    else:
+        print("[ESL] WARNING: greenswitch not installed - events will not work")
 
     # Watch JSON translation files for auto-reload in debug mode
     extra_files = list((Path(__file__).parent / 'lang').glob('*.json'))
 
-    app.run(host='0.0.0.0', port=port, debug=debug, extra_files=extra_files)
+    try:
+        app.run(host='0.0.0.0', port=port, debug=debug, extra_files=extra_files)
+    finally:
+        # Stop ESL subscriber on shutdown
+        if ESL_AVAILABLE:
+            print("[ESL] Stopping event subscriber...")
+            esl_events.stop_subscriber()
