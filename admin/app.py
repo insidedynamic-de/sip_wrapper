@@ -715,6 +715,52 @@ def parse_channels_count():
                 return int(parts[0])
     return 0
 
+def parse_call_statistics():
+    """Parse call statistics from sofia profiles (CALLS-IN, FAILED-CALLS-IN, etc.)"""
+    stats = {
+        'internal': {'calls_in': 0, 'failed_in': 0, 'calls_out': 0, 'failed_out': 0, 'registrations': 0},
+        'external': {'calls_in': 0, 'failed_in': 0, 'calls_out': 0, 'failed_out': 0, 'registrations': 0},
+        'total': {'calls_in': 0, 'failed_in': 0, 'calls_out': 0, 'failed_out': 0}
+    }
+
+    for profile in ['internal', 'external']:
+        output = fs_cli(f'sofia status profile {profile}')
+        if not output:
+            continue
+
+        for line in output.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+
+            # Parse key-value pairs like "CALLS-IN \t 5"
+            if '\t' in line:
+                parts = line.split('\t')
+                if len(parts) >= 2:
+                    key = parts[0].strip().upper()
+                    value = parts[-1].strip()
+
+                    try:
+                        val = int(value)
+                        if key == 'CALLS-IN':
+                            stats[profile]['calls_in'] = val
+                            stats['total']['calls_in'] += val
+                        elif key == 'FAILED-CALLS-IN':
+                            stats[profile]['failed_in'] = val
+                            stats['total']['failed_in'] += val
+                        elif key == 'CALLS-OUT':
+                            stats[profile]['calls_out'] = val
+                            stats['total']['calls_out'] += val
+                        elif key == 'FAILED-CALLS-OUT':
+                            stats[profile]['failed_out'] = val
+                            stats['total']['failed_out'] += val
+                        elif key == 'REGISTRATIONS':
+                            stats[profile]['registrations'] = val
+                    except ValueError:
+                        pass
+
+    return stats
+
 def get_recent_logs(count=15):
     """Get recent FreeSWITCH log entries via ESL"""
     # Always use ESL - no local log files available
@@ -1037,7 +1083,7 @@ def dashboard():
     registrations = parse_registrations() if fs_access else []
     active_calls = parse_active_calls() if fs_access else []
     channels_count = parse_channels_count() if fs_access else 0
-    recent_logs = get_recent_logs(15)
+    call_stats = parse_call_statistics() if fs_access else {}
 
     call_logs = get_call_logs(10) if fs_access else []
 
@@ -1047,8 +1093,8 @@ def dashboard():
         registrations=registrations,
         active_calls=active_calls,
         channels_count=channels_count,
+        call_stats=call_stats,
         call_logs=call_logs,
-        recent_logs=recent_logs,
         fs_access=fs_access,
         client_ip=request.remote_addr,
         config={

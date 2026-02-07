@@ -101,7 +101,11 @@
     "environment": "Environment Variables",
     "no_gateways": "No gateways configured",
     "no_users_registered": "No users registered",
-    "no_logs": "No logs"
+    "no_logs": "No logs",
+    "call_stats": "Call Statistics",
+    "total_in": "Total Inbound",
+    "total_out": "Total Outbound",
+    "failed": "failed"
   },
 
   "calls": {

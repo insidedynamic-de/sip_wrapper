@@ -116,6 +116,94 @@
     </div>
 </div>
 
+<!-- Call Statistics -->
+{% if call_stats %}
+<div class="card mb-4">
+    <div class="card-header py-2">
+        <i class="bi bi-bar-chart me-2"></i>{{ t('dashboard.call_stats') }}
+    </div>
+    <div class="card-body py-2">
+        <div class="row g-3">
+            <!-- Internal Profile -->
+            <div class="col-md-6">
+                <div class="border rounded p-2">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong><i class="bi bi-telephone me-1"></i> Internal</strong>
+                        <span class="badge bg-secondary">{{ call_stats.internal.registrations }} reg</span>
+                    </div>
+                    <div class="row text-center g-2">
+                        <div class="col-3">
+                            <div class="small text-muted">IN</div>
+                            <div class="fs-5 text-success">{{ call_stats.internal.calls_in }}</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="small text-muted">FAIL IN</div>
+                            <div class="fs-5 {% if call_stats.internal.failed_in > 0 %}text-danger{% else %}text-muted{% endif %}">{{ call_stats.internal.failed_in }}</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="small text-muted">OUT</div>
+                            <div class="fs-5 text-primary">{{ call_stats.internal.calls_out }}</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="small text-muted">FAIL OUT</div>
+                            <div class="fs-5 {% if call_stats.internal.failed_out > 0 %}text-danger{% else %}text-muted{% endif %}">{{ call_stats.internal.failed_out }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- External Profile -->
+            <div class="col-md-6">
+                <div class="border rounded p-2">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong><i class="bi bi-globe me-1"></i> External</strong>
+                        <span class="badge bg-secondary">{{ call_stats.external.registrations }} reg</span>
+                    </div>
+                    <div class="row text-center g-2">
+                        <div class="col-3">
+                            <div class="small text-muted">IN</div>
+                            <div class="fs-5 text-success">{{ call_stats.external.calls_in }}</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="small text-muted">FAIL IN</div>
+                            <div class="fs-5 {% if call_stats.external.failed_in > 0 %}text-danger{% else %}text-muted{% endif %}">{{ call_stats.external.failed_in }}</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="small text-muted">OUT</div>
+                            <div class="fs-5 text-primary">{{ call_stats.external.calls_out }}</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="small text-muted">FAIL OUT</div>
+                            <div class="fs-5 {% if call_stats.external.failed_out > 0 %}text-danger{% else %}text-muted{% endif %}">{{ call_stats.external.failed_out }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Totals -->
+        <div class="row mt-3 text-center">
+            <div class="col">
+                <div class="bg-light rounded py-2">
+                    <small class="text-muted d-block">{{ t('dashboard.total_in') }}</small>
+                    <span class="fs-4 fw-bold text-success">{{ call_stats.total.calls_in }}</span>
+                    {% if call_stats.total.failed_in > 0 %}
+                    <span class="text-danger small">({{ call_stats.total.failed_in }} {{ t('dashboard.failed') }})</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="bg-light rounded py-2">
+                    <small class="text-muted d-block">{{ t('dashboard.total_out') }}</small>
+                    <span class="fs-4 fw-bold text-primary">{{ call_stats.total.calls_out }}</span>
+                    {% if call_stats.total.failed_out > 0 %}
+                    <span class="text-danger small">({{ call_stats.total.failed_out }} {{ t('dashboard.failed') }})</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Active Calls -->
 <div class="card mb-4 border-warning" id="active-calls-card" {% if not active_calls %}style="display: none;"{% endif %}>
     <div class="card-header py-2 bg-warning bg-opacity-10">
@@ -336,26 +424,6 @@
             {{ t('no_call_logs') }}
         </div>
         {% endif %}
-    </div>
-</div>
-
-<!-- Recent Logs Preview -->
-<div class="card mt-4">
-    <div class="card-header py-2 d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-journal-text me-2"></i>{{ t('logs') }}</span>
-        <a href="/logs" class="btn btn-sm btn-link py-0">{{ t('logs') }} &rarr;</a>
-    </div>
-    <div class="card-body p-0">
-        <div id="logs-preview-container" style="max-height: 150px; overflow-y: auto; font-family: monospace; font-size: 0.7rem;">
-            {% for log in recent_logs[-10:] %}
-            <div class="px-2 py-1 border-bottom {% if log.level == 'error' %}bg-danger bg-opacity-10 text-danger{% elif log.level == 'warning' %}bg-warning bg-opacity-10{% elif log.level == 'debug' %}text-muted{% endif %}">
-                {{ log.text[:120] }}{% if log.text|length > 120 %}...{% endif %}
-            </div>
-            {% endfor %}
-            {% if not recent_logs %}
-            <div class="p-2 text-center text-muted small">{{ t('dashboard.no_logs') }}</div>
-            {% endif %}
-        </div>
     </div>
 </div>
 

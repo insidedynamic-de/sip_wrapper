@@ -101,7 +101,11 @@
     "environment": "Umgebungsvariablen",
     "no_gateways": "Keine Gateways konfiguriert",
     "no_users_registered": "Keine Benutzer registriert",
-    "no_logs": "Keine Logs"
+    "no_logs": "Keine Logs",
+    "call_stats": "Anrufstatistik",
+    "total_in": "Gesamt Eingehend",
+    "total_out": "Gesamt Ausgehend",
+    "failed": "fehlgeschlagen"
   },
 
   "calls": {
