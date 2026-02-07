@@ -210,7 +210,20 @@ services:
         echo ""
         echo "[STEP 8/9] Configuring FreeSWITCH logging..."
 
-        # Create logfile.conf.xml with proper log settings
+        # Create console.conf.xml to enable console logging
+        cat > /etc/freeswitch/autoload_configs/console.conf.xml << 'CONSOLEEOF'
+        <configuration name="console.conf" description="Console Logger">
+          <mappings>
+            <map name="all" value="console,debug,info,notice,warning,err,crit,alert"/>
+          </mappings>
+          <settings>
+            <param name="colorize" value="true"/>
+            <param name="loglevel" value="debug"/>
+          </settings>
+        </configuration>
+        CONSOLEEOF
+
+        # Create logfile.conf.xml with proper log settings (including debug)
         cat > /etc/freeswitch/autoload_configs/logfile.conf.xml << 'LOGEOF'
         <configuration name="logfile.conf" description="File Logging">
           <settings>
@@ -224,18 +237,14 @@ services:
                 <param name="maximum-rotate" value="10"/>
               </settings>
               <mappings>
-                <map name="all" value="console,info,notice,warning,err,crit,alert"/>
+                <map name="all" value="console,debug,info,notice,warning,err,crit,alert"/>
               </mappings>
             </profile>
           </profiles>
         </configuration>
         LOGEOF
 
-        # Update log level based on config
-        if [ -n "$FS_LOGLEVEL" ]; then
-          echo "Setting log level to: $FS_LOGLEVEL"
-        fi
-        echo "✓ Logging configured"
+        echo "✓ Logging configured (console + file)"
 
         # Start Admin Portal
         echo ""
@@ -264,7 +273,49 @@ services:
         echo "  - freeswitch.log (main log)"
         echo "  - Use SIP Trace button for SIP debug"
         echo "=========================================="
-        exec /usr/bin/freeswitch -nonat -nf -nc -conf /etc/freeswitch -log /var/log/freeswitch -db /var/lib/freeswitch/db
+
+        # Start FreeSWITCH in background
+        /usr/bin/freeswitch -nonat -nf -nc -conf /etc/freeswitch -log /var/log/freeswitch -db /var/lib/freeswitch/db &
+        FS_PID=$$!
+
+        # Wait for FreeSWITCH to start (ESL port 8021)
+        echo "Waiting for FreeSWITCH to start..."
+        for i in 1 2 3 4 5 6 7 8 9 10; do
+          if nc -z 127.0.0.1 8021 2>/dev/null; then
+            echo "✓ FreeSWITCH ESL ready"
+            break
+          fi
+          sleep 1
+        done
+
+        # Set log level via ESL using Python
+        sleep 2
+        python3 -c "
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+try:
+    s.connect(('127.0.0.1', 8021))
+    s.recv(1024)  # auth/request
+    s.send(b'auth ClueCon\n\n')
+    s.recv(1024)  # +OK
+    s.send(b'api fsctl loglevel 7\n\n')  # DEBUG
+    s.recv(1024)
+    s.send(b'api sofia loglevel all 7\n\n')  # Sofia debug
+    s.recv(1024)
+    print('Log level set to DEBUG (7)')
+except Exception as e:
+    print(f'ESL setup: {e}')
+finally:
+    s.close()
+" 2>/dev/null || echo "Log level will be set from Admin Panel"
+
+        echo ""
+        echo "=========================================="
+        echo "FreeSWITCH started (PID: $$FS_PID)"
+        echo "=========================================="
+
+        # Wait for FreeSWITCH process
+        wait $$FS_PID
 
     environment:
       # LICENSE
