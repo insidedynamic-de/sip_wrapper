@@ -1,0 +1,288 @@
+{
+  "app": {
+    "title": "InsideDynamic Wrapper - Admin"
+  },
+
+  "nav": {
+    "dashboard": "Dashboard",
+    "config": "Configuration",
+    "security": "Security",
+    "logs": "Logs",
+    "profile": "Profile"
+  },
+
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "username": "Username",
+    "password": "Password"
+  },
+
+  "button": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "close": "Close",
+    "reload": "Reload",
+    "add": "Add",
+    "edit": "Edit",
+    "apply": "Apply",
+    "activate": "Activate",
+    "import": "Import",
+    "export": "Export",
+    "apply_reload": "Apply & Reload",
+    "block": "Block",
+    "allow": "Allow",
+    "refresh": "Refresh",
+    "check_now": "Check & Block Now",
+    "save_defaults": "Save Defaults"
+  },
+
+  "status": {
+    "online": "Online",
+    "offline": "Offline",
+    "registered": "Registered",
+    "not_registered": "Not registered",
+    "success": "Success",
+    "error": "Error",
+    "loading": "Loading...",
+    "checking": "Checking...",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "access_denied": "Access Denied"
+  },
+
+  "section": {
+    "users": "Users",
+    "sip_users": "SIP Users",
+    "acl_users": "ACL Users",
+    "gateways": "Gateways",
+    "routes": "Routes",
+    "settings": "Settings",
+    "outbound_routing": "Outbound Routes",
+    "inbound_routing": "Inbound Routes",
+    "user_routing": "User Routes",
+    "default_routes": "Default Routes",
+    "user_outbound_routes": "User Outbound Routes"
+  },
+
+  "field": {
+    "extension": "Extension",
+    "ip_address": "IP Address",
+    "user_agent": "User-Agent",
+    "contact": "Contact",
+    "pattern": "Pattern",
+    "destination": "Destination",
+    "did": "DID/Number",
+    "domain": "Domain",
+    "external_ip": "External IP",
+    "codecs": "Codecs",
+    "host": "Host",
+    "port": "Port",
+    "transport": "Transport",
+    "register": "Register",
+    "caller_id": "Caller ID",
+    "name": "Name",
+    "type": "Type",
+    "actions": "Actions",
+    "user": "User",
+    "gateway": "Gateway",
+    "comment": "Comment"
+  },
+
+  "dashboard": {
+    "gateway_status": "Gateway Status",
+    "user_registrations": "User Registrations",
+    "active_calls": "Active Calls",
+    "call_logs": "Call Logs",
+    "no_call_logs": "No calls recorded",
+    "environment": "Environment Variables",
+    "no_gateways": "No gateways configured",
+    "no_users_registered": "No users registered",
+    "no_logs": "No logs"
+  },
+
+  "calls": {
+    "call_flow": "Connection",
+    "direction": "Direction",
+    "from": "From",
+    "to": "To",
+    "duration": "Duration",
+    "result": "Result",
+    "time": "Time"
+  },
+
+  "config": {
+    "default_gateway": "Default Gateway",
+    "default_extension": "Default Extension",
+    "no_routes": "No routes configured",
+    "apply_changes": "Apply Changes",
+    "restart_required": "Restart Required",
+    "connection_error": "Connection error to server",
+    "outbound_calls_via": "All outbound calls go through this gateway",
+    "inbound_default": "Inbound calls without specific route go here",
+    "import_export": "Config Import / Export",
+    "export_config": "Export Config",
+    "export_desc": "Download the current configuration as JSON file",
+    "export_json": "Export JSON",
+    "import_config": "Import Config",
+    "import_desc": "Upload a JSON configuration file to replace current config",
+    "import_json": "Import JSON",
+    "import_env": "Import from Environment",
+    "import_env_desc": "Import configuration from current environment variables (one-time migration)",
+    "import_from_env": "Import from ENV"
+  },
+
+  "profile": {
+    "change_password": "Change Password",
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "passwords_not_match": "Passwords do not match",
+    "appearance": "Appearance",
+    "theme_mode": "Theme Mode",
+    "color_theme": "Color Theme"
+  },
+
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto",
+    "default": "Default",
+    "ocean": "Ocean",
+    "forest": "Forest",
+    "sunset": "Sunset"
+  },
+
+  "company": {
+    "company_info": "Company Information",
+    "company_name": "Company Name",
+    "address": "Address",
+    "zip_code": "ZIP Code",
+    "city": "City",
+    "country": "Country"
+  },
+
+  "invoice": {
+    "invoice_info": "Invoice Address",
+    "same_as_company": "Same as company address",
+    "invoice_name": "Invoice Recipient",
+    "invoice_address": "Invoice Address",
+    "invoice_email": "Invoice Email",
+    "invoice_email_hint": "Invoices will be sent to this address"
+  },
+
+  "license": {
+    "license_info": "License Information",
+    "license_key": "License Key",
+    "client_name": "Client Name",
+    "version": "Version",
+    "update_license": "Update License",
+    "license": "License",
+    "client": "Client"
+  },
+
+  "language": {
+    "language": "Language",
+    "german": "German",
+    "english": "English"
+  },
+
+  "logs": {
+    "filter": "Filter",
+    "search": "Search logs...",
+    "level": "Level",
+    "lines": "Lines",
+    "entries": "entries",
+    "no_logs": "No logs available",
+    "esl_failed": "ESL connection failed",
+    "saved": "Saved",
+    "failed_to_load": "Failed to load logs"
+  },
+
+  "security": {
+    "blacklist": "Blacklist",
+    "whitelist": "Whitelist",
+    "auto_blacklist": "Auto-Blacklist",
+    "fail2ban": "Fail2Ban",
+    "blocked": "Blocked",
+    "allowed": "Allowed",
+    "whitelist_mode": "Whitelist Mode",
+    "enable_whitelist": "Enable Whitelist Mode",
+    "whitelist_desc": "When enabled, only IPs in the whitelist can register. All other IPs will be blocked.",
+    "blocked_ips": "Blocked IPs",
+    "allowed_ips": "Allowed IPs",
+    "block_ip": "Block IP",
+    "allow_ip": "Allow IP",
+    "auto_blacklist_title": "Auto-Blacklist (Fail2Ban-like)",
+    "enable_auto_blacklist": "Enable Auto-Blacklist",
+    "auto_blacklist_desc": "Automatically block IPs after too many failed registration attempts.",
+    "max_attempts": "Max Attempts",
+    "block_after_n": "Block after N failed attempts",
+    "time_window": "Time Window (seconds)",
+    "count_in_time": "Count attempts within this time",
+    "block_duration": "Block Duration (seconds)",
+    "permanent": "0 = permanent",
+    "save_auto_blacklist": "Save Auto-Blacklist Settings",
+    "failed_attempts": "Failed Attempts Monitor",
+    "fail2ban_integration": "Fail2Ban Integration (Firewall Level)",
+    "enable_fail2ban": "Enable Fail2Ban Integration",
+    "fail2ban_desc": "When an IP is blocked repeatedly, add it to Fail2Ban for firewall-level blocking (iptables).",
+    "threshold": "Threshold (blocked count)",
+    "add_after_n": "Add to Fail2Ban after N blocks",
+    "jail_name": "Jail Name",
+    "jail_for_sip": "Fail2Ban jail for SIP blocking",
+    "save_fail2ban": "Save Fail2Ban Settings",
+    "refresh_status": "Refresh Status",
+    "setup_help": "Setup Help",
+    "fail2ban_setup": "Fail2Ban Setup",
+    "create_jail": "Create the jail configuration:",
+    "info_note": "After making changes, click \"Apply & Reload\" to reload the server with new ACL rules. Blacklist IPs are always blocked. Whitelist only takes effect when Whitelist Mode is enabled. Fail2Ban provides permanent firewall-level blocking for persistent attackers.",
+    "ip_or_cidr": "IP Address or CIDR",
+    "comment_optional": "Comment (optional)"
+  },
+
+  "gateway": {
+    "sip_gateways": "SIP Gateways / Providers",
+    "add_gateway": "Add Gateway",
+    "auth_username": "Auth Username (optional)",
+    "auth_username_hint": "For 3CX and some PBX systems"
+  },
+
+  "route": {
+    "add_route": "Add Route",
+    "inbound_routes": "Inbound Routes (DID)",
+    "add_inbound": "Add Inbound Route",
+    "did_number": "DID / Phone Number",
+    "dest_type": "Destination Type",
+    "add_user_route": "Add User Route"
+  },
+
+  "modal": {
+    "add_user": "Add User",
+    "edit_user": "Edit User",
+    "add_acl_user": "Add ACL User",
+    "edit_acl_user": "Edit ACL User",
+    "add_gateway": "Add Gateway",
+    "edit_gateway": "Edit Gateway",
+    "notification": "Notification",
+    "block_ip_address": "Block IP Address",
+    "allow_ip_address": "Allow IP Address",
+    "multiple_ips_hint": "Multiple IPs separated by |",
+    "select": "-- Select --"
+  },
+
+  "system": {
+    "system_settings": "System Settings",
+    "fs_domain": "FS Domain",
+    "external_sip_ip": "External SIP IP",
+    "internal_sip_port": "Internal SIP Port",
+    "external_sip_port": "External SIP Port",
+    "codec_prefs": "Codec Preferences",
+    "default_country": "Default Country Code",
+    "outbound_caller_id": "Outbound Caller ID",
+    "save_settings": "Save Settings"
+  }
+}

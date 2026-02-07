@@ -4,90 +4,19 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-journal-text me-2"></i>{{ t('logs') }}</h4>
     <div class="d-flex align-items-center gap-2">
-        <select id="log-refresh" class="form-select form-select-sm" style="width: auto;" onchange="updateLogRefresh()">
-            <option value="0">Auto: Off</option>
-            <option value="5">Auto: 5s</option>
-            <option value="10" selected>Auto: 10s</option>
-            <option value="30">Auto: 30s</option>
-            <option value="60">Auto: 60s</option>
+        <select id="fs-loglevel" class="form-select form-select-sm" style="width: auto;">
+            <option value="0">0 - CONSOLE</option>
+            <option value="1">1 - ALERT</option>
+            <option value="2">2 - CRIT</option>
+            <option value="3">3 - ERR</option>
+            <option value="4" selected>4 - WARNING</option>
+            <option value="5">5 - NOTICE</option>
+            <option value="6">6 - INFO</option>
+            <option value="7">7 - DEBUG</option>
         </select>
-        <button class="btn btn-sm btn-outline-primary" onclick="refreshLogs()" title="Refresh">
-            <i class="bi bi-arrow-clockwise me-1"></i>{{ t('reload') }}
+        <button class="btn btn-sm btn-primary" onclick="setLogLevel()">
+            <i class="bi bi-check-lg me-1"></i>{{ t('button.save') }}
         </button>
-    </div>
-</div>
-
-<!-- Connection Status -->
-<div class="row mb-3">
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header py-2">
-                <i class="bi bi-hdd-network me-2"></i>FreeSWITCH Connection
-            </div>
-            <div class="card-body py-2">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <span id="fs-status-badge" class="badge bg-secondary">Checking...</span>
-                        <small class="text-muted ms-2" id="fs-status-info"></small>
-                    </div>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="checkFsStatus()">
-                        <i class="bi bi-arrow-clockwise"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header py-2 d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-sliders me-2"></i>Log Settings</span>
-                <div>
-                    <span class="badge bg-secondary me-1" id="config-loglevel" title="Config">C: -</span>
-                    <span class="badge bg-secondary" id="server-loglevel" title="Server">S: -</span>
-                </div>
-            </div>
-            <div class="card-body py-2">
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <div class="d-flex align-items-center gap-1">
-                        <small class="text-muted">Level:</small>
-                        <select id="fs-loglevel" class="form-select form-select-sm" style="width: auto;">
-                            <option value="0">0 - CONSOLE</option>
-                            <option value="1">1 - ALERT</option>
-                            <option value="2">2 - CRIT</option>
-                            <option value="3">3 - ERR</option>
-                            <option value="4" selected>4 - WARNING</option>
-                            <option value="5">5 - NOTICE</option>
-                            <option value="6">6 - INFO</option>
-                            <option value="7">7 - DEBUG</option>
-                        </select>
-                        <button class="btn btn-sm btn-primary" onclick="setLogLevel('server')" title="Apply to Server">
-                            <i class="bi bi-cloud-upload"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="setLogLevel('config')" title="Save to Config only">
-                            <i class="bi bi-floppy"></i>
-                        </button>
-                    </div>
-                    <div class="d-flex align-items-center gap-1">
-                        <small class="text-muted">Lines:</small>
-                        <select id="log-limit" class="form-select form-select-sm" style="width: auto;" onchange="refreshLogs()">
-                            <option value="50">50</option>
-                            <option value="100" selected>100</option>
-                            <option value="200">200</option>
-                            <option value="500">500</option>
-                            <option value="1000">1000</option>
-                        </select>
-                    </div>
-                </div>
-                <!-- Sync warning -->
-                <div id="loglevel-sync-warning" class="alert alert-warning py-1 px-2 mt-2 mb-0 small d-none">
-                    <i class="bi bi-exclamation-triangle me-1"></i>
-                    <span id="loglevel-diff-text">Config and Server differ</span>
-                    <button class="btn btn-sm btn-warning ms-2 py-0" onclick="setLogLevel('sync')">
-                        <i class="bi bi-arrow-down-circle me-1"></i>Sync from Server
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -96,10 +25,10 @@
     <div class="card-body py-2">
         <div class="row align-items-center">
             <div class="col-auto">
-                <label class="form-label mb-0 small">Filter:</label>
+                <label class="form-label mb-0 small">{{ t('logs.filter') }}:</label>
             </div>
             <div class="col">
-                <input type="text" id="log-filter" class="form-control form-control-sm" placeholder="Search logs..." oninput="filterLogs()">
+                <input type="text" id="log-filter" class="form-control form-control-sm" placeholder="{{ t('logs.search') }}" oninput="filterLogs()">
             </div>
             <div class="col-auto">
                 <div class="btn-group btn-group-sm" role="group">
@@ -113,8 +42,15 @@
                     <label class="btn btn-outline-secondary" for="filter-debug">Debug</label>
                 </div>
             </div>
-            <div class="col-auto">
-                <span class="badge bg-secondary" id="log-count">0</span> entries
+            <div class="col-auto d-flex align-items-center gap-2">
+                <select id="log-limit" class="form-select form-select-sm" style="width: auto;" onchange="refreshLogs()">
+                    <option value="50">50</option>
+                    <option value="100" selected>100</option>
+                    <option value="200">200</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                </select>
+                <span><span class="badge bg-secondary" id="log-count">0</span> {{ t('logs.entries') }}</span>
             </div>
         </div>
     </div>
@@ -124,7 +60,7 @@
 <div class="card">
     <div class="card-body p-0">
         <div id="log-container" class="log-viewer" style="height: calc(100vh - 280px); overflow-y: auto; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.8rem; background: #1e1e1e; color: #d4d4d4;">
-            <div class="p-3 text-center text-muted">Loading logs...</div>
+            <div class="p-3 text-center text-muted">{{ t('status.loading') }}</div>
         </div>
     </div>
 </div>
@@ -161,8 +97,8 @@
 
 {% block scripts %}
 <script>
-let logRefreshInterval = null;
 let allLogs = [];
+let logStatus = {};
 
 async function refreshLogs() {
     const limit = document.getElementById('log-limit').value;
@@ -180,7 +116,8 @@ async function refreshLogs() {
     }
 }
 
-let logStatus = {};
+// Global auto-update hook
+window.pageRefresh = refreshLogs;
 
 function renderLogs() {
     const container = document.getElementById('log-container');
@@ -202,13 +139,13 @@ function renderLogs() {
             msg += '<div class="text-start mx-auto" style="max-width: 500px;">';
             msg += '<p class="small text-muted mb-1">Possible reasons:</p>';
             msg += '<ul class="small text-muted">';
-            msg += '<li>FreeSWITCH is not running</li>';
+            msg += '<li>Server is not running</li>';
             msg += '<li>ESL connection failed (check FS_HOST, FS_PORT, FS_PASS)</li>';
             msg += '<li>greenswitch library not installed</li>';
             msg += '</ul>';
             msg += '</div>';
         } else {
-            msg += '<p class="text-muted">No status data from FreeSWITCH.</p>';
+            msg += '<p class="text-muted">No status data from server.</p>';
         }
 
         msg += '</div>';
@@ -260,157 +197,73 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-function updateLogRefresh() {
-    const interval = parseInt(document.getElementById('log-refresh').value);
-
-    if (logRefreshInterval) {
-        clearInterval(logRefreshInterval);
-        logRefreshInterval = null;
-    }
-
-    if (interval > 0) {
-        logRefreshInterval = setInterval(refreshLogs, interval * 1000);
-    }
-}
-
-// Set FreeSWITCH log level
-// action: 'server' (push to FS), 'config' (save to config only), 'sync' (read from server)
-async function setLogLevel(action = 'server') {
+// Set log level - saves to config AND pushes to server
+async function setLogLevel() {
     const level = parseInt(document.getElementById('fs-loglevel').value);
-    const configBadge = document.getElementById('config-loglevel');
-    const serverBadge = document.getElementById('server-loglevel');
+    const btn = document.querySelector('button[onclick="setLogLevel()"]');
+    const originalHtml = btn.innerHTML;
 
-    // Show loading state
-    if (action === 'server') {
-        serverBadge.className = 'badge bg-warning text-dark';
-        serverBadge.textContent = 'S: ...';
-    } else if (action === 'config') {
-        configBadge.className = 'badge bg-warning text-dark';
-        configBadge.textContent = 'C: ...';
-    }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>...';
 
     try {
         const response = await fetch('/api/fs-loglevel', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ level: level, action: action })
+            body: JSON.stringify({ level: level })
         });
         const data = await response.json();
         console.log('setLogLevel response:', data);
 
         if (data.success) {
-            // Refresh to show updated state
-            await getLogLevel();
+            btn.className = 'btn btn-sm btn-success';
+            btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Saved';
+            setTimeout(() => {
+                btn.className = 'btn btn-sm btn-primary';
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }, 2000);
         } else {
+            btn.className = 'btn btn-sm btn-danger';
+            btn.innerHTML = '<i class="bi bi-x-lg me-1"></i>Error';
+            btn.disabled = false;
             alert('Error: ' + (data.error || 'Failed'));
-            await getLogLevel();
+            setTimeout(() => {
+                btn.className = 'btn btn-sm btn-primary';
+                btn.innerHTML = originalHtml;
+            }, 2000);
         }
     } catch (e) {
         console.error('Failed to set log level:', e);
-        alert('Failed: ' + e.message);
-        await getLogLevel();
+        btn.className = 'btn btn-sm btn-danger';
+        btn.innerHTML = '<i class="bi bi-x-lg me-1"></i>Error';
+        btn.disabled = false;
+        setTimeout(() => {
+            btn.className = 'btn btn-sm btn-primary';
+            btn.innerHTML = originalHtml;
+        }, 2000);
     }
 }
 
-// Get current log level - shows both config and server values
+// Get current log level from config
 async function getLogLevel() {
-    const configBadge = document.getElementById('config-loglevel');
-    const serverBadge = document.getElementById('server-loglevel');
-    const syncWarning = document.getElementById('loglevel-sync-warning');
-    const diffText = document.getElementById('loglevel-diff-text');
-
     try {
         const response = await fetch('/api/fs-loglevel');
         const data = await response.json();
         console.log('getLogLevel response:', data);
 
-        // Config level (source of truth)
         if (data.config_level !== undefined) {
-            configBadge.textContent = 'C: ' + data.config_level;
-            configBadge.className = 'badge bg-info';
-            configBadge.title = 'Config: ' + (data.config_level_name || data.config_level);
-            // Set dropdown to config value
             document.getElementById('fs-loglevel').value = data.config_level;
-        }
-
-        // Server level
-        if (data.server_level !== undefined) {
-            serverBadge.textContent = 'S: ' + data.server_level;
-            serverBadge.className = 'badge bg-success';
-            serverBadge.title = 'Server: ' + (data.server_level_name || data.server_level);
-        } else {
-            serverBadge.textContent = 'S: ?';
-            serverBadge.className = 'badge bg-secondary';
-            serverBadge.title = 'Server: unknown';
-        }
-
-        // Check sync status
-        if (data.synced === false) {
-            // Out of sync - show warning
-            syncWarning.classList.remove('d-none');
-            diffText.textContent = `Config: ${data.config_level} ≠ Server: ${data.server_level}`;
-            configBadge.className = 'badge bg-warning text-dark';
-            serverBadge.className = 'badge bg-warning text-dark';
-        } else {
-            syncWarning.classList.add('d-none');
-        }
-
-        if (data.error) {
-            console.warn('Log level access:', data.error);
         }
     } catch (e) {
         console.error('Failed to get log level:', e);
-        configBadge.className = 'badge bg-danger';
-        configBadge.textContent = 'C: Err';
-        serverBadge.className = 'badge bg-danger';
-        serverBadge.textContent = 'S: Err';
-    }
-}
-
-// Check FreeSWITCH connection status
-async function checkFsStatus() {
-    const badge = document.getElementById('fs-status-badge');
-    const info = document.getElementById('fs-status-info');
-
-    badge.className = 'badge bg-secondary';
-    badge.textContent = 'Checking...';
-    info.textContent = '';
-
-    try {
-        const response = await fetch('/api/status');
-        const data = await response.json();
-
-        if (data.error) {
-            badge.className = 'badge bg-warning text-dark';
-            badge.textContent = 'Limited';
-            info.textContent = data.error;
-        } else if (data.fs_access === false) {
-            badge.className = 'badge bg-danger';
-            badge.textContent = 'Disconnected';
-            info.textContent = 'Check FS_HOST, FS_PORT, FS_PASS';
-        } else if (data.profiles && data.profiles.length > 0) {
-            badge.className = 'badge bg-success';
-            badge.textContent = 'Connected';
-            const online = data.profiles.filter(p => p.status === 'online').length;
-            info.textContent = `${online}/${data.profiles.length} profiles online`;
-        } else {
-            badge.className = 'badge bg-warning text-dark';
-            badge.textContent = 'No profiles';
-            info.textContent = 'FreeSWITCH running but no SIP profiles';
-        }
-    } catch (e) {
-        badge.className = 'badge bg-danger';
-        badge.textContent = 'Error';
-        info.textContent = 'Cannot connect to API';
     }
 }
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     refreshLogs();
-    updateLogRefresh();
     getLogLevel();
-    checkFsStatus();
 });
 </script>
 {% endblock %}

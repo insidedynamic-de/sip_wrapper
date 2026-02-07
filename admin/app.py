@@ -106,6 +106,9 @@ except ImportError:
 app = Flask(__name__)
 app.secret_key = os.environ.get('ADMIN_SECRET', 'insidedynamic-wrapper-secret')
 
+# Auto-reload templates without restarting Python (works in debug mode)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+
 # Configuration
 ADMIN_USER = os.environ.get('ADMIN_USER', 'admin')
 ADMIN_PASS = os.environ.get('ADMIN_PASS', 'admin')
@@ -289,10 +292,55 @@ def get_failed_attempts_summary():
 
 
 ################################################################################
-# Translations
+# Translations - Load from JSON files
 ################################################################################
 
-TRANSLATIONS = {
+def load_translations():
+    """Load translations from JSON files in lang/ folder"""
+    translations = {}
+    lang_dir = Path(__file__).parent / 'lang'
+
+    if lang_dir.exists():
+        for lang_file in lang_dir.glob('*.json'):
+            lang_code = lang_file.stem  # e.g., 'en', 'de'
+            try:
+                with open(lang_file, 'r', encoding='utf-8') as f:
+                    translations[lang_code] = json.load(f)
+            except Exception as e:
+                print(f"Error loading {lang_file}: {e}")
+
+    # Fallback if no files found
+    if not translations:
+        translations = {'en': {}, 'de': {}}
+
+    return translations
+
+TRANSLATIONS = load_translations()
+
+# Legacy flat dict for backwards compatibility (auto-generated from nested)
+def flatten_translations(d, parent_key=''):
+    """Flatten nested dict: {'nav': {'dashboard': 'X'}} -> {'nav.dashboard': 'X', 'dashboard': 'X'}"""
+    items = {}
+    for k, v in d.items():
+        new_key = f"{parent_key}.{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.update(flatten_translations(v, new_key))
+            # Also add without prefix for backwards compatibility
+            items.update(flatten_translations(v, ''))
+        else:
+            items[new_key] = v
+            # Also add short key for backwards compatibility
+            if parent_key:
+                items[k] = v
+    return items
+
+# Create flattened versions for easy lookup
+TRANSLATIONS_FLAT = {
+    lang: flatten_translations(data) for lang, data in TRANSLATIONS.items()
+}
+
+# Legacy dict format (kept for reference, now loaded from JSON)
+_LEGACY_TRANSLATIONS = {
     'de': {
         'title': 'InsideDynamic Wrapper - Admin',
         'dashboard': 'Dashboard',
@@ -470,13 +518,33 @@ TRANSLATIONS = {
         'passwords_not_match': 'Passwords do not match',
     }
 }
+# End of legacy translations - now loaded from JSON files in lang/ folder
 
 def get_lang():
     return session.get('lang', 'de')
 
 def t(key):
+    """Get translation for key.
+
+    Supports:
+    - Simple keys: t('save') -> 'Save'
+    - Nested keys: t('nav.dashboard') -> 'Dashboard'
+    - Returns UPPERCASE key if not found: t('unknown') -> 'UNKNOWN'
+    """
     lang = get_lang()
-    return TRANSLATIONS.get(lang, TRANSLATIONS['de']).get(key, key)
+    translations = TRANSLATIONS_FLAT.get(lang, TRANSLATIONS_FLAT.get('en', {}))
+
+    # Try exact key first
+    if key in translations:
+        return translations[key]
+
+    # Fallback to English
+    en_translations = TRANSLATIONS_FLAT.get('en', {})
+    if key in en_translations:
+        return en_translations[key]
+
+    # Not found - return UPPERCASE key
+    return key.upper().replace('.', '_')
 
 @app.context_processor
 def inject_translations():
@@ -657,17 +725,89 @@ def get_recent_logs(count=15):
     return []
 
 
-def get_logs_via_esl(count=50):
-    """Get FreeSWITCH status info via ESL commands"""
-    logs = []
+################################################################################
+# FreeSWITCH Log Reading
+################################################################################
 
+import time
+
+# Possible log file locations
+FS_LOG_PATHS = [
+    '/var/log/freeswitch/freeswitch.log',
+    '/usr/local/freeswitch/log/freeswitch.log',
+    '/var/log/freeswitch.log',
+]
+
+def parse_log_level(line):
+    """Detect log level from line content"""
+    line_upper = line.upper()
+    if '[ERR]' in line_upper or '[CRIT]' in line_upper or '[ALERT]' in line_upper or 'ERROR' in line_upper:
+        return 'error'
+    elif '[WARNING]' in line_upper or '[WARN]' in line_upper:
+        return 'warning'
+    elif '[DEBUG]' in line_upper:
+        return 'debug'
+    else:
+        return 'info'
+
+def read_log_file(count=100):
+    """Read last N lines from FreeSWITCH log file"""
+    for log_path in FS_LOG_PATHS:
+        if os.path.isfile(log_path):
+            try:
+                # Read last N lines efficiently
+                with open(log_path, 'rb') as f:
+                    # Seek to end
+                    f.seek(0, 2)
+                    file_size = f.tell()
+
+                    # Read last ~100KB or whole file if smaller
+                    read_size = min(file_size, 100 * 1024)
+                    f.seek(max(0, file_size - read_size))
+                    content = f.read().decode('utf-8', errors='replace')
+
+                lines = content.split('\n')
+                logs = []
+
+                # Take last N non-empty lines
+                for line in lines[-count-1:]:
+                    line = line.strip()
+                    if line:
+                        logs.append({
+                            'text': line[:500],
+                            'level': parse_log_level(line),
+                            'timestamp': time.time()
+                        })
+
+                if logs:
+                    return logs, log_path
+            except Exception as e:
+                print(f"Error reading {log_path}: {e}")
+                continue
+
+    return [], None
+
+def get_logs_via_esl(count=50):
+    """Get FreeSWITCH logs - try log file first, then ESL status fallback"""
+    from datetime import datetime
+
+    # Try reading from log file first
+    logs, log_path = read_log_file(count)
+    if logs:
+        logs.insert(0, {
+            'text': f'--- Log file: {log_path} ({len(logs)} entries) ---',
+            'level': 'info',
+            'timestamp': time.time()
+        })
+        return logs
+
+    # Fallback: get status via ESL
+    logs = []
     try:
-        # Get various status info that can serve as "logs"
+        # Get FreeSWITCH status info
         commands = [
             ('status', 'info'),
             ('sofia status', 'info'),
-            ('show channels count', 'info'),
-            ('show registrations count', 'info'),
         ]
 
         for cmd, level in commands:
@@ -677,24 +817,31 @@ def get_logs_via_esl(count=50):
                     line = line.strip()
                     if line and not line.startswith('=') and not line.startswith('-'):
                         logs.append({
-                            'text': f'[{cmd.upper()}] {line[:180]}',
-                            'level': level
+                            'text': f'[{cmd.upper()}] {line[:300]}',
+                            'level': level,
+                            'timestamp': time.time()
                         })
 
-        # Add timestamp
-        from datetime import datetime
-        logs.insert(0, {
-            'text': f'--- FreeSWITCH Status ({FS_HOST}:{FS_PORT}) at {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} ---',
-            'level': 'info'
-        })
+        if logs:
+            logs.insert(0, {
+                'text': f'--- ESL Status ({FS_HOST}:{FS_PORT}) at {datetime.now().strftime("%H:%M:%S")} ---',
+                'level': 'info',
+                'timestamp': time.time()
+            })
+            logs.insert(1, {
+                'text': '[INFO] Log file not found - showing ESL status. Mount /var/log/freeswitch for real logs.',
+                'level': 'warning',
+                'timestamp': time.time()
+            })
 
     except Exception as e:
         logs.append({
             'text': f'ESL Error: {e}',
-            'level': 'error'
+            'level': 'error',
+            'timestamp': time.time()
         })
 
-    return logs[:count]
+    return logs[-count:] if len(logs) > count else logs
 
 def get_log_status():
     """Get status info about log availability (always ESL)"""
@@ -1136,9 +1283,9 @@ FS_LOG_LEVELS = {
 @app.route('/api/fs-loglevel', methods=['GET'])
 @login_required
 def api_get_loglevel():
-    """Get current FreeSWITCH log level - returns both config and server values"""
+    """Get current log level from config (source of truth)"""
     if not fs_allowed():
-        return jsonify({'error': 'Access denied', 'config_level': 4, 'server_level': None})
+        return jsonify({'error': 'Access denied', 'config_level': 4})
 
     # Get from config (source of truth)
     config_level = 4  # default
@@ -1148,31 +1295,9 @@ def api_get_loglevel():
     except Exception:
         pass
 
-    # Get from FreeSWITCH server
-    server_level = None
-    result = fs_cli('fsctl loglevel')
-
-    if result:
-        import re
-        # Try multiple patterns
-        match = re.search(r'\[(\d+)\]', result)
-        if match:
-            server_level = int(match.group(1))
-        else:
-            match = re.search(r'log\s*level\s*(\d+)', result, re.IGNORECASE)
-            if match:
-                server_level = int(match.group(1))
-
-    # Check if synced
-    synced = (server_level == config_level) if server_level is not None else None
-
     return jsonify({
         'config_level': config_level,
-        'config_level_name': FS_LOG_LEVELS.get(config_level, str(config_level)),
-        'server_level': server_level,
-        'server_level_name': FS_LOG_LEVELS.get(server_level, str(server_level)) if server_level is not None else None,
-        'synced': synced,
-        'raw': result[:100] if result else None
+        'config_level_name': FS_LOG_LEVELS.get(config_level, str(config_level))
     })
 
 @app.route('/api/fs-loglevel', methods=['POST'])
@@ -1180,89 +1305,48 @@ def api_get_loglevel():
 def api_set_loglevel():
     """Set FreeSWITCH log level (0-7)
 
-    Actions:
-    - action='config': Save to config only (don't push to server)
-    - action='server': Push to FreeSWITCH server (and save to config)
-    - action='sync': Read from server and save to config
+    Always saves to config AND pushes to FreeSWITCH server.
+    Config is source of truth.
     """
     if not fs_allowed():
         return jsonify({'success': False, 'error': 'Access denied - IP not in FS_ALLOWED_IPS'})
 
     data = request.json
     level = data.get('level', 4)
-    action = data.get('action', 'server')  # default: push to server
 
     # Validate level
     if not isinstance(level, int) or level < 0 or level > 7:
         return jsonify({'success': False, 'error': 'Invalid log level (must be 0-7)'})
 
-    if action == 'config':
-        # Save to config only (don't push to server)
-        try:
-            config = config_store.load_config()
-            if 'settings' not in config:
-                config['settings'] = {}
-            config['settings']['fs_loglevel'] = level
-            config_store.save_config(config)
-            return jsonify({
-                'success': True,
-                'level': level,
-                'level_name': FS_LOG_LEVELS.get(level, str(level)),
-                'message': f'Saved to config: {level} ({FS_LOG_LEVELS.get(level, "")})',
-                'action': 'config'
-            })
-        except Exception as e:
-            return jsonify({'success': False, 'error': f'Failed to save config: {e}'})
+    # 1. Save to config (source of truth)
+    try:
+        config = config_store.load_config()
+        if 'settings' not in config:
+            config['settings'] = {}
+        config['settings']['fs_loglevel'] = level
+        config_store.save_config(config)
+    except Exception as e:
+        return jsonify({'success': False, 'error': f'Failed to save config: {e}'})
 
-    elif action == 'sync':
-        # Read from server and save to config
-        result = fs_cli('fsctl loglevel')
-        if result:
-            import re
-            match = re.search(r'\[(\d+)\]', result)
-            if match:
-                server_level = int(match.group(1))
-                try:
-                    config = config_store.load_config()
-                    if 'settings' not in config:
-                        config['settings'] = {}
-                    config['settings']['fs_loglevel'] = server_level
-                    config_store.save_config(config)
-                    return jsonify({
-                        'success': True,
-                        'level': server_level,
-                        'level_name': FS_LOG_LEVELS.get(server_level, str(server_level)),
-                        'message': f'Synced from server: {server_level}',
-                        'action': 'sync'
-                    })
-                except Exception as e:
-                    return jsonify({'success': False, 'error': f'Failed to save: {e}'})
-        return jsonify({'success': False, 'error': 'Could not read server level'})
+    # 2. Push to FreeSWITCH server
+    result = fs_cli(f'fsctl loglevel {level}', allow_empty=True)
 
-    else:
-        # action='server': Push to FreeSWITCH server
-        result = fs_cli(f'fsctl loglevel {level}', allow_empty=True)
+    if result is not None:
+        return jsonify({
+            'success': True,
+            'level': level,
+            'level_name': FS_LOG_LEVELS.get(level, str(level)),
+            'message': f'Log level set to {level} ({FS_LOG_LEVELS.get(level, "")})'
+        })
 
-        if result is not None:
-            # Save to config
-            try:
-                config = config_store.load_config()
-                if 'settings' not in config:
-                    config['settings'] = {}
-                config['settings']['fs_loglevel'] = level
-                config_store.save_config(config)
-            except Exception as e:
-                print(f"[DEBUG] Failed to save loglevel to config: {e}")
-
-            return jsonify({
-                'success': True,
-                'level': level,
-                'level_name': FS_LOG_LEVELS.get(level, str(level)),
-                'message': f'Applied to server: {level} ({FS_LOG_LEVELS.get(level, "")})',
-                'action': 'server'
-            })
-
-        return jsonify({'success': False, 'error': 'Failed to set log level - ESL connection error'})
+    # Config saved but server push failed
+    return jsonify({
+        'success': True,
+        'level': level,
+        'level_name': FS_LOG_LEVELS.get(level, str(level)),
+        'message': f'Saved to config (server push failed)',
+        'warning': 'ESL connection error'
+    })
 
 ################################################################################
 # CRUD API - Users
@@ -2070,4 +2154,7 @@ if __name__ == '__main__':
 ================================================================================
 """)
 
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    # Watch JSON translation files for auto-reload in debug mode
+    extra_files = list((Path(__file__).parent / 'lang').glob('*.json'))
+
+    app.run(host='0.0.0.0', port=port, debug=debug, extra_files=extra_files)

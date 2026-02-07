@@ -5,7 +5,7 @@
     <h4 class="mb-0"><i class="bi bi-gear me-2"></i>{{ t('config') }}</h4>
     <div>
         <button class="btn btn-success btn-sm" onclick="applyConfig()">
-            <i class="bi bi-check-circle me-1"></i>Apply & Reload
+            <i class="bi bi-check-circle me-1"></i>{{ t('button.apply_reload') }}
         </button>
     </div>
 </div>
@@ -14,22 +14,22 @@
 <ul class="nav nav-tabs mb-4" role="tablist">
     <li class="nav-item">
         <button class="nav-link active" id="users-btn" data-bs-toggle="tab" data-bs-target="#users-tab">
-            <i class="bi bi-people me-1"></i>Users
+            <i class="bi bi-people me-1"></i>{{ t('section.users') }}
         </button>
     </li>
     <li class="nav-item">
         <button class="nav-link" id="gateways-btn" data-bs-toggle="tab" data-bs-target="#gateways-tab">
-            <i class="bi bi-diagram-3 me-1"></i>Gateways
+            <i class="bi bi-diagram-3 me-1"></i>{{ t('section.gateways') }}
         </button>
     </li>
     <li class="nav-item">
         <button class="nav-link" id="routes-btn" data-bs-toggle="tab" data-bs-target="#routes-tab">
-            <i class="bi bi-signpost-2 me-1"></i>Routes
+            <i class="bi bi-signpost-2 me-1"></i>{{ t('section.routes') }}
         </button>
     </li>
     <li class="nav-item">
         <button class="nav-link" id="settings-btn" data-bs-toggle="tab" data-bs-target="#settings-tab">
-            <i class="bi bi-sliders me-1"></i>Settings
+            <i class="bi bi-sliders me-1"></i>{{ t('section.settings') }}
         </button>
     </li>
 </ul>
@@ -39,9 +39,9 @@
     <div class="tab-pane fade show active" id="users-tab">
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-person-badge me-2"></i>SIP Users</span>
+                <span><i class="bi bi-person-badge me-2"></i>{{ t('section.sip_users') }}</span>
                 <button class="btn btn-primary btn-sm" onclick="showAddUserModal()">
-                    <i class="bi bi-plus-lg me-1"></i>Add User
+                    <i class="bi bi-plus-lg me-1"></i>{{ t('modal.add_user') }}
                 </button>
             </div>
             <div class="card-body p-0">
@@ -49,10 +49,10 @@
                     <table class="table table-hover mb-0" id="users-table">
                         <thead>
                             <tr>
-                                <th>Username</th>
-                                <th>Extension</th>
-                                <th>Status</th>
-                                <th width="120">Actions</th>
+                                <th>{{ t('auth.username') }}</th>
+                                <th>{{ t('field.extension') }}</th>
+                                <th>{{ t('status.online') }}</th>
+                                <th width="120">{{ t('field.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -63,9 +63,9 @@
 
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-shield-check me-2"></i>ACL Users (IP-based)</span>
+                <span><i class="bi bi-shield-check me-2"></i>{{ t('section.acl_users') }}</span>
                 <button class="btn btn-primary btn-sm" onclick="showAddAclUserModal()">
-                    <i class="bi bi-plus-lg me-1"></i>Add ACL User
+                    <i class="bi bi-plus-lg me-1"></i>{{ t('modal.add_acl_user') }}
                 </button>
             </div>
             <div class="card-body p-0">
@@ -73,11 +73,11 @@
                     <table class="table table-hover mb-0" id="acl-users-table">
                         <thead>
                             <tr>
-                                <th>Username</th>
-                                <th>IP Address</th>
-                                <th>Extension</th>
-                                <th>Caller ID</th>
-                                <th width="120">Actions</th>
+                                <th>{{ t('auth.username') }}</th>
+                                <th>{{ t('field.ip_address') }}</th>
+                                <th>{{ t('field.extension') }}</th>
+                                <th>{{ t('field.caller_id') }}</th>
+                                <th width="120">{{ t('field.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -91,9 +91,9 @@
     <div class="tab-pane fade" id="gateways-tab">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-diagram-3 me-2"></i>SIP Gateways / Providers</span>
+                <span><i class="bi bi-diagram-3 me-2"></i>{{ t('gateway.sip_gateways') }}</span>
                 <button class="btn btn-primary btn-sm" onclick="showAddGatewayModal()">
-                    <i class="bi bi-plus-lg me-1"></i>Add Gateway
+                    <i class="bi bi-plus-lg me-1"></i>{{ t('gateway.add_gateway') }}
                 </button>
             </div>
             <div class="card-body p-0">
@@ -101,13 +101,13 @@
                     <table class="table table-hover mb-0" id="gateways-table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Host</th>
-                                <th>Port</th>
-                                <th>Username</th>
-                                <th>Register</th>
-                                <th>Status</th>
-                                <th width="120">Actions</th>
+                                <th>{{ t('field.name') }}</th>
+                                <th>{{ t('field.host') }}</th>
+                                <th>{{ t('field.port') }}</th>
+                                <th>{{ t('auth.username') }}</th>
+                                <th>{{ t('field.register') }}</th>
+                                <th>{{ t('status.online') }}</th>
+                                <th width="120">{{ t('field.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -122,25 +122,25 @@
         <!-- Default Routes -->
         <div class="card mb-4">
             <div class="card-header">
-                <i class="bi bi-house me-2"></i>Default Routes
+                <i class="bi bi-house me-2"></i>{{ t('section.default_routes') }}
             </div>
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">Default Gateway (Outbound)</label>
+                        <label class="form-label">{{ t('config.default_gateway') }}</label>
                         <select class="form-select" id="default-gateway">
-                            <option value="">-- Select --</option>
+                            <option value="">{{ t('modal.select') }}</option>
                         </select>
-                        <small class="text-muted">All outbound calls go through this gateway</small>
+                        <small class="text-muted">{{ t('config.outbound_calls_via') }}</small>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Default Extension (Inbound)</label>
+                        <label class="form-label">{{ t('config.default_extension') }}</label>
                         <input type="text" class="form-control" id="default-extension" placeholder="1001">
-                        <small class="text-muted">Inbound calls without specific route go here</small>
+                        <small class="text-muted">{{ t('config.inbound_default') }}</small>
                     </div>
                 </div>
                 <button class="btn btn-primary mt-3" onclick="saveDefaultRoutes()">
-                    <i class="bi bi-save me-1"></i>Save Defaults
+                    <i class="bi bi-save me-1"></i>{{ t('button.save_defaults') }}
                 </button>
             </div>
         </div>
@@ -148,9 +148,9 @@
         <!-- Inbound Routes -->
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-telephone-inbound me-2"></i>Inbound Routes (DID)</span>
+                <span><i class="bi bi-telephone-inbound me-2"></i>{{ t('route.inbound_routes') }}</span>
                 <button class="btn btn-primary btn-sm" onclick="showAddInboundRouteModal()">
-                    <i class="bi bi-plus-lg me-1"></i>Add Route
+                    <i class="bi bi-plus-lg me-1"></i>{{ t('route.add_route') }}
                 </button>
             </div>
             <div class="card-body p-0">
@@ -158,10 +158,10 @@
                     <table class="table table-hover mb-0" id="inbound-routes-table">
                         <thead>
                             <tr>
-                                <th>DID / Number</th>
-                                <th>Destination</th>
-                                <th>Type</th>
-                                <th width="100">Actions</th>
+                                <th>{{ t('route.did_number') }}</th>
+                                <th>{{ t('field.destination') }}</th>
+                                <th>{{ t('field.type') }}</th>
+                                <th width="100">{{ t('field.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -173,9 +173,9 @@
         <!-- User Routes -->
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-person-lines-fill me-2"></i>User Outbound Routes</span>
+                <span><i class="bi bi-person-lines-fill me-2"></i>{{ t('section.user_outbound_routes') }}</span>
                 <button class="btn btn-primary btn-sm" onclick="showAddUserRouteModal()">
-                    <i class="bi bi-plus-lg me-1"></i>Add Route
+                    <i class="bi bi-plus-lg me-1"></i>{{ t('route.add_route') }}
                 </button>
             </div>
             <div class="card-body p-0">
@@ -183,9 +183,9 @@
                     <table class="table table-hover mb-0" id="user-routes-table">
                         <thead>
                             <tr>
-                                <th>User</th>
-                                <th>Gateway</th>
-                                <th width="100">Actions</th>
+                                <th>{{ t('field.user') }}</th>
+                                <th>{{ t('field.gateway') }}</th>
+                                <th width="100">{{ t('field.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -200,16 +200,16 @@
         <!-- License -->
         <div class="card mb-4">
             <div class="card-header">
-                <i class="bi bi-key me-2"></i>License
+                <i class="bi bi-key me-2"></i>{{ t('license.license') }}
             </div>
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">License Key</label>
+                        <label class="form-label">{{ t('license.license_key') }}</label>
                         <input type="text" class="form-control" id="setting-license-key" placeholder="XXXXX-XXXXX-XXXXX">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Client Name</label>
+                        <label class="form-label">{{ t('license.client_name') }}</label>
                         <input type="text" class="form-control" id="setting-client-name" placeholder="Company GmbH">
                     </div>
                 </div>
@@ -219,41 +219,41 @@
         <!-- System Settings -->
         <div class="card mb-4">
             <div class="card-header">
-                <i class="bi bi-sliders me-2"></i>System Settings
+                <i class="bi bi-sliders me-2"></i>{{ t('system.system_settings') }}
             </div>
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">FS Domain</label>
+                        <label class="form-label">{{ t('system.fs_domain') }}</label>
                         <input type="text" class="form-control" id="setting-fs-domain" placeholder="sip.example.com">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">External SIP IP</label>
+                        <label class="form-label">{{ t('system.external_sip_ip') }}</label>
                         <input type="text" class="form-control" id="setting-external-sip-ip" placeholder="203.0.113.10">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Internal SIP Port</label>
+                        <label class="form-label">{{ t('system.internal_sip_port') }}</label>
                         <input type="number" class="form-control" id="setting-internal-sip-port" value="5060">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">External SIP Port</label>
+                        <label class="form-label">{{ t('system.external_sip_port') }}</label>
                         <input type="number" class="form-control" id="setting-external-sip-port" value="5080">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Codec Preferences</label>
+                        <label class="form-label">{{ t('system.codec_prefs') }}</label>
                         <input type="text" class="form-control" id="setting-codec-prefs" placeholder="PCMU,PCMA,G729">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Default Country Code</label>
+                        <label class="form-label">{{ t('system.default_country') }}</label>
                         <input type="text" class="form-control" id="setting-country-code" value="49">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Outbound Caller ID</label>
+                        <label class="form-label">{{ t('system.outbound_caller_id') }}</label>
                         <input type="text" class="form-control" id="setting-outbound-caller-id" placeholder="+4932221803989">
                     </div>
                 </div>
                 <button class="btn btn-primary mt-3" onclick="saveSettings()">
-                    <i class="bi bi-save me-1"></i>Save Settings
+                    <i class="bi bi-save me-1"></i>{{ t('system.save_settings') }}
                 </button>
             </div>
         </div>
@@ -261,33 +261,33 @@
         <!-- Config Import/Export -->
         <div class="card">
             <div class="card-header">
-                <i class="bi bi-file-earmark-code me-2"></i>Config Import / Export
+                <i class="bi bi-file-earmark-code me-2"></i>{{ t('config.import_export') }}
             </div>
             <div class="card-body">
                 <div class="row g-4">
                     <div class="col-md-6">
-                        <h6><i class="bi bi-download me-2"></i>Export Config</h6>
-                        <p class="text-muted small">Download the current configuration as JSON file</p>
+                        <h6><i class="bi bi-download me-2"></i>{{ t('config.export_config') }}</h6>
+                        <p class="text-muted small">{{ t('config.export_desc') }}</p>
                         <button class="btn btn-outline-primary" onclick="exportConfig()">
-                            <i class="bi bi-download me-1"></i>Export JSON
+                            <i class="bi bi-download me-1"></i>{{ t('config.export_json') }}
                         </button>
                     </div>
                     <div class="col-md-6">
-                        <h6><i class="bi bi-upload me-2"></i>Import Config</h6>
-                        <p class="text-muted small">Upload a JSON configuration file to replace current config</p>
+                        <h6><i class="bi bi-upload me-2"></i>{{ t('config.import_config') }}</h6>
+                        <p class="text-muted small">{{ t('config.import_desc') }}</p>
                         <input type="file" class="form-control mb-2" id="config-file-input" accept=".json">
                         <button class="btn btn-outline-warning" onclick="importConfig()">
-                            <i class="bi bi-upload me-1"></i>Import JSON
+                            <i class="bi bi-upload me-1"></i>{{ t('config.import_json') }}
                         </button>
                     </div>
                 </div>
                 <hr class="my-4">
                 <div class="row">
                     <div class="col-12">
-                        <h6><i class="bi bi-arrow-down-circle me-2"></i>Import from Environment</h6>
-                        <p class="text-muted small">Import configuration from current environment variables (one-time migration)</p>
+                        <h6><i class="bi bi-arrow-down-circle me-2"></i>{{ t('config.import_env') }}</h6>
+                        <p class="text-muted small">{{ t('config.import_env_desc') }}</p>
                         <button class="btn btn-outline-secondary" onclick="importFromEnv()">
-                            <i class="bi bi-cloud-download me-1"></i>Import from ENV
+                            <i class="bi bi-cloud-download me-1"></i>{{ t('config.import_from_env') }}
                         </button>
                     </div>
                 </div>
@@ -303,31 +303,31 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="userModalTitle">Add User</h5>
+                <h5 class="modal-title" id="userModalTitle">{{ t('modal.add_user') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="user-edit-mode">
                 <div class="mb-3">
-                    <label class="form-label">Username</label>
+                    <label class="form-label">{{ t('auth.username') }}</label>
                     <input type="text" class="form-control" id="user-username" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Password</label>
+                    <label class="form-label">{{ t('auth.password') }}</label>
                     <input type="password" class="form-control" id="user-password" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Extension</label>
+                    <label class="form-label">{{ t('field.extension') }}</label>
                     <input type="text" class="form-control" id="user-extension" placeholder="1001" required>
                 </div>
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input" id="user-enabled" checked>
-                    <label class="form-check-label">Enabled</label>
+                    <label class="form-check-label">{{ t('status.enabled') }}</label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveUser()">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('button.cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="saveUser()">{{ t('button.save') }}</button>
             </div>
         </div>
     </div>
@@ -338,32 +338,32 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="aclUserModalTitle">Add ACL User</h5>
+                <h5 class="modal-title" id="aclUserModalTitle">{{ t('modal.add_acl_user') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="acl-user-edit-mode">
                 <div class="mb-3">
-                    <label class="form-label">Username</label>
+                    <label class="form-label">{{ t('auth.username') }}</label>
                     <input type="text" class="form-control" id="acl-user-username" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">IP Address</label>
+                    <label class="form-label">{{ t('field.ip_address') }}</label>
                     <input type="text" class="form-control" id="acl-user-ip" placeholder="192.168.1.100" required>
-                    <small class="text-muted">Multiple IPs separated by |</small>
+                    <small class="text-muted">{{ t('modal.multiple_ips_hint') }}</small>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Extension</label>
+                    <label class="form-label">{{ t('field.extension') }}</label>
                     <input type="text" class="form-control" id="acl-user-extension" placeholder="9000">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Caller ID</label>
+                    <label class="form-label">{{ t('field.caller_id') }}</label>
                     <input type="text" class="form-control" id="acl-user-callerid" placeholder="+4932221803986">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveAclUser()">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('button.cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="saveAclUser()">{{ t('button.save') }}</button>
             </div>
         </div>
     </div>
@@ -374,41 +374,41 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="gatewayModalTitle">Add Gateway</h5>
+                <h5 class="modal-title" id="gatewayModalTitle">{{ t('modal.add_gateway') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="gateway-edit-mode">
                 <div class="mb-3">
-                    <label class="form-label">Name</label>
+                    <label class="form-label">{{ t('field.name') }}</label>
                     <input type="text" class="form-control" id="gateway-name" placeholder="provider" required>
                 </div>
                 <div class="row mb-3">
                     <div class="col-8">
-                        <label class="form-label">Host</label>
+                        <label class="form-label">{{ t('field.host') }}</label>
                         <input type="text" class="form-control" id="gateway-host" placeholder="sip.provider.com" required>
                     </div>
                     <div class="col-4">
-                        <label class="form-label">Port</label>
+                        <label class="form-label">{{ t('field.port') }}</label>
                         <input type="number" class="form-control" id="gateway-port" value="5060">
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Username</label>
+                    <label class="form-label">{{ t('auth.username') }}</label>
                     <input type="text" class="form-control" id="gateway-username">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Password</label>
+                    <label class="form-label">{{ t('auth.password') }}</label>
                     <input type="password" class="form-control" id="gateway-password">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Auth Username (optional)</label>
+                    <label class="form-label">{{ t('gateway.auth_username') }}</label>
                     <input type="text" class="form-control" id="gateway-auth-username">
-                    <small class="text-muted">For 3CX and some PBX systems</small>
+                    <small class="text-muted">{{ t('gateway.auth_username_hint') }}</small>
                 </div>
                 <div class="row mb-3">
                     <div class="col-6">
-                        <label class="form-label">Transport</label>
+                        <label class="form-label">{{ t('field.transport') }}</label>
                         <select class="form-select" id="gateway-transport">
                             <option value="udp">UDP</option>
                             <option value="tcp">TCP</option>
@@ -418,14 +418,14 @@
                     <div class="col-6">
                         <div class="form-check mt-4">
                             <input type="checkbox" class="form-check-input" id="gateway-register" checked>
-                            <label class="form-check-label">Register</label>
+                            <label class="form-check-label">{{ t('field.register') }}</label>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveGateway()">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('button.cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="saveGateway()">{{ t('button.save') }}</button>
             </div>
         </div>
     </div>
@@ -436,29 +436,29 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add Inbound Route</h5>
+                <h5 class="modal-title">{{ t('route.add_inbound') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label">DID / Phone Number</label>
+                    <label class="form-label">{{ t('route.did_number') }}</label>
                     <input type="text" class="form-control" id="inbound-did" placeholder="+4930221803986" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Destination Type</label>
+                    <label class="form-label">{{ t('route.dest_type') }}</label>
                     <select class="form-select" id="inbound-dest-type">
-                        <option value="extension">Extension</option>
-                        <option value="gateway">Gateway</option>
+                        <option value="extension">{{ t('field.extension') }}</option>
+                        <option value="gateway">{{ t('field.gateway') }}</option>
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Destination</label>
+                    <label class="form-label">{{ t('field.destination') }}</label>
                     <input type="text" class="form-control" id="inbound-destination" placeholder="1001 or gateway_name">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveInboundRoute()">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('button.cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="saveInboundRoute()">{{ t('button.save') }}</button>
             </div>
         </div>
     </div>
@@ -469,22 +469,22 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add User Route</h5>
+                <h5 class="modal-title">{{ t('route.add_user_route') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label">User</label>
+                    <label class="form-label">{{ t('field.user') }}</label>
                     <select class="form-select" id="user-route-user"></select>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Gateway</label>
+                    <label class="form-label">{{ t('field.gateway') }}</label>
                     <select class="form-select" id="user-route-gateway"></select>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveUserRoute()">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('button.cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="saveUserRoute()">{{ t('button.save') }}</button>
             </div>
         </div>
     </div>
@@ -495,7 +495,7 @@
     <div id="toast" class="toast" role="alert">
         <div class="toast-header">
             <i class="bi bi-info-circle me-2" id="toast-icon"></i>
-            <strong class="me-auto" id="toast-title">Notification</strong>
+            <strong class="me-auto" id="toast-title">{{ t('modal.notification') }}</strong>
             <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
         </div>
         <div class="toast-body" id="toast-body"></div>

@@ -45,6 +45,11 @@ function refreshStatus() {
 
     // Refresh logs preview
     refreshLogsSilent();
+
+    // Call page-specific refresh if defined
+    if (typeof window.pageRefresh === 'function') {
+        window.pageRefresh();
+    }
 }
 
 // Refresh Logs Preview (dashboard)

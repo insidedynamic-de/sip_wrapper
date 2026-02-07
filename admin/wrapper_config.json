@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-02-07T22:55:37.362605",
+  "updated_at": "2026-02-07T23:17:20.785113",
   "license": {
     "key": "IDGMBH-2025-001",
     "client_name": "Mustermann GmbH"
@@ -218,6 +218,6 @@
   },
   "profile": {
     "theme_mode": "light",
-    "color_theme": "default"
+    "color_theme": "forest"
   }
 }

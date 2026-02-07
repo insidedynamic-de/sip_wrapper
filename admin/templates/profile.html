@@ -46,15 +46,15 @@
                     <div class="btn-group w-100" role="group">
                         <input type="radio" class="btn-check" name="theme-mode" id="mode-light" value="light" onchange="setThemeMode('light')">
                         <label class="btn btn-outline-secondary" for="mode-light">
-                            <i class="bi bi-sun me-1"></i>Light
+                            <i class="bi bi-sun me-1"></i>{{ t('theme.light') }}
                         </label>
                         <input type="radio" class="btn-check" name="theme-mode" id="mode-dark" value="dark" onchange="setThemeMode('dark')">
                         <label class="btn btn-outline-secondary" for="mode-dark">
-                            <i class="bi bi-moon me-1"></i>Dark
+                            <i class="bi bi-moon me-1"></i>{{ t('theme.dark') }}
                         </label>
                         <input type="radio" class="btn-check" name="theme-mode" id="mode-auto" value="auto" onchange="setThemeMode('auto')">
                         <label class="btn btn-outline-secondary" for="mode-auto">
-                            <i class="bi bi-circle-half me-1"></i>Auto
+                            <i class="bi bi-circle-half me-1"></i>{{ t('theme.auto') }}
                         </label>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                                 <div class="theme-preview">
                                     <div class="theme-color" style="background: linear-gradient(135deg, #6366f1, #4f46e5);"></div>
                                 </div>
-                                <span>Default</span>
+                                <span>{{ t('theme.default') }}</span>
                             </div>
                         </div>
                         <div class="col-6">
@@ -76,7 +76,7 @@
                                 <div class="theme-preview">
                                     <div class="theme-color" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);"></div>
                                 </div>
-                                <span>Ocean</span>
+                                <span>{{ t('theme.ocean') }}</span>
                             </div>
                         </div>
                         <div class="col-6">
@@ -84,7 +84,7 @@
                                 <div class="theme-preview">
                                     <div class="theme-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div>
                                 </div>
-                                <span>Forest</span>
+                                <span>{{ t('theme.forest') }}</span>
                             </div>
                         </div>
                         <div class="col-6">
@@ -92,7 +92,7 @@
                                 <div class="theme-preview">
                                     <div class="theme-color" style="background: linear-gradient(135deg, #f97316, #ea580c);"></div>
                                 </div>
-                                <span>Sunset</span>
+                                <span>{{ t('theme.sunset') }}</span>
                             </div>
                         </div>
                     </div>

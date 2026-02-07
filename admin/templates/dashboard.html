@@ -218,7 +218,7 @@
                 {% else %}
                 <div class="p-4 text-center text-muted">
                     <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                    Keine Gateways konfiguriert
+                    {{ t('dashboard.no_gateways') }}
                 </div>
                 {% endif %}
             </div>
@@ -261,7 +261,7 @@
                 {% else %}
                 <div class="p-4 text-center text-muted">
                     <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                    Keine Benutzer registriert
+                    {{ t('dashboard.no_users_registered') }}
                 </div>
                 {% endif %}
             </div>
@@ -353,7 +353,7 @@
             </div>
             {% endfor %}
             {% if not recent_logs %}
-            <div class="p-2 text-center text-muted small">No logs</div>
+            <div class="p-2 text-center text-muted small">{{ t('dashboard.no_logs') }}</div>
             {% endif %}
         </div>
     </div>
@@ -365,9 +365,9 @@
         <i class="bi bi-hdd-network me-1"></i>
         FreeSWITCH: {{ config.FS_HOST }}:{{ config.FS_PORT }}
         {% if fs_access %}
-        <span class="text-success"><i class="bi bi-check-circle ms-2"></i> Connected</span>
+        <span class="text-success"><i class="bi bi-check-circle ms-2"></i> {{ t('status.connected') }}</span>
         {% else %}
-        <span class="text-danger"><i class="bi bi-x-circle ms-2"></i> Access Denied ({{ client_ip }})</span>
+        <span class="text-danger"><i class="bi bi-x-circle ms-2"></i> {{ t('status.access_denied') }} ({{ client_ip }})</span>
         {% endif %}
     </small>
 </div>
