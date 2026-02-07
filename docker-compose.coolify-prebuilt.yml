@@ -58,7 +58,7 @@ services:
         echo ""
 
         # Validate ENV
-        echo "[STEP 1/8] Validating environment variables..."
+        echo "[STEP 1/9] Validating environment variables..."
         if [ -z "$FS_DOMAIN" ] || [ -z "$EXTERNAL_SIP_IP" ] || [ -z "$EXTERNAL_RTP_IP" ]; then
           echo "ERROR: Missing required environment variables!"
           echo "Required: FS_DOMAIN, EXTERNAL_SIP_IP, EXTERNAL_RTP_IP"
@@ -85,7 +85,7 @@ services:
 
         # Check if FreeSWITCH is installed
         echo ""
-        echo "[STEP 2/8] Checking FreeSWITCH installation..."
+        echo "[STEP 2/9] Checking FreeSWITCH installation..."
         if [ -x /usr/bin/freeswitch ]; then
           echo "✓ FreeSWITCH found"
         else
@@ -95,7 +95,7 @@ services:
 
         # Clean default config
         echo ""
-        echo "[STEP 3/8] Preparing configuration..."
+        echo "[STEP 3/9] Preparing configuration..."
         if [ -d /etc/freeswitch ]; then
           find /etc/freeswitch/dialplan -type f -name "*.xml" -delete 2>/dev/null || true
           find /etc/freeswitch/directory -type f -name "*.xml" -delete 2>/dev/null || true
@@ -106,9 +106,16 @@ services:
           echo "✓ Config directories prepared"
         fi
 
+        # Create log directories
+        echo ""
+        echo "[STEP 4/9] Setting up logging..."
+        mkdir -p /var/log/freeswitch
+        chmod 755 /var/log/freeswitch
+        echo "✓ Log directory ready: /var/log/freeswitch"
+
         # Install bash, python, jq and flask (needed for provision script and admin portal)
         echo ""
-        echo "[STEP 4/8] Installing dependencies..."
+        echo "[STEP 5/9] Installing dependencies..."
         apk add --no-cache bash python3 py3-flask py3-gunicorn jq >/dev/null 2>&1 || {
           echo "Trying with apt-get..."
           apt-get update -qq && apt-get install -y -qq bash python3 python3-pip python3-venv jq || {
@@ -125,7 +132,7 @@ services:
 
         # Download and run provision
         echo ""
-        echo "[STEP 5/8] Running provision script..."
+        echo "[STEP 6/9] Running provision script..."
         wget --no-cache -qO /tmp/provision.sh https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/provision.sh
         chmod +x /tmp/provision.sh
 
@@ -138,13 +145,14 @@ services:
 
         # Install Admin Portal
         echo ""
-        echo "[STEP 6/8] Installing Admin Portal..."
+        echo "[STEP 7/9] Installing Admin Portal..."
         if [ "$SKIP_ADMIN" != "true" ]; then
           mkdir -p /opt/admin/templates
           mkdir -p /opt/admin/static/css
           mkdir -p /opt/admin/static/js
           mkdir -p /opt/admin/static/vendor/bootstrap
           mkdir -p /opt/admin/static/vendor/bootstrap-icons
+          mkdir -p /opt/admin/lang
 
           ADMIN_BASE="https://raw.githubusercontent.com/insidedynamic-de/sip_wrapper/main/admin"
 
@@ -174,6 +182,10 @@ services:
           wget --no-cache -qO /opt/admin/static/js/manage.js $$ADMIN_BASE/static/js/manage.js
           wget --no-cache -qO /opt/admin/static/js/security.js $$ADMIN_BASE/static/js/security.js
 
+          # Download language files
+          wget --no-cache -qO /opt/admin/lang/en.json $$ADMIN_BASE/lang/en.json
+          wget --no-cache -qO /opt/admin/lang/de.json $$ADMIN_BASE/lang/de.json
+
           # Download vendor files (Bootstrap)
           wget --no-cache -qO /opt/admin/static/vendor/bootstrap/bootstrap.min.css $$ADMIN_BASE/static/vendor/bootstrap/bootstrap.min.css
           wget --no-cache -qO /opt/admin/static/vendor/bootstrap/bootstrap.bundle.min.js $$ADMIN_BASE/static/vendor/bootstrap/bootstrap.bundle.min.js
@@ -194,9 +206,40 @@ services:
           echo "✓ Admin Portal skipped (SKIP_ADMIN=true)"
         fi
 
+        # Configure FreeSWITCH logging
+        echo ""
+        echo "[STEP 8/9] Configuring FreeSWITCH logging..."
+
+        # Create logfile.conf.xml with proper log settings
+        cat > /etc/freeswitch/autoload_configs/logfile.conf.xml << 'LOGEOF'
+        <configuration name="logfile.conf" description="File Logging">
+          <settings>
+            <param name="rotate-on-hup" value="true"/>
+          </settings>
+          <profiles>
+            <profile name="default">
+              <settings>
+                <param name="logfile" value="/var/log/freeswitch/freeswitch.log"/>
+                <param name="rollover" value="10485760"/>
+                <param name="maximum-rotate" value="10"/>
+              </settings>
+              <mappings>
+                <map name="all" value="console,info,notice,warning,err,crit,alert"/>
+              </mappings>
+            </profile>
+          </profiles>
+        </configuration>
+        LOGEOF
+
+        # Update log level based on config
+        if [ -n "$FS_LOGLEVEL" ]; then
+          echo "Setting log level to: $FS_LOGLEVEL"
+        fi
+        echo "✓ Logging configured"
+
         # Start Admin Portal
         echo ""
-        echo "[STEP 7/8] Starting Admin Portal..."
+        echo "[STEP 9/9] Starting Admin Portal..."
         if [ "$SKIP_ADMIN" != "true" ] && [ -f /opt/admin/app.py ]; then
           cd /opt/admin
           python3 app.py &
@@ -208,16 +251,20 @@ services:
 
         # Start FreeSWITCH
         echo ""
-        echo "[STEP 8/8] Starting FreeSWITCH..."
         echo "=========================================="
         echo "InsideDynamic Wrapper v$$WRAPPER_VERSION"
         echo "FreeSWITCH is starting..."
+        echo ""
         echo "Admin Portal: http://localhost:$ADMIN_PORT"
         if [ -n "$SERVICE_FQDN_ADMIN_8888" ]; then
           echo "Admin Portal (HTTPS): https://$SERVICE_FQDN_ADMIN_8888"
         fi
+        echo ""
+        echo "Log files: /var/log/freeswitch/"
+        echo "  - freeswitch.log (main log)"
+        echo "  - Use SIP Trace button for SIP debug"
         echo "=========================================="
-        exec /usr/bin/freeswitch -nonat -nf -nc
+        exec /usr/bin/freeswitch -nonat -nf -nc -conf /etc/freeswitch -log /var/log/freeswitch -db /var/lib/freeswitch/db
 
     environment:
       # LICENSE
@@ -265,6 +312,7 @@ services:
       FS_PORT: ${FS_PORT:-8021}
       FS_PASS: ${FS_PASS:-ClueCon}
       FS_ALLOWED_IPS: ${FS_ALLOWED_IPS:-0.0.0.0}
+      FS_LOGLEVEL: ${FS_LOGLEVEL:-4}
 
       # CONFIG STORAGE
       CONFIG_FILE: ${CONFIG_FILE:-/var/lib/freeswitch/wrapper_config.json}
@@ -276,8 +324,12 @@ services:
     restart: unless-stopped
 
     volumes:
-      - freeswitch_backups:/var/backups/freeswitch
+      # Config storage (persistent)
       - wrapper_config:/var/lib/freeswitch
+      # Backups
+      - freeswitch_backups:/var/backups/freeswitch
+      # FreeSWITCH logs (for admin panel log viewer)
+      - freeswitch_logs:/var/log/freeswitch
 
     healthcheck:
       test: ["CMD", "sh", "-c", "pidof freeswitch || exit 1"]
@@ -287,9 +339,11 @@ services:
       start_period: 300s
 
 volumes:
+  wrapper_config:
+    driver: local
   freeswitch_backups:
     driver: local
-  wrapper_config:
+  freeswitch_logs:
     driver: local
 
 ################################################################################
@@ -301,6 +355,8 @@ volumes:
 # ✅ Меньше точек отказа
 # ✅ Работает даже если files.freeswitch.org недоступен
 # ✅ Admin Portal на порту 8888
+# ✅ Логи FreeSWITCH сохраняются в volume
+# ✅ i18n поддержка (EN/DE)
 #
 # ИСПОЛЬЗОВАНИЕ В COOLIFY:
 # 1. Docker Compose file: docker-compose.coolify-prebuilt.yml
@@ -313,6 +369,11 @@ volumes:
 # 3. Добавьте домен (например: admin.example.com)
 # 4. URL: https://admin.example.com (port 443 автоматически)
 # 5. Login: admin / admin (или ADMIN_USER / ADMIN_PASS)
+#
+# ЛОГИ:
+# - FreeSWITCH логи: /var/log/freeswitch/freeswitch.log
+# - Admin Portal: Logs страница с SIP Trace и Debug кнопками
+# - FS_LOGLEVEL: 0-7 (0=console, 7=debug)
 #
 # Документация: https://insidedynamic.de/wrapper
 ################################################################################

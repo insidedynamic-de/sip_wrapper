@@ -726,16 +726,31 @@ def get_recent_logs(count=15):
 
 
 ################################################################################
-# FreeSWITCH Log Reading
+# FreeSWITCH Log Reading - Multiple Log Sources
 ################################################################################
 
 import time
+import re
 
-# Possible log file locations
-FS_LOG_PATHS = [
-    '/var/log/freeswitch/freeswitch.log',
-    '/usr/local/freeswitch/log/freeswitch.log',
-    '/var/log/freeswitch.log',
+# Log file configurations: (name, paths, prefix)
+FS_LOG_SOURCES = [
+    ('main', [
+        '/var/log/freeswitch/freeswitch.log',
+        '/usr/local/freeswitch/log/freeswitch.log',
+    ], ''),
+    ('sofia', [
+        '/var/log/freeswitch/sofia.log',
+        '/var/log/freeswitch/sofia_sip.log',
+        '/usr/local/freeswitch/log/sofia.log',
+    ], '[SOFIA]'),
+    ('debug', [
+        '/var/log/freeswitch/debug.log',
+        '/usr/local/freeswitch/log/debug.log',
+    ], '[DEBUG]'),
+    ('sip', [
+        '/var/log/freeswitch/sip.log',
+        '/var/log/freeswitch/sip_trace.log',
+    ], '[SIP]'),
 ]
 
 def parse_log_level(line):
@@ -750,87 +765,150 @@ def parse_log_level(line):
     else:
         return 'info'
 
-def read_log_file(count=100):
-    """Read last N lines from FreeSWITCH log file"""
-    for log_path in FS_LOG_PATHS:
-        if os.path.isfile(log_path):
-            try:
-                # Read last N lines efficiently
-                with open(log_path, 'rb') as f:
-                    # Seek to end
-                    f.seek(0, 2)
-                    file_size = f.tell()
+def parse_log_timestamp(line):
+    """Try to extract timestamp from log line for sorting"""
+    # FreeSWITCH format: 2024-01-15 10:30:45.123456
+    match = re.match(r'(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})', line)
+    if match:
+        try:
+            from datetime import datetime
+            dt = datetime.strptime(match.group(1), '%Y-%m-%d %H:%M:%S')
+            return dt.timestamp()
+        except:
+            pass
+    return time.time()
 
-                    # Read last ~100KB or whole file if smaller
-                    read_size = min(file_size, 100 * 1024)
-                    f.seek(max(0, file_size - read_size))
-                    content = f.read().decode('utf-8', errors='replace')
+def read_single_log_file(log_path, prefix='', count=100):
+    """Read last N lines from a single log file"""
+    if not os.path.isfile(log_path):
+        return []
 
-                lines = content.split('\n')
-                logs = []
+    try:
+        with open(log_path, 'rb') as f:
+            f.seek(0, 2)
+            file_size = f.tell()
+            read_size = min(file_size, 200 * 1024)  # Read last 200KB
+            f.seek(max(0, file_size - read_size))
+            content = f.read().decode('utf-8', errors='replace')
 
-                # Take last N non-empty lines
-                for line in lines[-count-1:]:
-                    line = line.strip()
-                    if line:
-                        logs.append({
-                            'text': line[:500],
-                            'level': parse_log_level(line),
-                            'timestamp': time.time()
-                        })
+        lines = content.split('\n')
+        logs = []
 
-                if logs:
-                    return logs, log_path
-            except Exception as e:
-                print(f"Error reading {log_path}: {e}")
-                continue
+        for line in lines[-count-1:]:
+            line = line.strip()
+            if line:
+                text = f'{prefix} {line}' if prefix else line
+                logs.append({
+                    'text': text[:500],
+                    'level': parse_log_level(line),
+                    'timestamp': parse_log_timestamp(line),
+                    'source': prefix or 'main'
+                })
 
-    return [], None
+        return logs
+    except Exception as e:
+        print(f"Error reading {log_path}: {e}")
+        return []
+
+def read_all_log_files(count=100):
+    """Read from all available FreeSWITCH log files"""
+    all_logs = []
+    found_sources = []
+
+    for source_name, paths, prefix in FS_LOG_SOURCES:
+        for log_path in paths:
+            logs = read_single_log_file(log_path, prefix, count // 2)
+            if logs:
+                all_logs.extend(logs)
+                found_sources.append(f'{source_name}:{log_path}')
+                break  # Found this source, move to next
+
+    # Sort by timestamp
+    all_logs.sort(key=lambda x: x.get('timestamp', 0))
+
+    # Return last N entries
+    return all_logs[-count:] if len(all_logs) > count else all_logs, found_sources
 
 def get_logs_via_esl(count=50):
-    """Get FreeSWITCH logs - try log file first, then ESL status fallback"""
+    """Get FreeSWITCH logs - try log files first, then ESL status fallback"""
     from datetime import datetime
 
-    # Try reading from log file first
-    logs, log_path = read_log_file(count)
+    # Try reading from all log files
+    logs, sources = read_all_log_files(count)
+
     if logs:
+        source_info = ', '.join(sources) if sources else 'unknown'
         logs.insert(0, {
-            'text': f'--- Log file: {log_path} ({len(logs)} entries) ---',
+            'text': f'--- Logs from: {source_info} ({len(logs)} entries) ---',
             'level': 'info',
             'timestamp': time.time()
         })
         return logs
 
-    # Fallback: get status via ESL
+    # Fallback: get live data via ESL - comprehensive debug info
     logs = []
     try:
-        # Get FreeSWITCH status info
+        # Get FreeSWITCH debug information
         commands = [
+            # Basic status
             ('status', 'info'),
+            # Sofia SIP stack
             ('sofia status', 'info'),
+            ('sofia status profile internal', 'info'),
+            ('sofia status profile external', 'info'),
+            # Registrations with details
+            ('sofia status profile internal reg', 'debug'),
+            # Active calls
+            ('show calls', 'info'),
+            ('show channels', 'debug'),
+            # Current registrations
+            ('show registrations', 'info'),
+            # Gateway status
+            ('sofia status gateway', 'info'),
+            # Debug level info
+            ('fsctl loglevel', 'debug'),
+            # Memory/performance
+            ('status sessions', 'debug'),
         ]
 
         for cmd, level in commands:
             result = fs_cli(cmd)
-            if result:
+            if result and not result.startswith('-ERR'):
+                # Add section header
+                logs.append({
+                    'text': f'━━━ {cmd.upper()} ━━━',
+                    'level': 'info',
+                    'timestamp': time.time()
+                })
                 for line in result.split('\n'):
                     line = line.strip()
-                    if line and not line.startswith('=') and not line.startswith('-'):
+                    if line:
+                        # Detect level from content
+                        line_level = level
+                        if 'error' in line.lower() or 'fail' in line.lower():
+                            line_level = 'error'
+                        elif 'warning' in line.lower() or 'warn' in line.lower():
+                            line_level = 'warning'
                         logs.append({
-                            'text': f'[{cmd.upper()}] {line[:300]}',
-                            'level': level,
+                            'text': line[:400],
+                            'level': line_level,
                             'timestamp': time.time()
                         })
 
         if logs:
             logs.insert(0, {
-                'text': f'--- ESL Status ({FS_HOST}:{FS_PORT}) at {datetime.now().strftime("%H:%M:%S")} ---',
+                'text': f'═══ FreeSWITCH Debug ({FS_HOST}:{FS_PORT}) - {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} ═══',
                 'level': 'info',
                 'timestamp': time.time()
             })
             logs.insert(1, {
-                'text': '[INFO] Log file not found - showing ESL status. Mount /var/log/freeswitch for real logs.',
+                'text': '⚠ Log files not found. Showing ESL debug output. Mount /var/log/freeswitch/ for file logs.',
                 'level': 'warning',
+                'timestamp': time.time()
+            })
+            logs.insert(2, {
+                'text': '💡 Use "SIP Trace" button to enable detailed SIP message logging.',
+                'level': 'info',
                 'timestamp': time.time()
             })
 
@@ -844,21 +922,33 @@ def get_logs_via_esl(count=50):
     return logs[-count:] if len(logs) > count else logs
 
 def get_log_status():
-    """Get status info about log availability (always ESL)"""
+    """Get status info about log availability"""
     status = {
         'available': False,
-        'mode': 'none',  # none, esl
-        'esl_host': f'{FS_HOST}:{FS_PORT}'
+        'mode': 'none',  # none, file, esl
+        'esl_host': f'{FS_HOST}:{FS_PORT}',
+        'sources': []
     }
 
-    # Check if ESL is available
+    # Check for log files
+    for source_name, paths, _ in FS_LOG_SOURCES:
+        for log_path in paths:
+            if os.path.isfile(log_path):
+                status['sources'].append(f'{source_name}:{log_path}')
+                status['available'] = True
+                status['mode'] = 'file'
+                break
+
+    # Check if ESL is available as fallback
     if ESL_AVAILABLE:
         try:
             if fs_allowed():
-                status['available'] = True
-                status['mode'] = 'esl'
+                if not status['available']:
+                    status['available'] = True
+                    status['mode'] = 'esl'
+                status['esl_available'] = True
         except Exception:
-            pass
+            status['esl_available'] = False
 
     return status
 
@@ -1347,6 +1437,86 @@ def api_set_loglevel():
         'message': f'Saved to config (server push failed)',
         'warning': 'ESL connection error'
     })
+
+@app.route('/api/sofia-trace', methods=['POST'])
+@login_required
+def api_sofia_trace():
+    """Enable/disable Sofia SIP trace logging"""
+    if not fs_allowed():
+        return jsonify({'success': False, 'error': 'Access denied'})
+
+    data = request.json
+    enable = data.get('enable', False)
+    profile = data.get('profile', 'all')  # internal, external, or all
+
+    try:
+        if enable:
+            # Enable SIP trace for profile - maximum debug
+            fs_cli('console loglevel 7')  # DEBUG level
+            if profile == 'all':
+                fs_cli('sofia loglevel all 9')
+                fs_cli('sofia global siptrace on')
+            else:
+                fs_cli(f'sofia loglevel {profile} 9')
+                fs_cli(f'sofia profile {profile} siptrace on')
+            message = f'Sofia SIP trace enabled for {profile}'
+        else:
+            # Disable SIP trace
+            if profile == 'all':
+                fs_cli('sofia loglevel all 0')
+                fs_cli('sofia global siptrace off')
+            else:
+                fs_cli(f'sofia loglevel {profile} 0')
+                fs_cli(f'sofia profile {profile} siptrace off')
+            message = f'Sofia SIP trace disabled for {profile}'
+
+        return jsonify({'success': True, 'message': message})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/sofia-debug', methods=['GET'])
+@login_required
+def api_sofia_debug():
+    """Get detailed Sofia debug information"""
+    if not fs_allowed():
+        return jsonify({'success': False, 'error': 'Access denied'})
+
+    debug_info = []
+
+    # Get detailed sofia info
+    commands = [
+        'sofia status',
+        'sofia status profile internal',
+        'sofia status profile external',
+        'sofia status profile internal reg',
+        'sofia status gateway',
+        'sofia xmlstatus profile internal',
+        'show registrations',
+        'show calls',
+        'show channels',
+    ]
+
+    for cmd in commands:
+        result = fs_cli(cmd)
+        if result and not result.startswith('-ERR'):
+            debug_info.append({
+                'command': cmd,
+                'output': result
+            })
+
+    return jsonify({
+        'success': True,
+        'debug': debug_info,
+        'timestamp': time.time()
+    })
+
+@app.route('/api/log-sources', methods=['GET'])
+@login_required
+def api_log_sources():
+    """Get available log sources"""
+    status = get_log_status()
+    return jsonify(status)
 
 ################################################################################
 # CRUD API - Users

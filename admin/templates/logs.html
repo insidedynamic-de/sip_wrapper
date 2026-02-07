@@ -4,6 +4,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-journal-text me-2"></i>{{ t('logs') }}</h4>
     <div class="d-flex align-items-center gap-2">
+        <!-- Log Level -->
         <select id="fs-loglevel" class="form-select form-select-sm" style="width: auto;">
             <option value="0">0 - CONSOLE</option>
             <option value="1">1 - ALERT</option>
@@ -17,7 +18,28 @@
         <button class="btn btn-sm btn-primary" onclick="setLogLevel()">
             <i class="bi bi-check-lg me-1"></i>{{ t('button.save') }}
         </button>
+        <span class="mx-1">|</span>
+        <!-- Sofia Trace Toggle -->
+        <button id="sofia-trace-btn" class="btn btn-sm btn-outline-warning" onclick="toggleSofiaTrace()">
+            <i class="bi bi-broadcast me-1"></i>SIP Trace
+        </button>
+        <!-- Debug Dump -->
+        <button class="btn btn-sm btn-outline-info" onclick="showDebugDump()">
+            <i class="bi bi-bug me-1"></i>Debug
+        </button>
+        <!-- Refresh -->
+        <button class="btn btn-sm btn-outline-secondary" onclick="refreshLogs()">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
     </div>
+</div>
+
+<!-- Log Sources Info -->
+<div class="alert alert-info py-2 mb-3" id="log-sources-info" style="display: none;">
+    <small>
+        <i class="bi bi-folder me-1"></i>
+        <strong>{{ t('logs.sources') }}:</strong> <span id="log-sources-list">-</span>
+    </small>
 </div>
 
 <!-- Log Filter -->
@@ -40,6 +62,10 @@
                     <label class="btn btn-outline-info" for="filter-info">Info</label>
                     <input type="checkbox" class="btn-check" id="filter-debug" checked onchange="filterLogs()">
                     <label class="btn btn-outline-secondary" for="filter-debug">Debug</label>
+                    <input type="checkbox" class="btn-check" id="filter-sofia" checked onchange="filterLogs()">
+                    <label class="btn btn-outline-primary" for="filter-sofia">Sofia</label>
+                    <input type="checkbox" class="btn-check" id="filter-sip" checked onchange="filterLogs()">
+                    <label class="btn btn-outline-success" for="filter-sip">SIP</label>
                 </div>
             </div>
             <div class="col-auto d-flex align-items-center gap-2">
@@ -89,6 +115,14 @@
 .log-viewer .log-info {
     color: #d4d4d4;
 }
+.log-viewer .log-sofia {
+    color: #9cdcfe;
+    border-left: 3px solid #0ea5e9;
+}
+.log-viewer .log-sip {
+    color: #4ec9b0;
+    border-left: 3px solid #22c55e;
+}
 .log-viewer .log-hidden {
     display: none;
 }
@@ -126,6 +160,17 @@ function renderLogs() {
     const showWarning = document.getElementById('filter-warning').checked;
     const showInfo = document.getElementById('filter-info').checked;
     const showDebug = document.getElementById('filter-debug').checked;
+    const showSofia = document.getElementById('filter-sofia').checked;
+    const showSip = document.getElementById('filter-sip').checked;
+
+    // Update log sources display
+    if (logStatus.sources && logStatus.sources.length > 0) {
+        document.getElementById('log-sources-info').style.display = 'block';
+        document.getElementById('log-sources-list').textContent = logStatus.sources.join(', ');
+    } else if (logStatus.mode === 'esl') {
+        document.getElementById('log-sources-info').style.display = 'block';
+        document.getElementById('log-sources-list').textContent = 'ESL (' + (logStatus.esl_host || '') + ')';
+    }
 
     let visibleCount = 0;
 
@@ -154,13 +199,18 @@ function renderLogs() {
         return;
     }
 
-    // Build ESL mode indicator
+    // Build mode indicator
     let modeIndicator = '';
-    if (logStatus.mode === 'esl') {
+    if (logStatus.mode === 'file') {
+        modeIndicator = '<div class="alert alert-success py-1 px-2 mb-0 small" style="border-radius: 0;"><i class="bi bi-file-text me-1"></i>Reading from log files</div>';
+    } else if (logStatus.mode === 'esl') {
         modeIndicator = '<div class="alert alert-info py-1 px-2 mb-0 small" style="border-radius: 0;"><i class="bi bi-hdd-network me-1"></i>ESL: ' + (logStatus.esl_host || '') + '</div>';
     }
 
     const html = allLogs.map(log => {
+        const text = log.text || '';
+        const textLower = text.toLowerCase();
+
         // Check level filter
         let levelMatch = false;
         if (log.level === 'error' && showError) levelMatch = true;
@@ -168,16 +218,26 @@ function renderLogs() {
         else if (log.level === 'debug' && showDebug) levelMatch = true;
         else if (log.level === 'info' && showInfo) levelMatch = true;
 
+        // Check source filter (sofia/sip)
+        const isSofia = textLower.includes('[sofia]') || textLower.includes('sofia');
+        const isSip = textLower.includes('[sip]') || textLower.includes('sip:') || textLower.includes('invite') || textLower.includes('register');
+
+        if (isSofia && !showSofia) levelMatch = false;
+        if (isSip && !showSip) levelMatch = false;
+
         // Check text filter
-        const textMatch = !filterText || log.text.toLowerCase().includes(filterText);
+        const textMatch = !filterText || textLower.includes(filterText);
 
         const isVisible = levelMatch && textMatch;
         if (isVisible) visibleCount++;
 
-        const levelClass = `log-${log.level}`;
+        // Determine CSS class
+        let levelClass = `log-${log.level}`;
+        if (isSofia) levelClass += ' log-sofia';
+        if (isSip) levelClass += ' log-sip';
         const hiddenClass = isVisible ? '' : 'log-hidden';
 
-        return `<div class="log-line ${levelClass} ${hiddenClass}">${escapeHtml(log.text)}</div>`;
+        return `<div class="log-line ${levelClass} ${hiddenClass}">${escapeHtml(text)}</div>`;
     }).join('');
 
     container.innerHTML = modeIndicator + html;
@@ -260,10 +320,114 @@ async function getLogLevel() {
     }
 }
 
+// Sofia SIP trace toggle
+let sofiaTraceEnabled = false;
+
+async function toggleSofiaTrace() {
+    const btn = document.getElementById('sofia-trace-btn');
+    const originalHtml = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>...';
+
+    try {
+        const response = await fetch('/api/sofia-trace', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                enable: !sofiaTraceEnabled,
+                profile: 'all'
+            })
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            sofiaTraceEnabled = !sofiaTraceEnabled;
+            if (sofiaTraceEnabled) {
+                btn.className = 'btn btn-sm btn-warning';
+                btn.innerHTML = '<i class="bi bi-broadcast-pin me-1"></i>SIP Trace ON';
+            } else {
+                btn.className = 'btn btn-sm btn-outline-warning';
+                btn.innerHTML = '<i class="bi bi-broadcast me-1"></i>SIP Trace';
+            }
+            btn.disabled = false;
+            // Refresh logs to see new trace output
+            setTimeout(refreshLogs, 1000);
+        } else {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+            alert('Error: ' + (data.error || 'Failed'));
+        }
+    } catch (e) {
+        console.error('Failed to toggle sofia trace:', e);
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+    }
+}
+
+// Get log sources info
+async function getLogSources() {
+    try {
+        const response = await fetch('/api/log-sources');
+        const data = await response.json();
+        if (data.sources && data.sources.length > 0) {
+            document.getElementById('log-sources-info').style.display = 'block';
+            document.getElementById('log-sources-list').textContent = data.sources.join(', ');
+        }
+    } catch (e) {
+        console.error('Failed to get log sources:', e);
+    }
+}
+
+// Show detailed debug dump
+async function showDebugDump() {
+    const container = document.getElementById('log-container');
+    container.innerHTML = '<div class="p-3 text-center"><i class="bi bi-hourglass-split"></i> Loading debug info...</div>';
+
+    try {
+        const response = await fetch('/api/sofia-debug');
+        const data = await response.json();
+
+        if (data.success && data.debug) {
+            let html = '<div class="p-2" style="background: #1e1e1e;">';
+            html += `<div class="log-line log-info">═══ FreeSWITCH Debug Dump - ${new Date().toLocaleTimeString()} ═══</div>`;
+
+            for (const item of data.debug) {
+                html += `<div class="log-line log-warning">━━━ ${item.command.toUpperCase()} ━━━</div>`;
+                const lines = (item.output || '').split('\n');
+                for (const line of lines) {
+                    if (line.trim()) {
+                        let levelClass = 'log-info';
+                        const lineLower = line.toLowerCase();
+                        if (lineLower.includes('error') || lineLower.includes('fail')) {
+                            levelClass = 'log-error';
+                        } else if (lineLower.includes('warning')) {
+                            levelClass = 'log-warning';
+                        } else if (lineLower.includes('running') || lineLower.includes('registered')) {
+                            levelClass = 'log-sofia';
+                        }
+                        html += `<div class="log-line ${levelClass}">${escapeHtml(line)}</div>`;
+                    }
+                }
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+            document.getElementById('log-count').textContent = data.debug.length + ' commands';
+        } else {
+            container.innerHTML = '<div class="p-3 text-center text-danger">Failed to get debug info</div>';
+        }
+    } catch (e) {
+        console.error('Failed to get debug dump:', e);
+        container.innerHTML = '<div class="p-3 text-center text-danger">Error: ' + e.message + '</div>';
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     refreshLogs();
     getLogLevel();
+    getLogSources();
 });
 </script>
 {% endblock %}

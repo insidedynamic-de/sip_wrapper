@@ -196,6 +196,7 @@
     "level": "Level",
     "lines": "Zeilen",
     "entries": "Einträge",
+    "sources": "Quellen",
     "no_logs": "Keine Logs verfügbar",
     "esl_failed": "ESL-Verbindung fehlgeschlagen",
     "saved": "Gespeichert",
