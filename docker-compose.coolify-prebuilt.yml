@@ -163,6 +163,8 @@ services:
           wget --no-cache -qO /opt/admin/templates/dashboard.html $$ADMIN_BASE/templates/dashboard.html
           wget --no-cache -qO /opt/admin/templates/manage.html $$ADMIN_BASE/templates/manage.html
           wget --no-cache -qO /opt/admin/templates/logs.html $$ADMIN_BASE/templates/logs.html
+          wget --no-cache -qO /opt/admin/templates/security.html $$ADMIN_BASE/templates/security.html
+          wget --no-cache -qO /opt/admin/templates/profile.html $$ADMIN_BASE/templates/profile.html
 
           # Download static CSS
           wget --no-cache -qO /opt/admin/static/css/admin.css $$ADMIN_BASE/static/css/admin.css
@@ -170,6 +172,7 @@ services:
           # Download static JS
           wget --no-cache -qO /opt/admin/static/js/admin.js $$ADMIN_BASE/static/js/admin.js
           wget --no-cache -qO /opt/admin/static/js/manage.js $$ADMIN_BASE/static/js/manage.js
+          wget --no-cache -qO /opt/admin/static/js/security.js $$ADMIN_BASE/static/js/security.js
 
           # Download vendor files (Bootstrap)
           wget --no-cache -qO /opt/admin/static/vendor/bootstrap/bootstrap.min.css $$ADMIN_BASE/static/vendor/bootstrap/bootstrap.min.css

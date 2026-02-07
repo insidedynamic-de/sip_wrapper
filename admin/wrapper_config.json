@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-02-03T00:00:00Z",
+  "updated_at": "2026-02-07T22:55:37.362605",
   "license": {
     "key": "IDGMBH-2025-001",
     "client_name": "Mustermann GmbH"
@@ -14,7 +14,8 @@
     "codec_prefs": "G722,PCMA,PCMU,G729,opus",
     "outbound_codec_prefs": "G722,PCMA,PCMU,G729",
     "default_country_code": "49",
-    "sip_user_agent": "InsideDynamic-Wrapper"
+    "sip_user_agent": "InsideDynamic-Wrapper",
+    "fs_loglevel": 7
   },
   "users": [
     {
@@ -57,7 +58,11 @@
   "acl_users": [
     {
       "username": "vapi1",
-      "ips": ["34.213.129.25", "44.238.177.138", "44.229.228.186"],
+      "ips": [
+        "34.213.129.25",
+        "44.238.177.138",
+        "44.229.228.186"
+      ],
       "extension": "9000",
       "caller_id": "+4932221803988",
       "enabled": true
@@ -142,21 +147,77 @@
     "default_extension": "1001",
     "outbound_caller_id": "+4932221803989",
     "inbound": [
-      { "gateway": "fritz-rt", "extension": "1001" },
-      { "gateway": "3cx-rt", "extension": "1002" },
-      { "gateway": "sipgate-rt", "extension": "1005" },
-      { "gateway": "placetel-rt", "extension": "1004" },
-      { "gateway": "plusnet-rt", "extension": "1006" }
+      {
+        "gateway": "fritz-rt",
+        "extension": "1001"
+      },
+      {
+        "gateway": "3cx-rt",
+        "extension": "1002"
+      },
+      {
+        "gateway": "sipgate-rt",
+        "extension": "1005"
+      },
+      {
+        "gateway": "placetel-rt",
+        "extension": "1004"
+      },
+      {
+        "gateway": "plusnet-rt",
+        "extension": "1006"
+      }
     ],
     "outbound": [],
     "user_routes": [
-      { "username": "fritz", "gateway": "fritz-rt" },
-      { "username": "3cx", "gateway": "3cx-rt" },
-      { "username": "agfeo", "gateway": "agfeo-rt" },
-      { "username": "placetel", "gateway": "placetel-rt" },
-      { "username": "vapi1", "gateway": "agfeo-rt" },
-      { "username": "sipgate", "gateway": "sipgate-rt" },
-      { "username": "plusnet", "gateway": "plusnet-rt" }
+      {
+        "username": "fritz",
+        "gateway": "fritz-rt"
+      },
+      {
+        "username": "3cx",
+        "gateway": "3cx-rt"
+      },
+      {
+        "username": "agfeo",
+        "gateway": "agfeo-rt"
+      },
+      {
+        "username": "placetel",
+        "gateway": "placetel-rt"
+      },
+      {
+        "username": "vapi1",
+        "gateway": "agfeo-rt"
+      },
+      {
+        "username": "sipgate",
+        "gateway": "sipgate-rt"
+      },
+      {
+        "username": "plusnet",
+        "gateway": "plusnet-rt"
+      }
     ]
+  },
+  "security": {
+    "blacklist": [],
+    "whitelist": [],
+    "whitelist_enabled": false,
+    "auto_blacklist": {
+      "enabled": false,
+      "max_attempts": 10,
+      "time_window": 300,
+      "block_duration": 3600
+    },
+    "fail2ban": {
+      "enabled": false,
+      "threshold": 50,
+      "jail_name": "sip-blacklist"
+    }
+  },
+  "profile": {
+    "theme_mode": "light",
+    "color_theme": "default"
   }
 }
