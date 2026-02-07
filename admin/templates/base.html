@@ -7,6 +7,20 @@
     <link href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+    <script>
+        // Apply theme immediately to prevent flash
+        (function() {
+            const mode = localStorage.getItem('themeMode') || 'light';
+            const colorTheme = localStorage.getItem('colorTheme') || 'default';
+            if (mode === 'auto') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', mode);
+            }
+            document.documentElement.setAttribute('data-color-theme', colorTheme);
+        })();
+    </script>
 </head>
 <body>
     <div class="container-fluid">
@@ -35,11 +49,21 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'security' %}active{% endif %}" href="/security">
+                            <i class="bi bi-shield-lock"></i> {{ t('security') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'logs' %}active{% endif %}" href="/logs">
                             <i class="bi bi-journal-text"></i> {{ t('logs') }}
                         </a>
                     </li>
-                    <li class="nav-item mt-3">
+                    <li class="nav-item mt-3 border-top border-secondary pt-3">
+                        <a class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}" href="/profile">
+                            <i class="bi bi-person-circle"></i> {{ t('profile') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link text-danger" href="/logout">
                             <i class="bi bi-box-arrow-left"></i> {{ t('logout') }}
                         </a>

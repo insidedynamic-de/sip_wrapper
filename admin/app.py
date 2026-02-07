@@ -300,6 +300,7 @@ TRANSLATIONS = {
         'gateways': 'Gateways',
         'users': 'Benutzer',
         'routing': 'Routing',
+        'security': 'Sicherheit',
         'logs': 'Logs',
         'login': 'Anmelden',
         'logout': 'Abmelden',
@@ -352,6 +353,33 @@ TRANSLATIONS = {
         'duration': 'Dauer',
         'result': 'Ergebnis',
         'time': 'Zeit',
+        # Profile page
+        'change_password': 'Passwort ändern',
+        'current_password': 'Aktuelles Passwort',
+        'new_password': 'Neues Passwort',
+        'confirm_password': 'Passwort bestätigen',
+        'appearance': 'Erscheinungsbild',
+        'theme_mode': 'Theme-Modus',
+        'color_theme': 'Farbschema',
+        'company_info': 'Firmeninformationen',
+        'company_name': 'Firmenname',
+        'address': 'Adresse',
+        'zip_code': 'PLZ',
+        'city': 'Stadt',
+        'country': 'Land',
+        'invoice_info': 'Rechnungsadresse',
+        'same_as_company': 'Wie Firmenadresse',
+        'invoice_name': 'Rechnungsempfänger',
+        'invoice_address': 'Rechnungsadresse',
+        'invoice_email': 'Rechnungs-E-Mail',
+        'invoice_email_hint': 'Rechnungen werden an diese Adresse gesendet',
+        'license_info': 'Lizenzinformationen',
+        'license_key': 'Lizenzschlüssel',
+        'client_name': 'Kundenname',
+        'version': 'Version',
+        'update_license': 'Lizenz aktualisieren',
+        'activate': 'Aktivieren',
+        'passwords_not_match': 'Passwörter stimmen nicht überein',
     },
     'en': {
         'title': 'InsideDynamic Wrapper - Admin',
@@ -360,6 +388,7 @@ TRANSLATIONS = {
         'gateways': 'Gateways',
         'users': 'Users',
         'routing': 'Routing',
+        'security': 'Security',
         'logs': 'Logs',
         'login': 'Login',
         'logout': 'Logout',
@@ -412,6 +441,33 @@ TRANSLATIONS = {
         'duration': 'Duration',
         'result': 'Result',
         'time': 'Time',
+        # Profile page
+        'change_password': 'Change Password',
+        'current_password': 'Current Password',
+        'new_password': 'New Password',
+        'confirm_password': 'Confirm Password',
+        'appearance': 'Appearance',
+        'theme_mode': 'Theme Mode',
+        'color_theme': 'Color Theme',
+        'company_info': 'Company Information',
+        'company_name': 'Company Name',
+        'address': 'Address',
+        'zip_code': 'ZIP Code',
+        'city': 'City',
+        'country': 'Country',
+        'invoice_info': 'Invoice Address',
+        'same_as_company': 'Same as company address',
+        'invoice_name': 'Invoice Recipient',
+        'invoice_address': 'Invoice Address',
+        'invoice_email': 'Invoice Email',
+        'invoice_email_hint': 'Invoices will be sent to this address',
+        'license_info': 'License Information',
+        'license_key': 'License Key',
+        'client_name': 'Client Name',
+        'version': 'Version',
+        'update_license': 'Update License',
+        'activate': 'Activate',
+        'passwords_not_match': 'Passwords do not match',
     }
 }
 
@@ -736,6 +792,15 @@ def manage():
 @login_required
 def logs():
     return render_template('logs.html')
+
+@app.route('/profile')
+@login_required
+def profile():
+    # Load profile data
+    config = config_store.load_config()
+    profile_data = config.get('profile', {})
+    license_data = config.get('license', {})
+    return render_template('profile.html', profile=profile_data, license=license_data)
 
 def parse_configured_users():
     """Parse USERS and ACL_USERS environment variables"""
@@ -1704,6 +1769,87 @@ def freeswitch_directory():
 </document>'''
 
     return xml_response, 200, {'Content-Type': 'text/xml'}
+
+
+################################################################################
+# Profile API
+################################################################################
+
+@app.route('/api/profile/password', methods=['POST'])
+@login_required
+def api_profile_password():
+    """Change admin password"""
+    data = request.get_json()
+    current = data.get('current_password', '')
+    new_pass = data.get('new_password', '')
+
+    # Verify current password
+    if current != ADMIN_PASS:
+        return jsonify({'success': False, 'message': 'Aktuelles Passwort ist falsch'})
+
+    if len(new_pass) < 6:
+        return jsonify({'success': False, 'message': 'Passwort muss mindestens 6 Zeichen haben'})
+
+    # Update password in config
+    config = config_store.load_config()
+    if 'profile' not in config:
+        config['profile'] = {}
+    config['profile']['admin_password'] = new_pass
+    config_store.save_config(config)
+
+    return jsonify({'success': True, 'message': 'Passwort geändert. Neustart erforderlich.'})
+
+@app.route('/api/profile/company', methods=['POST'])
+@login_required
+def api_profile_company():
+    """Save company information"""
+    data = request.get_json()
+    config = config_store.load_config()
+    if 'profile' not in config:
+        config['profile'] = {}
+
+    config['profile']['company_name'] = data.get('company_name', '')
+    config['profile']['company_address'] = data.get('company_address', '')
+    config['profile']['company_zip'] = data.get('company_zip', '')
+    config['profile']['company_city'] = data.get('company_city', '')
+    config['profile']['company_country'] = data.get('company_country', '')
+
+    config_store.save_config(config)
+    return jsonify({'success': True, 'message': 'Firmeninformationen gespeichert'})
+
+@app.route('/api/profile/invoice', methods=['POST'])
+@login_required
+def api_profile_invoice():
+    """Save invoice information"""
+    data = request.get_json()
+    config = config_store.load_config()
+    if 'profile' not in config:
+        config['profile'] = {}
+
+    config['profile']['invoice_same_as_company'] = data.get('invoice_same_as_company', False)
+    config['profile']['invoice_name'] = data.get('invoice_name', '')
+    config['profile']['invoice_address'] = data.get('invoice_address', '')
+    config['profile']['invoice_zip'] = data.get('invoice_zip', '')
+    config['profile']['invoice_city'] = data.get('invoice_city', '')
+    config['profile']['invoice_email'] = data.get('invoice_email', '')
+
+    config_store.save_config(config)
+    return jsonify({'success': True, 'message': 'Rechnungsinformationen gespeichert'})
+
+@app.route('/api/profile/preferences', methods=['POST'])
+@login_required
+def api_profile_preferences():
+    """Save UI preferences"""
+    data = request.get_json()
+    config = config_store.load_config()
+    if 'profile' not in config:
+        config['profile'] = {}
+
+    config['profile']['theme_mode'] = data.get('theme_mode', 'light')
+    config['profile']['color_theme'] = data.get('color_theme', 'default')
+
+    config_store.save_config(config)
+    return jsonify({'success': True})
 
 
 ################################################################################

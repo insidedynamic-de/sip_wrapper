@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-person-circle me-2"></i>{{ t('profile') }}</h4>
+</div>
+
+<div class="row">
+    <!-- Left Column: User & Appearance -->
+    <div class="col-lg-6">
+        <!-- Password Change -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-key me-2"></i>{{ t('change_password') }}
+            </div>
+            <div class="card-body">
+                <form id="password-form" onsubmit="changePassword(event)">
+                    <div class="mb-3">
+                        <label class="form-label">{{ t('current_password') }}</label>
+                        <input type="password" class="form-control" id="current-password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ t('new_password') }}</label>
+                        <input type="password" class="form-control" id="new-password" required minlength="6">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ t('confirm_password') }}</label>
+                        <input type="password" class="form-control" id="confirm-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>{{ t('save') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Appearance -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-palette me-2"></i>{{ t('appearance') }}
+            </div>
+            <div class="card-body">
+                <!-- Theme Mode -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">{{ t('theme_mode') }}</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="theme-mode" id="mode-light" value="light" onchange="setThemeMode('light')">
+                        <label class="btn btn-outline-secondary" for="mode-light">
+                            <i class="bi bi-sun me-1"></i>Light
+                        </label>
+                        <input type="radio" class="btn-check" name="theme-mode" id="mode-dark" value="dark" onchange="setThemeMode('dark')">
+                        <label class="btn btn-outline-secondary" for="mode-dark">
+                            <i class="bi bi-moon me-1"></i>Dark
+                        </label>
+                        <input type="radio" class="btn-check" name="theme-mode" id="mode-auto" value="auto" onchange="setThemeMode('auto')">
+                        <label class="btn btn-outline-secondary" for="mode-auto">
+                            <i class="bi bi-circle-half me-1"></i>Auto
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Color Theme -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">{{ t('color_theme') }}</label>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="theme-option" data-theme="default" onclick="setColorTheme('default')">
+                                <div class="theme-preview">
+                                    <div class="theme-color" style="background: linear-gradient(135deg, #6366f1, #4f46e5);"></div>
+                                </div>
+                                <span>Default</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="theme-option" data-theme="ocean" onclick="setColorTheme('ocean')">
+                                <div class="theme-preview">
+                                    <div class="theme-color" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);"></div>
+                                </div>
+                                <span>Ocean</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="theme-option" data-theme="forest" onclick="setColorTheme('forest')">
+                                <div class="theme-preview">
+                                    <div class="theme-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div>
+                                </div>
+                                <span>Forest</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="theme-option" data-theme="sunset" onclick="setColorTheme('sunset')">
+                                <div class="theme-preview">
+                                    <div class="theme-color" style="background: linear-gradient(135deg, #f97316, #ea580c);"></div>
+                                </div>
+                                <span>Sunset</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Language -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">{{ t('language') }}</label>
+                    <select class="form-select" id="profile-lang" onchange="setProfileLang(this.value)">
+                        <option value="de" {% if lang == 'de' %}selected{% endif %}>Deutsch</option>
+                        <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Company & License -->
+    <div class="col-lg-6">
+        <!-- Company Info -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-building me-2"></i>{{ t('company_info') }}
+            </div>
+            <div class="card-body">
+                <form id="company-form" onsubmit="saveCompanyInfo(event)">
+                    <div class="mb-3">
+                        <label class="form-label">{{ t('company_name') }}</label>
+                        <input type="text" class="form-control" id="company-name" value="{{ profile.company_name or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ t('address') }}</label>
+                        <textarea class="form-control" id="company-address" rows="2">{{ profile.company_address or '' }}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{{ t('zip_code') }}</label>
+                            <input type="text" class="form-control" id="company-zip" value="{{ profile.company_zip or '' }}">
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">{{ t('city') }}</label>
+                            <input type="text" class="form-control" id="company-city" value="{{ profile.company_city or '' }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ t('country') }}</label>
+                        <input type="text" class="form-control" id="company-country" value="{{ profile.company_country or 'Deutschland' }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>{{ t('save') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Invoice Address -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-receipt me-2"></i>{{ t('invoice_info') }}
+            </div>
+            <div class="card-body">
+                <form id="invoice-form" onsubmit="saveInvoiceInfo(event)">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="same-as-company" onchange="toggleInvoiceAddress()" {{ 'checked' if profile.invoice_same_as_company else '' }}>
+                        <label class="form-check-label" for="same-as-company">
+                            {{ t('same_as_company') }}
+                        </label>
+                    </div>
+                    <div id="invoice-address-fields" style="{{ 'display:none' if profile.invoice_same_as_company else '' }}">
+                        <div class="mb-3">
+                            <label class="form-label">{{ t('invoice_name') }}</label>
+                            <input type="text" class="form-control" id="invoice-name" value="{{ profile.invoice_name or '' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ t('invoice_address') }}</label>
+                            <textarea class="form-control" id="invoice-address" rows="2">{{ profile.invoice_address or '' }}</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ t('zip_code') }}</label>
+                                <input type="text" class="form-control" id="invoice-zip" value="{{ profile.invoice_zip or '' }}">
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">{{ t('city') }}</label>
+                                <input type="text" class="form-control" id="invoice-city" value="{{ profile.invoice_city or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ t('invoice_email') }}</label>
+                        <input type="email" class="form-control" id="invoice-email" value="{{ profile.invoice_email or '' }}" placeholder="rechnung@example.com">
+                        <small class="text-muted">{{ t('invoice_email_hint') }}</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>{{ t('save') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- License Info -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-key-fill me-2"></i>{{ t('license_info') }}
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">{{ t('license_key') }}</div>
+                    <div class="col-sm-8">
+                        <code class="bg-light px-2 py-1 rounded">{{ license.key or 'UNLICENSED' }}</code>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">{{ t('client_name') }}</div>
+                    <div class="col-sm-8">{{ license.client_name or '-' }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">{{ t('version') }}</div>
+                    <div class="col-sm-8">
+                        <span class="badge bg-primary">v{{ version_info.version }}</span>
+                        {% if version_info.git_commit %}
+                        <span class="badge bg-secondary">{{ version_info.git_commit }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <form id="license-form" onsubmit="saveLicense(event)">
+                    <div class="mb-3">
+                        <label class="form-label">{{ t('update_license') }}</label>
+                        <input type="text" class="form-control" id="license-key" placeholder="XXXX-XXXX-XXXX-XXXX">
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-repeat me-1"></i>{{ t('activate') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.theme-option {
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.theme-option:hover {
+    border-color: var(--primary);
+}
+.theme-option.active {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+}
+.theme-preview {
+    width: 100%;
+    height: 40px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+.theme-color {
+    width: 100%;
+    height: 100%;
+}
+.theme-option span {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Theme functions
+function setThemeMode(mode) {
+    localStorage.setItem('themeMode', mode);
+    applyTheme();
+    savePreferences();
+}
+
+function setColorTheme(theme) {
+    document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
+    document.querySelector(`[data-theme="${theme}"]`).classList.add('active');
+    localStorage.setItem('colorTheme', theme);
+    applyTheme();
+    savePreferences();
+}
+
+function applyTheme() {
+    const mode = localStorage.getItem('themeMode') || 'light';
+    const colorTheme = localStorage.getItem('colorTheme') || 'default';
+
+    // Apply mode
+    if (mode === 'auto') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    } else {
+        document.documentElement.setAttribute('data-theme', mode);
+    }
+
+    // Apply color theme
+    document.documentElement.setAttribute('data-color-theme', colorTheme);
+}
+
+function setProfileLang(lang) {
+    fetch('/api/set-lang', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({lang: lang})
+    }).then(() => location.reload());
+}
+
+function toggleInvoiceAddress() {
+    const sameAs = document.getElementById('same-as-company').checked;
+    document.getElementById('invoice-address-fields').style.display = sameAs ? 'none' : '';
+}
+
+async function changePassword(e) {
+    e.preventDefault();
+    const current = document.getElementById('current-password').value;
+    const newPass = document.getElementById('new-password').value;
+    const confirm = document.getElementById('confirm-password').value;
+
+    if (newPass !== confirm) {
+        alert('{{ t("passwords_not_match") }}');
+        return;
+    }
+
+    const res = await fetch('/api/profile/password', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({current_password: current, new_password: newPass})
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (data.success) {
+        document.getElementById('password-form').reset();
+    }
+}
+
+async function saveCompanyInfo(e) {
+    e.preventDefault();
+    const data = {
+        company_name: document.getElementById('company-name').value,
+        company_address: document.getElementById('company-address').value,
+        company_zip: document.getElementById('company-zip').value,
+        company_city: document.getElementById('company-city').value,
+        company_country: document.getElementById('company-country').value
+    };
+    const res = await fetch('/api/profile/company', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    alert(result.message);
+}
+
+async function saveInvoiceInfo(e) {
+    e.preventDefault();
+    const data = {
+        invoice_same_as_company: document.getElementById('same-as-company').checked,
+        invoice_name: document.getElementById('invoice-name').value,
+        invoice_address: document.getElementById('invoice-address').value,
+        invoice_zip: document.getElementById('invoice-zip').value,
+        invoice_city: document.getElementById('invoice-city').value,
+        invoice_email: document.getElementById('invoice-email').value
+    };
+    const res = await fetch('/api/profile/invoice', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    alert(result.message);
+}
+
+async function saveLicense(e) {
+    e.preventDefault();
+    const key = document.getElementById('license-key').value;
+    const res = await fetch('/api/crud/license', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({key: key})
+    });
+    const result = await res.json();
+    alert(result.message);
+    if (result.success) location.reload();
+}
+
+async function savePreferences() {
+    const prefs = {
+        theme_mode: localStorage.getItem('themeMode') || 'light',
+        color_theme: localStorage.getItem('colorTheme') || 'default'
+    };
+    await fetch('/api/profile/preferences', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(prefs)
+    });
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function() {
+    // Set current theme mode
+    const mode = localStorage.getItem('themeMode') || 'light';
+    document.getElementById(`mode-${mode}`).checked = true;
+
+    // Set current color theme
+    const colorTheme = localStorage.getItem('colorTheme') || 'default';
+    document.querySelectorAll('.theme-option').forEach(el => {
+        if (el.dataset.theme === colorTheme) el.classList.add('active');
+    });
+
+    applyTheme();
+});
+</script>
+{% endblock %}
