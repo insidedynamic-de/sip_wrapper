@@ -22,6 +22,22 @@ FS_CONF="${FS_CONF:-/etc/freeswitch}"
 BACKUP_DIR="${BACKUP_DIR:-/var/backups/freeswitch}"
 TIMESTAMP=$(date -u '+%Y%m%d-%H%M%S')
 
+# Version - read from VERSION file
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/VERSION" ]; then
+  WRAPPER_VERSION=$(cat "$SCRIPT_DIR/VERSION" | tr -d '\n\r')
+elif [ -f "/app/VERSION" ]; then
+  WRAPPER_VERSION=$(cat "/app/VERSION" | tr -d '\n\r')
+else
+  WRAPPER_VERSION="dev"
+fi
+
+# Git commit (if available)
+GIT_COMMIT=""
+if command -v git &> /dev/null && [ -d "$SCRIPT_DIR/.git" ]; then
+  GIT_COMMIT=$(git -C "$SCRIPT_DIR" rev-parse --short HEAD 2>/dev/null || echo "")
+fi
+
 # JSON Config file path
 CONFIG_FILE="${CONFIG_FILE:-/var/lib/freeswitch/wrapper_config.json}"
 USE_JSON_CONFIG=false
@@ -269,6 +285,13 @@ error_exit() {
 show_banner() {
   local license
   local client
+  local version_str
+
+  # Build version string
+  version_str="v${WRAPPER_VERSION}"
+  if [ -n "$GIT_COMMIT" ]; then
+    version_str="${version_str} (${GIT_COMMIT})"
+  fi
 
   # Try JSON first, then ENV
   if [ "$USE_JSON_CONFIG" = true ]; then
@@ -282,9 +305,9 @@ show_banner() {
   echo ""
   echo "================================================================================"
   if [ -n "$client" ]; then
-    echo "  InsideDynamic Wrapper - ($license) für $client"
+    echo "  InsideDynamic Wrapper ${version_str} - ($license) für $client"
   else
-    echo "  InsideDynamic Wrapper - ($license)"
+    echo "  InsideDynamic Wrapper ${version_str} - ($license)"
   fi
   echo "================================================================================"
   echo "  https://github.com/insidedynamic-de/sip_wrapper"

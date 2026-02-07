@@ -5,8 +5,16 @@
 
 FROM debian:bookworm-slim
 
+# Build arguments for version info
+ARG VERSION=dev
+ARG GIT_COMMIT=unknown
+ARG BUILD_DATE=unknown
+
 LABEL maintainer="DevOps"
 LABEL description="FreeSWITCH for Coolify - Production Ready"
+LABEL version="${VERSION}"
+LABEL git.commit="${GIT_COMMIT}"
+LABEL build.date="${BUILD_DATE}"
 
 ################################################################################
 # Environment
@@ -57,11 +65,17 @@ RUN if [ -d "$FS_CONF" ]; then \
     fi
 
 ################################################################################
-# Copy scripts
+# Copy scripts and version
 ################################################################################
 
+COPY VERSION /app/VERSION
 COPY provision.sh /usr/local/bin/provision.sh
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+# Store build info
+RUN mkdir -p /app && \
+    echo "${GIT_COMMIT}" > /app/GIT_COMMIT && \
+    echo "${BUILD_DATE}" > /app/BUILD_DATE
 
 RUN chmod +x /usr/local/bin/provision.sh /usr/local/bin/docker-entrypoint.sh
 

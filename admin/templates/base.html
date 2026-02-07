@@ -16,6 +16,12 @@
                 <div class="brand">
                     <h5><i class="bi bi-telephone-fill"></i> InsideDynamic</h5>
                     <small>SIP Wrapper Admin</small>
+                    <div class="version-badge mt-1">
+                        <span class="badge bg-secondary">v{{ version_info.version }}</span>
+                        {% if version_info.git_commit %}
+                        <span class="badge bg-dark" title="{{ version_info.git_branch }}">{{ version_info.git_commit }}</span>
+                        {% endif %}
+                    </div>
                 </div>
                 <ul class="nav flex-column mt-3">
                     <li class="nav-item">

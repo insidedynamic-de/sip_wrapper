@@ -6,12 +6,86 @@ Simple web interface for FreeSWITCH configuration management
 
 import os
 import json
+import subprocess
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify, session
 from functools import wraps
 
 # Config store for CRUD operations
 import config_store
+
+# Version info
+def get_version_info():
+    """Get version info from VERSION file and git"""
+    version_info = {
+        'version': '0.0.0',
+        'git_commit': None,
+        'git_branch': None,
+        'build_date': None
+    }
+
+    # Read VERSION file
+    version_paths = [
+        Path(__file__).parent.parent / 'VERSION',
+        Path(__file__).parent / 'VERSION',
+        Path('/app/VERSION'),
+    ]
+    for vpath in version_paths:
+        if vpath.exists():
+            try:
+                version_info['version'] = vpath.read_text().strip()
+                break
+            except Exception:
+                pass
+
+    # Try Docker build info files first (for containerized deployments)
+    docker_commit_path = Path('/app/GIT_COMMIT')
+    docker_date_path = Path('/app/BUILD_DATE')
+
+    if docker_commit_path.exists():
+        try:
+            commit = docker_commit_path.read_text().strip()
+            if commit and commit != 'unknown':
+                version_info['git_commit'] = commit
+        except Exception:
+            pass
+
+    if docker_date_path.exists():
+        try:
+            build_date = docker_date_path.read_text().strip()
+            if build_date and build_date != 'unknown':
+                version_info['build_date'] = build_date
+        except Exception:
+            pass
+
+    # If no Docker info, try git directly (for local development)
+    if not version_info['git_commit']:
+        try:
+            result = subprocess.run(
+                ['git', 'rev-parse', '--short', 'HEAD'],
+                capture_output=True, text=True, timeout=5,
+                cwd=Path(__file__).parent.parent
+            )
+            if result.returncode == 0:
+                version_info['git_commit'] = result.stdout.strip()
+        except Exception:
+            pass
+
+    if not version_info['git_branch']:
+        try:
+            result = subprocess.run(
+                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                capture_output=True, text=True, timeout=5,
+                cwd=Path(__file__).parent.parent
+            )
+            if result.returncode == 0:
+                version_info['git_branch'] = result.stdout.strip()
+        except Exception:
+            pass
+
+    return version_info
+
+VERSION_INFO = get_version_info()
 
 # Load .env file for local development
 try:
@@ -350,7 +424,7 @@ def t(key):
 
 @app.context_processor
 def inject_translations():
-    return {'t': t, 'lang': get_lang()}
+    return {'t': t, 'lang': get_lang(), 'version_info': VERSION_INFO}
 
 ################################################################################
 # Authentication
@@ -798,6 +872,11 @@ def set_lang():
 ################################################################################
 # API Endpoints
 ################################################################################
+
+@app.route('/api/version')
+def api_version():
+    """Get version info"""
+    return jsonify(VERSION_INFO)
 
 @app.route('/api/config')
 def api_config():
