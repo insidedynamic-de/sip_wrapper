@@ -4,12 +4,12 @@ ESL Event Subscriber for FreeSWITCH
 Real-time event streaming via Event Socket Library
 
 All communication with FreeSWITCH goes through ESL - no file access needed.
+Uses gevent for async operations (required by greenswitch).
 """
 
 import os
 import time
 import threading
-import queue
 from datetime import datetime
 from collections import deque
 
@@ -111,20 +111,24 @@ class ESLEventSubscriber:
         self.esl = None
         self.running = False
         self.connected = False
-        self.thread = None
+        self.greenlet = None
         self.reconnect_delay = 5  # seconds
         self.last_error = None
         self.connection_attempts = 0
         self.last_event_time = None
 
     def start(self):
-        """Start the event subscriber thread"""
+        """Start the event subscriber using gevent greenlet"""
         if self.running:
             return
 
+        if not ESL_AVAILABLE:
+            print("[ESL] Cannot start - greenswitch not installed")
+            return
+
         self.running = True
-        self.thread = threading.Thread(target=self._run, daemon=True)
-        self.thread.start()
+        # Use gevent.spawn for proper async operation with greenswitch
+        self.greenlet = gevent.spawn(self._run)
         print(f"[ESL] Event subscriber started for {self.host}:{self.port}")
 
     def stop(self):
@@ -135,8 +139,11 @@ class ESLEventSubscriber:
                 self.esl.stop()
             except:
                 pass
-        if self.thread:
-            self.thread.join(timeout=5)
+        if self.greenlet:
+            try:
+                self.greenlet.kill(timeout=5)
+            except:
+                pass
         print("[ESL] Event subscriber stopped")
 
     def _run(self):
@@ -149,9 +156,9 @@ class ESLEventSubscriber:
                 self.connected = False
                 print(f"[ESL] Connection error: {e}")
 
-            # Wait before reconnecting
+            # Wait before reconnecting (use gevent.sleep!)
             if self.running:
-                time.sleep(self.reconnect_delay)
+                gevent.sleep(self.reconnect_delay)
 
     def _connect_and_subscribe(self):
         """Connect to FreeSWITCH and subscribe to events"""
@@ -166,29 +173,14 @@ class ESLEventSubscriber:
         self.connected = True
         self.last_error = None
 
-        print(f"[ESL] Connected! Registering event handlers...")
+        print(f"[ESL] Connected! esl.connected={self.esl.connected}")
 
         # Register event handler for all events
         self.esl.register_handle('*', self._on_event)
 
-        # Subscribe to events
-        event_list = []
-        custom_events = []
-        for event in self.SUBSCRIBE_EVENTS:
-            if event.startswith('CUSTOM '):
-                custom_events.append(event.split(" ", 1)[1])
-            else:
-                event_list.append(event)
-
-        # Subscribe to regular events
-        if event_list:
-            self.esl.send(f'event plain {" ".join(event_list)}')
-
-        # Subscribe to custom events
-        for custom in custom_events:
-            self.esl.send(f'event plain CUSTOM {custom}')
-
-        print(f"[ESL] Subscribed to {len(event_list)} events + {len(custom_events)} custom events")
+        # Subscribe to ALL events (simpler, more reliable)
+        result = self.esl.send('event plain all')
+        print(f"[ESL] Subscribed to all events, result={result}")
 
         # Add initial connection event
         self._add_event({
@@ -212,13 +204,25 @@ class ESLEventSubscriber:
         """Receive and process events using greenswitch's event loop"""
         try:
             # greenswitch uses gevent - start_event_handlers spawns:
-            # - receive_events greenlet (reads socket, puts in queue)
-            # - process_events greenlet (calls handlers from queue)
+            # - _receive_events_greenlet (reads socket, puts in queue)
+            # - _process_events_greenlet (calls handlers from queue)
+            print(f"[ESL] Starting event handlers, esl.connected={self.esl.connected}")
             self.esl.start_event_handlers()
+            print(f"[ESL] Event handlers started, esl.connected={self.esl.connected}")
 
-            # Wait while connected (greenlets run in background)
-            while self.running and self.esl.connected:
-                gevent.sleep(1)
+            # Wait for the receive greenlet to finish (it runs while connected)
+            # This blocks until disconnect or error
+            if hasattr(self.esl, '_receive_events_greenlet') and self.esl._receive_events_greenlet:
+                print(f"[ESL] Joining receive greenlet...")
+                self.esl._receive_events_greenlet.join()
+                print(f"[ESL] Receive greenlet finished")
+            else:
+                print(f"[ESL] No receive greenlet, polling connected status")
+                # Fallback: poll connected status
+                while self.running and self.esl.connected:
+                    gevent.sleep(1)
+
+            print(f"[ESL] Event loop ended, esl.connected={self.esl.connected}")
 
             # Add disconnect event
             if self.running:
