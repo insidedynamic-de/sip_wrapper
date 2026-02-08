@@ -17,6 +17,9 @@ import config_store
 # Auto-initialize config from ENV on first run
 config_store.init_config()
 
+# Initialize trial license if no key
+config_store.init_license()
+
 # ESL Event Subscriber for real-time FreeSWITCH events
 import esl_events
 
@@ -122,12 +125,12 @@ ADMIN_PASS = os.environ.get('ADMIN_PASS', 'admin')
 # FreeSWITCH ESL connection settings from JSON config
 def _get_esl_config():
     try:
-        from esl_events import parse_esl_address
         settings = config_store.get_settings()
-        address = settings.get('esl_address', '127.0.0.1:8021')
-        host, port = parse_esl_address(address)
-        password = settings.get('esl_password', 'ClueCon') or 'ClueCon'
-        return host, port, password
+        return (
+            settings.get('esl_host', '127.0.0.1') or '127.0.0.1',
+            int(settings.get('esl_port', 8021) or 8021),
+            settings.get('esl_password', 'ClueCon') or 'ClueCon'
+        )
     except Exception:
         return ('127.0.0.1', 8021, 'ClueCon')
 
@@ -563,7 +566,8 @@ def t(key):
 
 @app.context_processor
 def inject_translations():
-    return {'t': t, 'lang': get_lang(), 'version_info': VERSION_INFO}
+    license_status = config_store.get_license_status()
+    return {'t': t, 'lang': get_lang(), 'version_info': VERSION_INFO, 'license_status': license_status}
 
 ################################################################################
 # Authentication
@@ -1247,6 +1251,17 @@ def api_esl_clear():
     subscriber.buffer.clear()
     return jsonify({'success': True, 'message': 'Event buffer cleared'})
 
+@app.route('/api/esl/test', methods=['POST'])
+@login_required
+def api_esl_test():
+    """Test ESL connection without saving"""
+    data = request.json or {}
+    host = data.get('host', '127.0.0.1')
+    port = data.get('port', 8021)
+    password = data.get('password', 'ClueCon')
+    result = esl_events.test_esl_connection(host, port, password)
+    return jsonify(result)
+
 @app.route('/api/cdr')
 @login_required
 def api_cdr():
@@ -1676,15 +1691,26 @@ def crud_get_license():
 @app.route('/api/crud/license', methods=['PUT'])
 @login_required
 def crud_update_license():
-    """Update license info"""
+    """Update/activate license"""
     data = request.json
-    config = config_store.load_config()
-    config['license'] = {
-        'key': data.get('key', ''),
-        'client_name': data.get('client_name', '')
-    }
-    config_store.save_config(config)
-    return jsonify({'success': True, 'message': 'License updated'})
+    key = data.get('key', '')
+    client_name = data.get('client_name', '')
+
+    if key:
+        success, msg = config_store.activate_license(key, client_name)
+        return jsonify({'success': success, 'message': msg})
+    else:
+        # Just update client_name without key
+        config = config_store.load_config()
+        config['license']['client_name'] = client_name
+        config_store.save_config(config)
+        return jsonify({'success': True, 'message': 'License info updated'})
+
+@app.route('/api/license/status')
+@login_required
+def api_license_status():
+    """Get license status"""
+    return jsonify(config_store.get_license_status())
 
 ################################################################################
 # CRUD API - Inbound Routes (by gateway)
@@ -1803,10 +1829,15 @@ def api_export_config_file():
     from flask import Response
     config = config_store.get_full_config()
 
-    # Create filename with timestamp
+    # Create filename: instancename_YYYYMMDD_HHMMSS.json
     from datetime import datetime
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    filename = f"wrapper_config_{timestamp}.json"
+    settings = config.get('settings', {})
+    domain = settings.get('fs_domain', '') or 'wrapper'
+    # Sanitize domain for filename
+    import re as _re
+    safe_domain = _re.sub(r'[^a-zA-Z0-9_-]', '_', domain)
+    filename = f"{safe_domain}_{timestamp}.json"
 
     json_content = json.dumps(config, indent=2, ensure_ascii=False)
 

@@ -14,35 +14,16 @@ from datetime import datetime
 from collections import deque
 
 # ESL connection settings from JSON config (initialized from ENV on first run)
-def parse_esl_address(address):
-    """Parse ESL address string into (host, port) tuple.
-    Formats: 'hostname.domain' (port=8021), '1.2.3.4:8021', 'fs.local:9021'
-    """
-    if not address:
-        return '127.0.0.1', 8021
-    address = address.strip()
-    if ':' in address:
-        parts = address.rsplit(':', 1)
-        host = parts[0]
-        try:
-            port = int(parts[1])
-        except ValueError:
-            port = 8021
-    else:
-        host = address
-        port = 8021
-    return host, port
-
-
 def _get_esl_settings():
     """Get ESL settings from JSON config"""
     try:
         import config_store
         settings = config_store.get_settings()
-        address = settings.get('esl_address', '127.0.0.1:8021')
-        host, port = parse_esl_address(address)
-        password = settings.get('esl_password', 'ClueCon') or 'ClueCon'
-        return host, port, password
+        return (
+            settings.get('esl_host', '127.0.0.1') or '127.0.0.1',
+            int(settings.get('esl_port', 8021) or 8021),
+            settings.get('esl_password', 'ClueCon') or 'ClueCon'
+        )
     except Exception:
         return ('127.0.0.1', 8021, 'ClueCon')
 
@@ -57,6 +38,25 @@ except ImportError:
     ESL_AVAILABLE = False
     gevent = None
     print("WARNING: greenswitch not installed - ESL events will not work")
+
+
+def test_esl_connection(host, port, password):
+    """Test ESL connection without subscribing to events. Returns status dict."""
+    if not ESL_AVAILABLE:
+        return {'success': False, 'error': 'greenswitch not installed'}
+    try:
+        esl = InboundESL(host=host, port=int(port), password=password)
+        esl.connect()
+        connected = esl.connected
+        # Get FreeSWITCH version
+        result = esl.send('api version')
+        version = ''
+        if result and hasattr(result, 'data'):
+            version = result.data.strip() if isinstance(result.data, str) else result.data.decode('utf-8').strip()
+        esl.stop()
+        return {'success': connected, 'version': version}
+    except Exception as e:
+        return {'success': False, 'error': str(e)}
 
 
 class ESLEventBuffer:

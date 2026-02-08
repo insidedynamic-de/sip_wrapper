@@ -194,11 +194,31 @@
         </div>
 
         <!-- License Info -->
-        <div class="card mb-4">
+        <div class="card mb-4" id="license">
             <div class="card-header">
                 <i class="bi bi-key-fill me-2"></i>{{ t('license_info') }}
             </div>
             <div class="card-body">
+                <!-- License Status -->
+                {% if license_status.active and license_status.connection_licensed %}
+                <div class="alert alert-success py-2 mb-3">
+                    <i class="bi bi-check-circle me-1"></i>{{ t('license.licensed') }}
+                    {% if license_status.license_expires_at %}
+                    <small class="ms-2">{{ t('license.expires') }}: {{ license_status.license_expires_at[:10] }}</small>
+                    {% endif %}
+                </div>
+                {% elif license_status.is_trial and not license_status.trial_expired %}
+                <div class="alert alert-warning py-2 mb-3">
+                    <i class="bi bi-clock-history me-1"></i>{{ t('license.trial_mode') }}:
+                    <strong>{{ license_status.trial_days_remaining }}</strong> {{ t('license.days_remaining') }}
+                    <br><small>Max {{ license_status.max_connections }} {{ t('license.connections') }}</small>
+                </div>
+                {% elif license_status.trial_expired %}
+                <div class="alert alert-danger py-2 mb-3">
+                    <i class="bi bi-exclamation-triangle me-1"></i>{{ t('license.trial_expired_title') }}
+                </div>
+                {% endif %}
+
                 <div class="row mb-3">
                     <div class="col-sm-4 text-muted">{{ t('license_key') }}</div>
                     <div class="col-sm-8">
@@ -220,14 +240,191 @@
                 </div>
                 <hr>
                 <form id="license-form" onsubmit="saveLicense(event)">
-                    <div class="mb-3">
-                        <label class="form-label">{{ t('update_license') }}</label>
-                        <input type="text" class="form-control" id="license-key" placeholder="XXXX-XXXX-XXXX-XXXX">
+                    <div class="row g-2">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ t('license.license_key') }}</label>
+                            <input type="text" class="form-control" id="license-key" placeholder="XXXX-XXXX-XXXX-XXXX" minlength="8">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ t('license.client_name') }}</label>
+                            <input type="text" class="form-control" id="license-client-name" placeholder="Company GmbH">
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-outline-primary">
-                        <i class="bi bi-arrow-repeat me-1"></i>{{ t('activate') }}
+                        <i class="bi bi-key me-1"></i>{{ t('license.activate_license') }}
                     </button>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- Settings Section -->
+<!-- ========================================================================= -->
+<hr class="my-4">
+<div class="d-flex justify-content-between align-items-center mb-4" id="settings">
+    <h4 class="mb-0"><i class="bi bi-sliders me-2"></i>{{ t('section.settings') }}</h4>
+</div>
+
+<div class="row">
+    <!-- ESL Connection (FIRST!) -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-hdd-network me-2"></i>{{ t('system.esl_settings') }}
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label">Host</label>
+                        <input type="text" class="form-control" id="setting-esl-host" placeholder="127.0.0.1">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Port</label>
+                        <input type="number" class="form-control" id="setting-esl-port" value="8021" min="1" max="65535">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">{{ t('system.esl_password') }}</label>
+                        <input type="password" class="form-control" id="setting-esl-password" placeholder="ClueCon">
+                    </div>
+                </div>
+                <div id="esl-test-status" class="mt-3" style="display:none;"></div>
+                <div class="mt-3 d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="testEslConnection()" id="btn-esl-test">
+                        <i class="bi bi-plug me-1"></i>{{ t('system.esl_test') }}
+                    </button>
+                    <button class="btn btn-primary" onclick="saveSettings()">
+                        <i class="bi bi-save me-1"></i>{{ t('system.save_settings') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Server Settings -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-server me-2"></i>{{ t('system.server') }}
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">{{ t('system.fs_domain') }}</label>
+                        <input type="text" class="form-control" id="setting-fs-domain" placeholder="sip.example.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ t('system.external_sip_ip') }}</label>
+                        <input type="text" class="form-control" id="setting-external-sip-ip" placeholder="203.0.113.10">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ t('system.internal_sip_port') }}</label>
+                        <input type="number" class="form-control" id="setting-internal-sip-port" value="5060">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ t('system.external_sip_port') }}</label>
+                        <input type="number" class="form-control" id="setting-external-sip-port" value="5080">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Codec Preferences -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-soundwave me-2"></i>{{ t('system.codec_prefs') }}
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="codec-pcmu" value="PCMU">
+                            <label class="form-check-label" for="codec-pcmu">PCMU <small class="text-muted">(G.711 ulaw)</small></label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="codec-pcma" value="PCMA">
+                            <label class="form-check-label" for="codec-pcma">PCMA <small class="text-muted">(G.711 alaw)</small></label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="codec-g729" value="G729">
+                            <label class="form-check-label" for="codec-g729">G729</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="codec-opus" value="opus">
+                            <label class="form-check-label" for="codec-opus">Opus</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="codec-g722" value="G722">
+                            <label class="form-check-label" for="codec-g722">G722 <small class="text-muted">(HD)</small></label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="codec-ilbc" value="iLBC">
+                            <label class="form-check-label" for="codec-ilbc">iLBC</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Config Import / Export -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-file-earmark-code me-2"></i>{{ t('config.import_export') }}
+            </div>
+            <div class="card-body">
+                <div class="d-flex gap-2 mb-3">
+                    <button class="btn btn-outline-primary" onclick="exportConfig()">
+                        <i class="bi bi-download me-1"></i>{{ t('config.export_json') }}
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="loadDefaults()">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>{{ t('config.load_defaults') }}
+                    </button>
+                </div>
+                <div class="input-group">
+                    <input type="file" class="form-control" id="config-file-input" accept=".json">
+                    <button class="btn btn-outline-warning" onclick="importConfig()">
+                        <i class="bi bi-upload me-1"></i>{{ t('config.import_json') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Confirmation Modal -->
+<div class="modal fade" id="importConfirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>{{ t('config.import_confirm_title') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ t('config.import_confirm_text') }}</p>
+                <div id="import-preview" class="small text-muted"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="confirmImport()">
+                    <i class="bi bi-check-lg me-1"></i>{{ t('config.import_overwrite') }}
+                </button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i>{{ t('button.cancel') }}
+                </button>
             </div>
         </div>
     </div>
@@ -269,7 +466,12 @@
 
 {% block scripts %}
 <script>
-// Theme functions
+const _base = window.BASE_URL || '';
+
+// =========================================================================
+// Theme & Profile functions
+// =========================================================================
+
 function setThemeMode(mode) {
     localStorage.setItem('themeMode', mode);
     applyTheme();
@@ -287,21 +489,17 @@ function setColorTheme(theme) {
 function applyTheme() {
     const mode = localStorage.getItem('themeMode') || 'light';
     const colorTheme = localStorage.getItem('colorTheme') || 'default';
-
-    // Apply mode
     if (mode === 'auto') {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
     } else {
         document.documentElement.setAttribute('data-theme', mode);
     }
-
-    // Apply color theme
     document.documentElement.setAttribute('data-color-theme', colorTheme);
 }
 
 function setProfileLang(lang) {
-    fetch((window.BASE_URL||'') + '/api/set-lang', {
+    fetch(_base + '/api/set-lang', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({lang: lang})
@@ -317,23 +515,21 @@ async function changePassword(e) {
     e.preventDefault();
     const current = document.getElementById('current-password').value;
     const newPass = document.getElementById('new-password').value;
-    const confirm = document.getElementById('confirm-password').value;
+    const confirmPass = document.getElementById('confirm-password').value;
 
-    if (newPass !== confirm) {
+    if (newPass !== confirmPass) {
         alert('{{ t("passwords_not_match") }}');
         return;
     }
 
-    const res = await fetch((window.BASE_URL||'') + '/api/profile/password', {
+    const res = await fetch(_base + '/api/profile/password', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({current_password: current, new_password: newPass})
     });
     const data = await res.json();
     alert(data.message);
-    if (data.success) {
-        document.getElementById('password-form').reset();
-    }
+    if (data.success) document.getElementById('password-form').reset();
 }
 
 async function saveCompanyInfo(e) {
@@ -345,7 +541,7 @@ async function saveCompanyInfo(e) {
         company_city: document.getElementById('company-city').value,
         company_country: document.getElementById('company-country').value
     };
-    const res = await fetch((window.BASE_URL||'') + '/api/profile/company', {
+    const res = await fetch(_base + '/api/profile/company', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
@@ -364,7 +560,7 @@ async function saveInvoiceInfo(e) {
         invoice_city: document.getElementById('invoice-city').value,
         invoice_email: document.getElementById('invoice-email').value
     };
-    const res = await fetch((window.BASE_URL||'') + '/api/profile/invoice', {
+    const res = await fetch(_base + '/api/profile/invoice', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
@@ -376,10 +572,11 @@ async function saveInvoiceInfo(e) {
 async function saveLicense(e) {
     e.preventDefault();
     const key = document.getElementById('license-key').value;
-    const res = await fetch((window.BASE_URL||'') + '/api/crud/license', {
+    const clientName = document.getElementById('license-client-name').value;
+    const res = await fetch(_base + '/api/crud/license', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({key: key})
+        body: JSON.stringify({key: key, client_name: clientName})
     });
     const result = await res.json();
     alert(result.message);
@@ -391,26 +588,253 @@ async function savePreferences() {
         theme_mode: localStorage.getItem('themeMode') || 'light',
         color_theme: localStorage.getItem('colorTheme') || 'default'
     };
-    await fetch((window.BASE_URL||'') + '/api/profile/preferences', {
+    await fetch(_base + '/api/profile/preferences', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(prefs)
     });
 }
 
-// Initialize on load
+// =========================================================================
+// Settings functions
+// =========================================================================
+
+const CODEC_LIST = ['PCMU', 'PCMA', 'G729', 'opus', 'G722', 'iLBC'];
+
+async function loadSettings() {
+    const res = await fetch(_base + '/api/crud/settings');
+    const settings = await res.json();
+
+    document.getElementById('setting-esl-host').value = settings.esl_host || '127.0.0.1';
+    document.getElementById('setting-esl-port').value = settings.esl_port || 8021;
+    document.getElementById('setting-esl-password').value = settings.esl_password || '';
+    document.getElementById('setting-fs-domain').value = settings.fs_domain || '';
+    document.getElementById('setting-external-sip-ip').value = settings.external_sip_ip || '';
+    document.getElementById('setting-internal-sip-port').value = settings.internal_sip_port || 5060;
+    document.getElementById('setting-external-sip-port').value = settings.external_sip_port || 5080;
+
+    // Load codec checkboxes
+    const codecs = (settings.codec_prefs || '').split(',').map(c => c.trim()).filter(Boolean);
+    CODEC_LIST.forEach(c => {
+        const el = document.getElementById('codec-' + c.toLowerCase());
+        if (el) el.checked = codecs.includes(c);
+    });
+}
+
+function getSelectedCodecs() {
+    return CODEC_LIST.filter(c => {
+        const el = document.getElementById('codec-' + c.toLowerCase());
+        return el && el.checked;
+    }).join(',');
+}
+
+async function saveSettings() {
+    const data = {
+        esl_host: document.getElementById('setting-esl-host').value,
+        esl_port: parseInt(document.getElementById('setting-esl-port').value) || 8021,
+        esl_password: document.getElementById('setting-esl-password').value,
+        fs_domain: document.getElementById('setting-fs-domain').value,
+        external_sip_ip: document.getElementById('setting-external-sip-ip').value,
+        internal_sip_port: parseInt(document.getElementById('setting-internal-sip-port').value) || 5060,
+        external_sip_port: parseInt(document.getElementById('setting-external-sip-port').value) || 5080,
+        codec_prefs: getSelectedCodecs()
+    };
+
+    const res = await fetch(_base + '/api/crud/settings', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.success) {
+        showSettingsToast('Settings saved', 'success');
+    } else {
+        showSettingsToast('Failed to save settings', 'error');
+    }
+}
+
+function showSettingsToast(message, type) {
+    const div = document.createElement('div');
+    div.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed bottom-0 end-0 m-3`;
+    div.style.zIndex = '9999';
+    div.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 3000);
+}
+
+// =========================================================================
+// ESL Connection Test
+// =========================================================================
+
+async function testEslConnection() {
+    const btn = document.getElementById('btn-esl-test');
+    const statusEl = document.getElementById('esl-test-status');
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Testing...';
+    statusEl.style.display = 'block';
+    statusEl.innerHTML = '<div class="alert alert-info py-2 mb-0"><i class="bi bi-hourglass-split me-1"></i>Connecting...</div>';
+
+    const data = {
+        host: document.getElementById('setting-esl-host').value || '127.0.0.1',
+        port: parseInt(document.getElementById('setting-esl-port').value) || 8021,
+        password: document.getElementById('setting-esl-password').value || 'ClueCon'
+    };
+
+    try {
+        const res = await fetch(_base + '/api/esl/test', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            let info = '<i class="bi bi-check-circle me-1"></i>Connected';
+            if (result.version) info += ' - ' + result.version;
+            statusEl.innerHTML = `<div class="alert alert-success py-2 mb-0">${info}</div>`;
+        } else {
+            statusEl.innerHTML = `<div class="alert alert-danger py-2 mb-0"><i class="bi bi-x-circle me-1"></i>${result.error || 'Connection failed'}</div>`;
+        }
+    } catch (e) {
+        statusEl.innerHTML = `<div class="alert alert-danger py-2 mb-0"><i class="bi bi-x-circle me-1"></i>${e.message}</div>`;
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-plug me-1"></i>{{ t("system.esl_test") }}';
+}
+
+// =========================================================================
+// Config Import / Export
+// =========================================================================
+
+async function exportConfig() {
+    try {
+        const res = await fetch(_base + '/api/config/export');
+        if (!res.ok) throw new Error('Export failed');
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+
+        // Filename: instancename_YYYYMMDD_HHMMSS.json
+        const settings = await (await fetch(_base + '/api/crud/settings')).json();
+        const domain = (settings.fs_domain || 'wrapper').replace(/[^a-zA-Z0-9_-]/g, '_');
+        const now = new Date();
+        const ts = now.getFullYear().toString() +
+            String(now.getMonth()+1).padStart(2,'0') +
+            String(now.getDate()).padStart(2,'0') + '_' +
+            String(now.getHours()).padStart(2,'0') +
+            String(now.getMinutes()).padStart(2,'0') +
+            String(now.getSeconds()).padStart(2,'0');
+        a.download = `${domain}_${ts}.json`;
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        showSettingsToast('Config exported', 'success');
+    } catch (e) {
+        showSettingsToast('Export failed: ' + e.message, 'error');
+    }
+}
+
+let _pendingImportJson = null;
+
+async function importConfig() {
+    const fileInput = document.getElementById('config-file-input');
+    if (!fileInput.files.length) {
+        showSettingsToast('Please select a JSON file', 'error');
+        return;
+    }
+
+    const file = fileInput.files[0];
+    if (!file.name.endsWith('.json')) {
+        showSettingsToast('Please select a .json file', 'error');
+        return;
+    }
+
+    try {
+        const text = await file.text();
+        _pendingImportJson = JSON.parse(text);
+
+        // Show preview info
+        const preview = document.getElementById('import-preview');
+        const keys = Object.keys(_pendingImportJson);
+        const userCount = (_pendingImportJson.users || []).length;
+        const gwCount = (_pendingImportJson.gateways || []).length;
+        preview.innerHTML = `<strong>${file.name}</strong><br>` +
+            `${userCount} users, ${gwCount} gateways, ${keys.length} sections`;
+
+        new bootstrap.Modal(document.getElementById('importConfirmModal')).show();
+    } catch (e) {
+        showSettingsToast('Invalid JSON: ' + e.message, 'error');
+    }
+}
+
+async function confirmImport() {
+    if (!_pendingImportJson) return;
+
+    bootstrap.Modal.getInstance(document.getElementById('importConfirmModal')).hide();
+
+    try {
+        const res = await fetch(_base + '/api/config/import', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(_pendingImportJson)
+        });
+        const result = await res.json();
+        if (result.success) {
+            showSettingsToast('Config imported', 'success');
+            document.getElementById('config-file-input').value = '';
+            await loadSettings();
+        } else {
+            showSettingsToast(result.message || 'Import failed', 'error');
+        }
+    } catch (e) {
+        showSettingsToast('Import failed: ' + e.message, 'error');
+    }
+    _pendingImportJson = null;
+}
+
+async function loadDefaults() {
+    if (!confirm('{{ t("config.load_defaults_confirm") }}')) return;
+
+    try {
+        const res = await fetch(_base + '/api/crud/import-env', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: '{}'
+        });
+        const result = await res.json();
+        if (result.success) {
+            showSettingsToast('Defaults loaded', 'success');
+            await loadSettings();
+        } else {
+            showSettingsToast(result.message || 'Failed', 'error');
+        }
+    } catch (e) {
+        showSettingsToast('Failed: ' + e.message, 'error');
+    }
+}
+
+// =========================================================================
+// Init
+// =========================================================================
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Set current theme mode
+    // Theme init
     const mode = localStorage.getItem('themeMode') || 'light';
     document.getElementById(`mode-${mode}`).checked = true;
-
-    // Set current color theme
     const colorTheme = localStorage.getItem('colorTheme') || 'default';
     document.querySelectorAll('.theme-option').forEach(el => {
         if (el.dataset.theme === colorTheme) el.classList.add('active');
     });
-
     applyTheme();
+
+    // Load settings
+    loadSettings();
 });
 </script>
 {% endblock %}

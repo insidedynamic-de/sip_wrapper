@@ -27,11 +27,6 @@
             <i class="bi bi-signpost-2 me-1"></i>{{ t('section.routes') }}
         </button>
     </li>
-    <li class="nav-item">
-        <button class="nav-link" id="settings-btn" data-bs-toggle="tab" data-bs-target="#settings-tab">
-            <i class="bi bi-sliders me-1"></i>{{ t('section.settings') }}
-        </button>
-    </li>
 </ul>
 
 <div class="tab-content">
@@ -138,6 +133,16 @@
                         <input type="text" class="form-control" id="default-extension" placeholder="1001">
                         <small class="text-muted">{{ t('config.inbound_default') }}</small>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ t('system.outbound_caller_id') }}</label>
+                        <input type="text" class="form-control" id="default-outbound-caller-id" placeholder="+4932221803989">
+                        <small class="text-muted">{{ t('config.caller_id_desc') }}</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ t('system.default_country') }}</label>
+                        <input type="text" class="form-control" id="default-country-code" value="49" maxlength="4">
+                        <small class="text-muted">{{ t('config.country_code_desc') }}</small>
+                    </div>
                 </div>
                 <button class="btn btn-primary mt-3" onclick="saveDefaultRoutes()">
                     <i class="bi bi-save me-1"></i>{{ t('button.save_defaults') }}
@@ -190,126 +195,6 @@
                         </thead>
                         <tbody></tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Tab -->
-    <div class="tab-pane fade" id="settings-tab">
-        <!-- License -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="bi bi-key me-2"></i>{{ t('license.license') }}
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">{{ t('license.license_key') }}</label>
-                        <input type="text" class="form-control" id="setting-license-key" placeholder="XXXXX-XXXXX-XXXXX">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ t('license.client_name') }}</label>
-                        <input type="text" class="form-control" id="setting-client-name" placeholder="Company GmbH">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- System Settings -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="bi bi-sliders me-2"></i>{{ t('system.system_settings') }}
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">{{ t('system.fs_domain') }}</label>
-                        <input type="text" class="form-control" id="setting-fs-domain" placeholder="sip.example.com">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ t('system.external_sip_ip') }}</label>
-                        <input type="text" class="form-control" id="setting-external-sip-ip" placeholder="203.0.113.10">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ t('system.internal_sip_port') }}</label>
-                        <input type="number" class="form-control" id="setting-internal-sip-port" value="5060">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ t('system.external_sip_port') }}</label>
-                        <input type="number" class="form-control" id="setting-external-sip-port" value="5080">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ t('system.codec_prefs') }}</label>
-                        <input type="text" class="form-control" id="setting-codec-prefs" placeholder="PCMU,PCMA,G729">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ t('system.default_country') }}</label>
-                        <input type="text" class="form-control" id="setting-country-code" value="49">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ t('system.outbound_caller_id') }}</label>
-                        <input type="text" class="form-control" id="setting-outbound-caller-id" placeholder="+4932221803989">
-                    </div>
-                </div>
-                <button class="btn btn-primary mt-3" onclick="saveSettings()">
-                    <i class="bi bi-save me-1"></i>{{ t('system.save_settings') }}
-                </button>
-            </div>
-        </div>
-
-        <!-- ESL Connection Settings -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="bi bi-hdd-network me-2"></i>{{ t('system.esl_settings') or 'ESL Connection' }}
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-8">
-                        <label class="form-label">{{ t('system.esl_address') or 'ESL Address' }}</label>
-                        <input type="text" class="form-control" id="setting-esl-address" placeholder="127.0.0.1:8021">
-                        <small class="text-muted">{{ t('system.esl_hint') or 'hostname.domain or ip:port (default port: 8021)' }}</small>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">{{ t('system.esl_password') or 'ESL Password' }}</label>
-                        <input type="password" class="form-control" id="setting-esl-password" placeholder="ClueCon">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Config Import/Export -->
-        <div class="card">
-            <div class="card-header">
-                <i class="bi bi-file-earmark-code me-2"></i>{{ t('config.import_export') }}
-            </div>
-            <div class="card-body">
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <h6><i class="bi bi-download me-2"></i>{{ t('config.export_config') }}</h6>
-                        <p class="text-muted small">{{ t('config.export_desc') }}</p>
-                        <button class="btn btn-outline-primary" onclick="exportConfig()">
-                            <i class="bi bi-download me-1"></i>{{ t('config.export_json') }}
-                        </button>
-                    </div>
-                    <div class="col-md-6">
-                        <h6><i class="bi bi-upload me-2"></i>{{ t('config.import_config') }}</h6>
-                        <p class="text-muted small">{{ t('config.import_desc') }}</p>
-                        <input type="file" class="form-control mb-2" id="config-file-input" accept=".json">
-                        <button class="btn btn-outline-warning" onclick="importConfig()">
-                            <i class="bi bi-upload me-1"></i>{{ t('config.import_json') }}
-                        </button>
-                    </div>
-                </div>
-                <hr class="my-4">
-                <div class="row">
-                    <div class="col-12">
-                        <h6><i class="bi bi-arrow-down-circle me-2"></i>{{ t('config.import_env') }}</h6>
-                        <p class="text-muted small">{{ t('config.import_env_desc') }}</p>
-                        <button class="btn btn-outline-secondary" onclick="importFromEnv()">
-                            <i class="bi bi-cloud-download me-1"></i>{{ t('config.import_from_env') }}
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

@@ -127,6 +127,8 @@
     "connection_error": "Connection error to server",
     "outbound_calls_via": "All outbound calls go through this gateway",
     "inbound_default": "Inbound calls without specific route go here",
+    "caller_id_desc": "Fixed Caller ID for all outbound calls (optional)",
+    "country_code_desc": "Country code for number normalization (e.g. 49 for Germany)",
     "import_export": "Config Import / Export",
     "export_config": "Export Config",
     "export_desc": "Download the current configuration as JSON file",
@@ -136,7 +138,12 @@
     "import_json": "Import JSON",
     "import_env": "Import from Environment",
     "import_env_desc": "Import configuration from current environment variables (one-time migration)",
-    "import_from_env": "Import from ENV"
+    "import_from_env": "Import from ENV",
+    "load_defaults": "Load Defaults",
+    "load_defaults_confirm": "Load default configuration from environment variables? This will overwrite current settings.",
+    "import_confirm_title": "Import Configuration?",
+    "import_confirm_text": "This will overwrite the current configuration. This action cannot be undone.",
+    "import_overwrite": "Overwrite"
   },
 
   "profile": {
@@ -184,8 +191,16 @@
     "client_name": "Client Name",
     "version": "Version",
     "update_license": "Update License",
+    "activate_license": "Activate License",
     "license": "License",
-    "client": "Client"
+    "client": "Client",
+    "licensed": "Licensed",
+    "expires": "Expires",
+    "trial_mode": "Trial",
+    "days_remaining": "days remaining",
+    "connections": "connections",
+    "trial_expired_title": "Trial Expired",
+    "trial_expired_text": "Your trial period has expired. Please enter a license key to continue using the application."
   },
 
   "language": {
@@ -287,6 +302,7 @@
 
   "system": {
     "system_settings": "System Settings",
+    "server": "Server",
     "fs_domain": "FS Domain",
     "external_sip_ip": "External SIP IP",
     "internal_sip_port": "Internal SIP Port",
@@ -296,8 +312,7 @@
     "outbound_caller_id": "Outbound Caller ID",
     "save_settings": "Save Settings",
     "esl_settings": "ESL Connection",
-    "esl_address": "ESL Address",
-    "esl_password": "ESL Password",
-    "esl_hint": "hostname.domain or ip:port (default port: 8021)"
+    "esl_password": "Password",
+    "esl_test": "Test Connection"
   }
 }

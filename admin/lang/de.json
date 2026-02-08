@@ -127,6 +127,8 @@
     "connection_error": "Verbindungsfehler zum Server",
     "outbound_calls_via": "Alle ausgehenden Anrufe gehen über dieses Gateway",
     "inbound_default": "Eingehende Anrufe ohne spezifische Route gehen hierhin",
+    "caller_id_desc": "Feste Anrufer-ID für alle ausgehenden Anrufe (optional)",
+    "country_code_desc": "Ländervorwahl für Rufnummern-Normalisierung (z.B. 49 für Deutschland)",
     "import_export": "Konfiguration Import / Export",
     "export_config": "Konfiguration exportieren",
     "export_desc": "Aktuelle Konfiguration als JSON-Datei herunterladen",
@@ -136,7 +138,12 @@
     "import_json": "JSON importieren",
     "import_env": "Aus Umgebungsvariablen importieren",
     "import_env_desc": "Konfiguration aus aktuellen Umgebungsvariablen importieren (einmalige Migration)",
-    "import_from_env": "Aus ENV importieren"
+    "import_from_env": "Aus ENV importieren",
+    "load_defaults": "Defaults laden",
+    "load_defaults_confirm": "Standardkonfiguration aus Umgebungsvariablen laden? Dies überschreibt die aktuellen Einstellungen.",
+    "import_confirm_title": "Konfiguration importieren?",
+    "import_confirm_text": "Dies überschreibt die aktuelle Konfiguration. Diese Aktion kann nicht rückgängig gemacht werden.",
+    "import_overwrite": "Überschreiben"
   },
 
   "profile": {
@@ -184,8 +191,16 @@
     "client_name": "Kundenname",
     "version": "Version",
     "update_license": "Lizenz aktualisieren",
+    "activate_license": "Lizenz aktivieren",
     "license": "Lizenz",
-    "client": "Kunde"
+    "client": "Kunde",
+    "licensed": "Lizenziert",
+    "expires": "Läuft ab",
+    "trial_mode": "Testversion",
+    "days_remaining": "Tage verbleibend",
+    "connections": "Verbindungen",
+    "trial_expired_title": "Testversion abgelaufen",
+    "trial_expired_text": "Ihre Testversion ist abgelaufen. Bitte geben Sie einen Lizenzschlüssel ein, um die Anwendung weiter zu nutzen."
   },
 
   "language": {
@@ -287,6 +302,7 @@
 
   "system": {
     "system_settings": "Systemeinstellungen",
+    "server": "Server",
     "fs_domain": "FS-Domain",
     "external_sip_ip": "Externe SIP-IP",
     "internal_sip_port": "Interner SIP-Port",
@@ -296,8 +312,7 @@
     "outbound_caller_id": "Ausgehende Anrufer-ID",
     "save_settings": "Einstellungen speichern",
     "esl_settings": "ESL-Verbindung",
-    "esl_address": "ESL-Adresse",
-    "esl_password": "ESL-Passwort",
-    "esl_hint": "hostname.domain oder ip:port (Standard-Port: 8021)"
+    "esl_password": "Passwort",
+    "esl_test": "Verbindung testen"
   }
 }

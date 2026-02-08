@@ -22,9 +22,7 @@ function showToast(title, message, type = 'info') {
     bsToast.show();
 }
 
-// API helpers (BASE_URL for reverse proxy support)
-const _base = window.BASE_URL || '';
-
+// API helpers (_base defined in admin.js via base.html)
 async function apiGet(url) {
     const res = await fetch(_base + url);
     return res.json();

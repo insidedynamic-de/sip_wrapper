@@ -25,9 +25,7 @@ function showToast(title, message, type = 'info') {
     bsToast.show();
 }
 
-// API helpers (BASE_URL for reverse proxy support)
-const _base = window.BASE_URL || '';
-
+// API helpers (_base defined in admin.js via base.html)
 async function apiGet(url) {
     const res = await fetch(_base + url);
     return res.json();
@@ -65,8 +63,7 @@ async function loadAll() {
         loadUsers(),
         loadAclUsers(),
         loadGateways(),
-        loadRoutes(),
-        loadSettings()
+        loadRoutes()
     ]);
     updateGatewaySelects();
     updateUserSelects();
@@ -89,30 +86,13 @@ async function loadGateways() {
 
 async function loadRoutes() {
     routes = await apiGet('/api/crud/routes');
-    renderRoutes();
-}
-
-async function loadSettings() {
-    const settings = await apiGet('/api/crud/settings');
-    document.getElementById('setting-fs-domain').value = settings.fs_domain || '';
-    document.getElementById('setting-external-sip-ip').value = settings.external_sip_ip || '';
-    document.getElementById('setting-internal-sip-port').value = settings.internal_sip_port || 5060;
-    document.getElementById('setting-external-sip-port').value = settings.external_sip_port || 5080;
-    document.getElementById('setting-codec-prefs').value = settings.codec_prefs || '';
-    document.getElementById('setting-country-code').value = settings.default_country_code || '49';
-
-    // Load ESL settings
-    document.getElementById('setting-esl-address').value = settings.esl_address || '127.0.0.1:8021';
-    document.getElementById('setting-esl-password').value = settings.esl_password || '';
-
-    // Load license
-    const license = await apiGet('/api/crud/license');
-    document.getElementById('setting-license-key').value = license.key || '';
-    document.getElementById('setting-client-name').value = license.client_name || '';
-
-    // Load defaults (outbound_caller_id)
+    // Also load defaults (outbound_caller_id, country_code)
     const defaults = await apiGet('/api/crud/defaults');
-    document.getElementById('setting-outbound-caller-id').value = defaults.outbound_caller_id || '';
+    routes.outbound_caller_id = defaults.outbound_caller_id || '';
+    // Load settings for country code
+    const settings = await apiGet('/api/crud/settings');
+    routes._country_code = settings.default_country_code || '49';
+    renderRoutes();
 }
 
 // =============================================================================
@@ -184,6 +164,8 @@ function renderRoutes() {
     // Default routes
     document.getElementById('default-gateway').value = routes.default_gateway || '';
     document.getElementById('default-extension').value = routes.default_extension || '';
+    document.getElementById('default-outbound-caller-id').value = routes.outbound_caller_id || '';
+    document.getElementById('default-country-code').value = routes._country_code || '49';
 
     // Inbound routes
     const inboundTbody = document.querySelector('#inbound-routes-table tbody');
@@ -466,17 +448,34 @@ async function deleteGateway(name) {
 // =============================================================================
 
 async function saveDefaultRoutes() {
-    const data = {
+    // Save routes
+    const routeData = {
         default_gateway: document.getElementById('default-gateway').value,
         default_extension: document.getElementById('default-extension').value
     };
 
-    const result = await apiPut('/api/crud/routes', data);
-    if (result.success) {
+    // Save defaults (outbound_caller_id)
+    const defaultsData = {
+        outbound_caller_id: document.getElementById('default-outbound-caller-id').value
+    };
+
+    // Save country code to settings
+    const settingsData = {
+        default_country_code: document.getElementById('default-country-code').value
+    };
+
+    const results = await Promise.all([
+        apiPut('/api/crud/routes', routeData),
+        apiPut('/api/crud/defaults', defaultsData),
+        apiPut('/api/crud/settings', settingsData)
+    ]);
+
+    const allSuccess = results.every(r => r.success);
+    if (allSuccess) {
         showToast('Success', 'Default routes saved', 'success');
         await loadRoutes();
     } else {
-        showToast('Error', result.message, 'error');
+        showToast('Error', 'Failed to save', 'error');
     }
 }
 
@@ -539,54 +538,11 @@ async function saveUserRoute() {
 }
 
 async function deleteUserRoute(username) {
-    // For now, set to empty gateway (remove route)
     const data = { username, gateway: '' };
     const result = await apiPost('/api/crud/routes/user', data);
     if (result.success) {
         showToast('Success', 'User route removed', 'success');
         await loadRoutes();
-    }
-}
-
-// =============================================================================
-// Settings
-// =============================================================================
-
-async function saveSettings() {
-    // Save settings
-    const settingsData = {
-        fs_domain: document.getElementById('setting-fs-domain').value,
-        external_sip_ip: document.getElementById('setting-external-sip-ip').value,
-        internal_sip_port: parseInt(document.getElementById('setting-internal-sip-port').value) || 5060,
-        external_sip_port: parseInt(document.getElementById('setting-external-sip-port').value) || 5080,
-        codec_prefs: document.getElementById('setting-codec-prefs').value,
-        default_country_code: document.getElementById('setting-country-code').value,
-        esl_address: document.getElementById('setting-esl-address').value,
-        esl_password: document.getElementById('setting-esl-password').value
-    };
-
-    // Save license
-    const licenseData = {
-        key: document.getElementById('setting-license-key').value,
-        client_name: document.getElementById('setting-client-name').value
-    };
-
-    // Save defaults (outbound_caller_id)
-    const defaultsData = {
-        outbound_caller_id: document.getElementById('setting-outbound-caller-id').value
-    };
-
-    const results = await Promise.all([
-        apiPut('/api/crud/settings', settingsData),
-        apiPut('/api/crud/license', licenseData),
-        apiPut('/api/crud/defaults', defaultsData)
-    ]);
-
-    const allSuccess = results.every(r => r.success);
-    if (allSuccess) {
-        showToast('Success', 'Settings saved', 'success');
-    } else {
-        showToast('Error', 'Failed to save some settings', 'error');
     }
 }
 
@@ -606,98 +562,12 @@ async function applyConfig() {
 }
 
 // =============================================================================
-// Config Import / Export
-// =============================================================================
-
-async function exportConfig() {
-    try {
-        const response = await fetch(_base + '/api/config/export');
-        if (!response.ok) {
-            throw new Error('Export failed');
-        }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'wrapper_config.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-
-        showToast('Success', 'Config exported', 'success');
-    } catch (e) {
-        showToast('Error', 'Export failed: ' + e.message, 'error');
-    }
-}
-
-async function importConfig() {
-    const fileInput = document.getElementById('config-file-input');
-    if (!fileInput.files.length) {
-        showToast('Error', 'Please select a JSON file', 'error');
-        return;
-    }
-
-    const file = fileInput.files[0];
-    if (!file.name.endsWith('.json')) {
-        showToast('Error', 'Please select a .json file', 'error');
-        return;
-    }
-
-    if (!confirm('Import config will overwrite all current settings. Continue?')) {
-        return;
-    }
-
-    try {
-        const text = await file.text();
-        const json = JSON.parse(text);
-
-        const response = await fetch(_base + '/api/config/import', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(json)
-        });
-
-        const result = await response.json();
-        if (result.success) {
-            showToast('Success', result.message, 'success');
-            fileInput.value = '';
-            await loadAll();
-        } else {
-            showToast('Error', result.message, 'error');
-        }
-    } catch (e) {
-        showToast('Error', 'Invalid JSON file: ' + e.message, 'error');
-    }
-}
-
-async function importFromEnv() {
-    if (!confirm('Import from ENV variables? This will merge ENV config into current settings.')) {
-        return;
-    }
-
-    try {
-        const result = await apiPost('/api/crud/import-env', {});
-        if (result.success) {
-            showToast('Success', result.message, 'success');
-            await loadAll();
-        } else {
-            showToast('Error', result.message, 'error');
-        }
-    } catch (e) {
-        showToast('Error', 'Import failed: ' + e.message, 'error');
-    }
-}
-
-// =============================================================================
 // URL Hash Navigation
 // =============================================================================
 
 function handleHashNavigation() {
-    const hash = window.location.hash.substring(1); // Remove #
+    const hash = window.location.hash.substring(1);
     if (hash) {
-        // Find tab button with matching id (e.g., #gateways -> gateways-btn)
         const btnId = hash + '-btn';
         const tabButton = document.getElementById(btnId);
         if (tabButton) {
@@ -708,12 +578,10 @@ function handleHashNavigation() {
 }
 
 function updateHashOnTabChange() {
-    // Listen to tab changes and update URL hash
     document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
         tab.addEventListener('shown.bs.tab', function(e) {
             const targetId = e.target.getAttribute('data-bs-target');
             if (targetId) {
-                // Convert #users-tab to users
                 const hash = targetId.replace('#', '').replace('-tab', '');
                 history.replaceState(null, null, '#' + hash);
             }
@@ -731,6 +599,4 @@ document.addEventListener('DOMContentLoaded', function() {
     updateHashOnTabChange();
 });
 
-// Handle back/forward navigation
 window.addEventListener('hashchange', handleHashNavigation);
-

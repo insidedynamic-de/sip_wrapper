@@ -102,6 +102,72 @@
         </button>
     </div>
 
+    <!-- License Expired Overlay -->
+    {% if license_status and license_status.trial_expired and not license_status.active %}
+    <div id="license-overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;">
+        <div class="card shadow-lg" style="max-width:480px;width:100%;">
+            <div class="card-header bg-danger text-white text-center">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>{{ t('license.trial_expired_title') }}</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="mb-3">{{ t('license.trial_expired_text') }}</p>
+                <form id="license-overlay-form" onsubmit="activateOverlayLicense(event)">
+                    <div class="mb-3">
+                        <label class="form-label">{{ t('license.license_key') }}</label>
+                        <input type="text" class="form-control" id="overlay-license-key" placeholder="XXXX-XXXX-XXXX-XXXX" required minlength="8">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ t('license.client_name') }}</label>
+                        <input type="text" class="form-control" id="overlay-client-name" placeholder="Company GmbH">
+                    </div>
+                    <div id="overlay-license-error" class="alert alert-danger py-2 d-none"></div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-key me-1"></i>{{ t('license.activate_license') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+    async function activateOverlayLicense(e) {
+        e.preventDefault();
+        const key = document.getElementById('overlay-license-key').value;
+        const clientName = document.getElementById('overlay-client-name').value;
+        const errorEl = document.getElementById('overlay-license-error');
+        errorEl.classList.add('d-none');
+        try {
+            const res = await fetch((window.BASE_URL || '') + '/api/crud/license', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({key: key, client_name: clientName})
+            });
+            const result = await res.json();
+            if (result.success) {
+                location.reload();
+            } else {
+                errorEl.textContent = result.message || 'Activation failed';
+                errorEl.classList.remove('d-none');
+            }
+        } catch (err) {
+            errorEl.textContent = err.message;
+            errorEl.classList.remove('d-none');
+        }
+    }
+    </script>
+    {% endif %}
+
+    <!-- Trial Banner -->
+    {% if license_status and license_status.is_trial and not license_status.trial_expired %}
+    <div class="trial-banner" style="position:fixed;bottom:60px;right:20px;z-index:1050;max-width:300px;">
+        <div class="alert alert-warning py-2 px-3 shadow-sm mb-0 small">
+            <i class="bi bi-clock-history me-1"></i>
+            {{ t('license.trial_mode') }}: <strong>{{ license_status.trial_days_remaining }}</strong> {{ t('license.days_remaining') }}
+            <br><small class="text-muted">Max {{ license_status.max_connections }} {{ t('license.connections') }}</small>
+            <a href="{{ url_for('profile') }}#license" class="d-block mt-1 small">{{ t('license.activate_license') }} &rarr;</a>
+        </div>
+    </div>
+    {% endif %}
+
     <script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
     <script>

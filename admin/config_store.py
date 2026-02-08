@@ -22,7 +22,12 @@ DEFAULT_CONFIG = {
     "updated_at": None,
     "license": {
         "key": "",
-        "client_name": ""
+        "client_name": "",
+        "trial_started_at": None,
+        "trial_days": 14,
+        "max_connections": 2,
+        "connection_licensed": False,
+        "license_expires_at": None
     },
     "settings": {
         "fs_domain": "",
@@ -34,7 +39,8 @@ DEFAULT_CONFIG = {
         "outbound_codec_prefs": "PCMU,PCMA,G729",
         "default_country_code": "49",
         "sip_user_agent": "InsideDynamic-Wrapper",
-        "esl_address": "127.0.0.1:8021",
+        "esl_host": "127.0.0.1",
+        "esl_port": 8021,
         "esl_password": "ClueCon"
     },
     "users": [],
@@ -93,6 +99,11 @@ def load_config():
                     for key in DEFAULT_CONFIG.get('settings', {}):
                         if key not in config['settings']:
                             config['settings'][key] = DEFAULT_CONFIG['settings'][key]
+                # Merge nested license defaults (for new trial fields)
+                if 'license' in config:
+                    for key in DEFAULT_CONFIG.get('license', {}):
+                        if key not in config['license']:
+                            config['license'][key] = DEFAULT_CONFIG['license'][key]
                 return config
         except (json.JSONDecodeError, IOError) as e:
             print(f"Error loading config: {e}")
@@ -639,10 +650,8 @@ def import_from_env():
     config['settings']['default_country_code'] = os.environ.get('DEFAULT_COUNTRY_CODE', '49')
 
     # Import ESL connection settings
-    # ESL connection: combine FS_HOST:FS_PORT into single address
-    esl_host = os.environ.get('FS_HOST', '127.0.0.1')
-    esl_port = os.environ.get('FS_PORT', '8021')
-    config['settings']['esl_address'] = config['settings'].get('esl_address', '') or f'{esl_host}:{esl_port}'
+    config['settings']['esl_host'] = os.environ.get('FS_HOST', config['settings'].get('esl_host', '127.0.0.1'))
+    config['settings']['esl_port'] = int(os.environ.get('FS_PORT', config['settings'].get('esl_port', 8021)))
     config['settings']['esl_password'] = os.environ.get('FS_PASS', config['settings'].get('esl_password', 'ClueCon'))
 
     save_config(config)
@@ -1053,3 +1062,105 @@ def reset_blocked_count(ip):
             save_config(config)
             return True, "Blocked count reset"
     return False, "IP not found"
+
+
+# =============================================================================
+# License System
+# =============================================================================
+
+def init_license():
+    """Initialize trial license on first start if no license key exists"""
+    config = load_config()
+    license_data = config.get('license', {})
+
+    # Already has a key - skip
+    if license_data.get('key'):
+        return
+
+    # Already has trial started - skip
+    if license_data.get('trial_started_at'):
+        return
+
+    # First start - initialize trial
+    print("[License] First start - initializing trial license (14 days, 2 connections)")
+    config['license'] = {
+        'key': '',
+        'client_name': license_data.get('client_name', ''),
+        'trial_started_at': datetime.now().isoformat(),
+        'trial_days': 14,
+        'max_connections': 2,
+        'connection_licensed': False,
+        'license_expires_at': None
+    }
+    save_config(config)
+
+
+def get_license_status():
+    """Get comprehensive license status"""
+    config = load_config()
+    license_data = config.get('license', {})
+
+    status = {
+        'has_key': bool(license_data.get('key')),
+        'key': license_data.get('key', ''),
+        'client_name': license_data.get('client_name', ''),
+        'connection_licensed': license_data.get('connection_licensed', False),
+        'license_expires_at': license_data.get('license_expires_at'),
+        'max_connections': license_data.get('max_connections', 2),
+        'is_trial': False,
+        'trial_expired': False,
+        'trial_days_remaining': 0,
+        'trial_started_at': license_data.get('trial_started_at'),
+        'active': False
+    }
+
+    # Licensed with valid key
+    if status['connection_licensed'] and status['has_key']:
+        expires = license_data.get('license_expires_at')
+        if expires:
+            try:
+                expires_dt = datetime.fromisoformat(expires)
+                status['active'] = datetime.now() < expires_dt
+            except (ValueError, TypeError):
+                status['active'] = True
+        else:
+            status['active'] = True
+        return status
+
+    # Trial mode
+    trial_started = license_data.get('trial_started_at')
+    if trial_started:
+        status['is_trial'] = True
+        trial_days = license_data.get('trial_days', 14)
+        try:
+            started_dt = datetime.fromisoformat(trial_started)
+            elapsed = (datetime.now() - started_dt).days
+            remaining = max(0, trial_days - elapsed)
+            status['trial_days_remaining'] = remaining
+            status['trial_expired'] = remaining <= 0
+            status['active'] = remaining > 0
+        except (ValueError, TypeError):
+            status['trial_expired'] = True
+            status['active'] = False
+    else:
+        # No trial, no key - init trial
+        init_license()
+        return get_license_status()
+
+    return status
+
+
+def activate_license(key, client_name=''):
+    """Activate a license key. Returns success status."""
+    if not key or len(key) < 8:
+        return False, "Invalid license key"
+
+    config = load_config()
+    config['license']['key'] = key
+    config['license']['client_name'] = client_name
+    config['license']['connection_licensed'] = True
+    # Set expiry to 1 year from now (server-side validation would override this)
+    from datetime import timedelta
+    config['license']['license_expires_at'] = (datetime.now() + timedelta(days=365)).isoformat()
+    save_config(config)
+    return True, "License activated"

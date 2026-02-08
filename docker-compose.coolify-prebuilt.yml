@@ -177,11 +177,13 @@ services:
 
           # Download static CSS
           wget --no-cache -qO /opt/admin/static/css/admin.css $$ADMIN_BASE/static/css/admin.css
+          wget --no-cache -qO /opt/admin/static/css/login.css $$ADMIN_BASE/static/css/login.css
 
           # Download static JS
           wget --no-cache -qO /opt/admin/static/js/admin.js $$ADMIN_BASE/static/js/admin.js
           wget --no-cache -qO /opt/admin/static/js/manage.js $$ADMIN_BASE/static/js/manage.js
           wget --no-cache -qO /opt/admin/static/js/security.js $$ADMIN_BASE/static/js/security.js
+          wget --no-cache -qO /opt/admin/static/js/login.js $$ADMIN_BASE/static/js/login.js
 
           # Download language files
           wget --no-cache -qO /opt/admin/lang/en.json $$ADMIN_BASE/lang/en.json
@@ -355,38 +357,12 @@ services:
       DEFAULT_COUNTRY_CODE: ${DEFAULT_COUNTRY_CODE:-49}
       OUTBOUND_CALLER_ID: ${OUTBOUND_CALLER_ID:-}
 
-      # OPTIONAL
-      ACL_USERS: ${ACL_USERS:-}
-      INTERNAL_SIP_PORT: ${INTERNAL_SIP_PORT:-5060}
-      EXTERNAL_SIP_PORT: ${EXTERNAL_SIP_PORT:-5080}
-      RTP_START_PORT: ${RTP_START_PORT:-16384}
-      RTP_END_PORT: ${RTP_END_PORT:-32768}
-      CODEC_PREFS: ${CODEC_PREFS:-PCMU,PCMA,G729,opus}
-      OUTBOUND_CODEC_PREFS: ${OUTBOUND_CODEC_PREFS:-}
-      SIP_USER_AGENT: ${SIP_USER_AGENT:-InsideDynamic-Wrapper}
-      SIP_DEBUG: ${SIP_DEBUG:-0}
-      SIP_TRACE: ${SIP_TRACE:-no}
-
       # ADMIN PORTAL
       ADMIN_PORT: ${ADMIN_PORT:-8888}
       ADMIN_USER: ${ADMIN_USER:-admin}
       ADMIN_PASS: ${ADMIN_PASS:-admin}
       ADMIN_SECRET: ${ADMIN_SECRET:-insidedynamic-wrapper-secret}
-      SKIP_ADMIN: ${SKIP_ADMIN:-false}
       SERVICE_FQDN_ADMIN_8888: ${SERVICE_FQDN_ADMIN_8888:-}
-
-      # ADMIN ESL CONNECTION (FreeSWITCH Event Socket)
-      FS_HOST: ${FS_HOST:-127.0.0.1}
-      FS_PORT: ${FS_PORT:-8021}
-      FS_PASS: ${FS_PASS:-ClueCon}
-      FS_ALLOWED_IPS: ${FS_ALLOWED_IPS:-0.0.0.0}
-      FS_LOGLEVEL: ${FS_LOGLEVEL:-4}
-
-      # CONFIG STORAGE
-      CONFIG_FILE: ${CONFIG_FILE:-/var/lib/freeswitch/wrapper_config.json}
-
-      # DEBUG
-      DEBUG: ${DEBUG:-false}
 
     network_mode: host
     restart: unless-stopped
@@ -396,7 +372,7 @@ services:
       - wrapper_config:/var/lib/freeswitch
       # Backups
       - freeswitch_backups:/var/backups/freeswitch
-      # FreeSWITCH logs (for admin panel log viewer)
+      # FreeSWITCH logs
       - freeswitch_logs:/var/log/freeswitch
 
     healthcheck:
@@ -423,7 +399,7 @@ volumes:
 # ✅ Меньше точек отказа
 # ✅ Работает даже если files.freeswitch.org недоступен
 # ✅ Admin Portal на порту 8888
-# ✅ Логи FreeSWITCH сохраняются в volume
+# ✅ ESL Events - real-time logs (no file access needed)
 # ✅ i18n поддержка (EN/DE)
 #
 # ИСПОЛЬЗОВАНИЕ В COOLIFY:
@@ -439,9 +415,8 @@ volumes:
 # 5. Login: admin / admin (или ADMIN_USER / ADMIN_PASS)
 #
 # ЛОГИ:
-# - FreeSWITCH логи: /var/log/freeswitch/freeswitch.log
-# - Admin Portal: Logs страница с SIP Trace и Debug кнопками
-# - FS_LOGLEVEL: 0-7 (0=console, 7=debug)
+# - Admin Portal → Logs страница (ESL Events, real-time)
+# - Настройки ESL/SIP Debug через Admin Panel
 #
 # Документация: https://insidedynamic.de/wrapper
 ################################################################################
