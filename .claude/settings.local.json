@@ -16,7 +16,9 @@
       "Bash(do echo -n \"$f: \")",
       "Bash(done)",
       "WebFetch(domain:github.com)",
-      "Bash(docker-compose:*)"
+      "Bash(docker-compose:*)",
+      "Bash(pip show:*)",
+      "Bash(if exist \"c:\\\\PROJECTS\\\\sip_wrapper\\\\nul\" del \"c:\\\\PROJECTS\\\\sip_wrapper\\\\nul\")"
     ]
   }
 }

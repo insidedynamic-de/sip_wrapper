@@ -18,12 +18,14 @@ FS_HOST = os.environ.get('FS_HOST', '127.0.0.1')
 FS_PORT = int(os.environ.get('FS_PORT', '8021'))
 FS_PASS = os.environ.get('FS_PASS', 'ClueCon')
 
-# Try to import greenswitch
+# Try to import greenswitch (requires gevent)
 try:
+    import gevent
     from greenswitch import InboundESL
     ESL_AVAILABLE = True
 except ImportError:
     ESL_AVAILABLE = False
+    gevent = None
     print("WARNING: greenswitch not installed - ESL events will not work")
 
 
@@ -164,15 +166,29 @@ class ESLEventSubscriber:
         self.connected = True
         self.last_error = None
 
-        print(f"[ESL] Connected! Subscribing to events...")
+        print(f"[ESL] Connected! Registering event handlers...")
+
+        # Register event handler for all events
+        self.esl.register_handle('*', self._on_event)
 
         # Subscribe to events
+        event_list = []
+        custom_events = []
         for event in self.SUBSCRIBE_EVENTS:
             if event.startswith('CUSTOM '):
-                # Custom events need special handling
-                self.esl.send(f'event plain CUSTOM {event.split(" ", 1)[1]}')
+                custom_events.append(event.split(" ", 1)[1])
             else:
-                self.esl.send(f'event plain {event}')
+                event_list.append(event)
+
+        # Subscribe to regular events
+        if event_list:
+            self.esl.send(f'event plain {" ".join(event_list)}')
+
+        # Subscribe to custom events
+        for custom in custom_events:
+            self.esl.send(f'event plain CUSTOM {custom}')
+
+        print(f"[ESL] Subscribed to {len(event_list)} events + {len(custom_events)} custom events")
 
         # Add initial connection event
         self._add_event({
@@ -182,22 +198,48 @@ class ESLEventSubscriber:
             'level': 'info'
         })
 
-        # Start receiving events
+        # Start receiving events (blocking call)
         self._receive_events()
 
+    def _on_event(self, event):
+        """Callback for incoming ESL events"""
+        try:
+            self._process_event(event)
+        except Exception as e:
+            print(f"[ESL] Event handler error: {e}")
+
     def _receive_events(self):
-        """Receive and process events"""
-        while self.running and self.connected:
-            try:
-                # Use recv with timeout
-                event = self.esl.recv_event()
-                if event:
-                    self._process_event(event)
-            except Exception as e:
-                if self.running:
-                    print(f"[ESL] Receive error: {e}")
-                    self.connected = False
-                break
+        """Receive and process events using greenswitch's event loop"""
+        try:
+            # greenswitch uses gevent - start_event_handlers spawns:
+            # - receive_events greenlet (reads socket, puts in queue)
+            # - process_events greenlet (calls handlers from queue)
+            self.esl.start_event_handlers()
+
+            # Wait while connected (greenlets run in background)
+            while self.running and self.esl.connected:
+                gevent.sleep(1)
+
+            # Add disconnect event
+            if self.running:
+                self._add_event({
+                    'type': 'SYSTEM',
+                    'subtype': 'DISCONNECTED',
+                    'text': f'ESL disconnected from {self.host}:{self.port}',
+                    'level': 'warning'
+                })
+
+        except Exception as e:
+            if self.running:
+                print(f"[ESL] Receive error: {e}")
+                self._add_event({
+                    'type': 'SYSTEM',
+                    'subtype': 'ERROR',
+                    'text': f'ESL error: {e}',
+                    'level': 'error'
+                })
+        finally:
+            self.connected = False
 
     def _process_event(self, event):
         """Process incoming ESL event"""
