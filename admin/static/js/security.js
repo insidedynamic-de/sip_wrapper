@@ -22,14 +22,16 @@ function showToast(title, message, type = 'info') {
     bsToast.show();
 }
 
-// API helpers
+// API helpers (BASE_URL for reverse proxy support)
+const _base = window.BASE_URL || '';
+
 async function apiGet(url) {
-    const res = await fetch(url);
+    const res = await fetch(_base + url);
     return res.json();
 }
 
 async function apiPost(url, data) {
-    const res = await fetch(url, {
+    const res = await fetch(_base + url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -38,7 +40,7 @@ async function apiPost(url, data) {
 }
 
 async function apiDelete(url) {
-    const res = await fetch(url, { method: 'DELETE' });
+    const res = await fetch(_base + url, { method: 'DELETE' });
     return res.json();
 }
 

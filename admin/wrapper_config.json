@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-02-08T00:25:27.600108",
+  "updated_at": "2026-02-08T18:28:19.195708",
   "license": {
     "key": "IDGMBH-2025-001",
     "client_name": "Mustermann GmbH"
@@ -202,7 +202,13 @@
   },
   "security": {
     "blacklist": [],
-    "whitelist": [],
+    "whitelist": [
+      {
+        "ip": "192.168.178.0/32",
+        "comment": "",
+        "added_at": "2026-02-08T18:28:19.195585"
+      }
+    ],
     "whitelist_enabled": false,
     "auto_blacklist": {
       "enabled": false,
@@ -218,6 +224,6 @@
   },
   "profile": {
     "theme_mode": "light",
-    "color_theme": "forest"
+    "color_theme": "ocean"
   }
 }

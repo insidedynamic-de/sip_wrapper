@@ -294,6 +294,10 @@
     "codec_prefs": "Codec Preferences",
     "default_country": "Default Country Code",
     "outbound_caller_id": "Outbound Caller ID",
-    "save_settings": "Save Settings"
+    "save_settings": "Save Settings",
+    "esl_settings": "ESL Connection",
+    "esl_address": "ESL Address",
+    "esl_password": "ESL Password",
+    "esl_hint": "hostname.domain or ip:port (default port: 8021)"
   }
 }

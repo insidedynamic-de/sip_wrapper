@@ -25,14 +25,16 @@ function showToast(title, message, type = 'info') {
     bsToast.show();
 }
 
-// API helpers
+// API helpers (BASE_URL for reverse proxy support)
+const _base = window.BASE_URL || '';
+
 async function apiGet(url) {
-    const res = await fetch(url);
+    const res = await fetch(_base + url);
     return res.json();
 }
 
 async function apiPost(url, data) {
-    const res = await fetch(url, {
+    const res = await fetch(_base + url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -41,7 +43,7 @@ async function apiPost(url, data) {
 }
 
 async function apiPut(url, data) {
-    const res = await fetch(url, {
+    const res = await fetch(_base + url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -50,7 +52,7 @@ async function apiPut(url, data) {
 }
 
 async function apiDelete(url) {
-    const res = await fetch(url, { method: 'DELETE' });
+    const res = await fetch(_base + url, { method: 'DELETE' });
     return res.json();
 }
 
@@ -98,6 +100,10 @@ async function loadSettings() {
     document.getElementById('setting-external-sip-port').value = settings.external_sip_port || 5080;
     document.getElementById('setting-codec-prefs').value = settings.codec_prefs || '';
     document.getElementById('setting-country-code').value = settings.default_country_code || '49';
+
+    // Load ESL settings
+    document.getElementById('setting-esl-address').value = settings.esl_address || '127.0.0.1:8021';
+    document.getElementById('setting-esl-password').value = settings.esl_password || '';
 
     // Load license
     const license = await apiGet('/api/crud/license');
@@ -554,7 +560,9 @@ async function saveSettings() {
         internal_sip_port: parseInt(document.getElementById('setting-internal-sip-port').value) || 5060,
         external_sip_port: parseInt(document.getElementById('setting-external-sip-port').value) || 5080,
         codec_prefs: document.getElementById('setting-codec-prefs').value,
-        default_country_code: document.getElementById('setting-country-code').value
+        default_country_code: document.getElementById('setting-country-code').value,
+        esl_address: document.getElementById('setting-esl-address').value,
+        esl_password: document.getElementById('setting-esl-password').value
     };
 
     // Save license
@@ -603,7 +611,7 @@ async function applyConfig() {
 
 async function exportConfig() {
     try {
-        const response = await fetch('/api/config/export');
+        const response = await fetch(_base + '/api/config/export');
         if (!response.ok) {
             throw new Error('Export failed');
         }
@@ -645,7 +653,7 @@ async function importConfig() {
         const text = await file.text();
         const json = JSON.parse(text);
 
-        const response = await fetch('/api/config/import', {
+        const response = await fetch(_base + '/api/config/import', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(json)

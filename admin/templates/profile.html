@@ -301,7 +301,7 @@ function applyTheme() {
 }
 
 function setProfileLang(lang) {
-    fetch('/api/set-lang', {
+    fetch((window.BASE_URL||'') + '/api/set-lang', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({lang: lang})
@@ -324,7 +324,7 @@ async function changePassword(e) {
         return;
     }
 
-    const res = await fetch('/api/profile/password', {
+    const res = await fetch((window.BASE_URL||'') + '/api/profile/password', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({current_password: current, new_password: newPass})
@@ -345,7 +345,7 @@ async function saveCompanyInfo(e) {
         company_city: document.getElementById('company-city').value,
         company_country: document.getElementById('company-country').value
     };
-    const res = await fetch('/api/profile/company', {
+    const res = await fetch((window.BASE_URL||'') + '/api/profile/company', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
@@ -364,7 +364,7 @@ async function saveInvoiceInfo(e) {
         invoice_city: document.getElementById('invoice-city').value,
         invoice_email: document.getElementById('invoice-email').value
     };
-    const res = await fetch('/api/profile/invoice', {
+    const res = await fetch((window.BASE_URL||'') + '/api/profile/invoice', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
@@ -376,7 +376,7 @@ async function saveInvoiceInfo(e) {
 async function saveLicense(e) {
     e.preventDefault();
     const key = document.getElementById('license-key').value;
-    const res = await fetch('/api/crud/license', {
+    const res = await fetch((window.BASE_URL||'') + '/api/crud/license', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({key: key})
@@ -391,7 +391,7 @@ async function savePreferences() {
         theme_mode: localStorage.getItem('themeMode') || 'light',
         color_theme: localStorage.getItem('colorTheme') || 'default'
     };
-    await fetch('/api/profile/preferences', {
+    await fetch((window.BASE_URL||'') + '/api/profile/preferences', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(prefs)

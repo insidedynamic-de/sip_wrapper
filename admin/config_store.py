@@ -33,7 +33,9 @@ DEFAULT_CONFIG = {
         "codec_prefs": "PCMU,PCMA,G729,opus",
         "outbound_codec_prefs": "PCMU,PCMA,G729",
         "default_country_code": "49",
-        "sip_user_agent": "InsideDynamic-Wrapper"
+        "sip_user_agent": "InsideDynamic-Wrapper",
+        "esl_address": "127.0.0.1:8021",
+        "esl_password": "ClueCon"
     },
     "users": [],
     "acl_users": [],
@@ -76,20 +78,35 @@ def get_config_path():
 
 
 def load_config():
-    """Load config from JSON file"""
+    """Load config from JSON file. Merges missing keys from defaults."""
     path = get_config_path()
     if path.exists():
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
-                # Merge with defaults for any missing keys
+                # Merge with defaults for any missing top-level keys
                 for key in DEFAULT_CONFIG:
                     if key not in config:
                         config[key] = DEFAULT_CONFIG[key]
+                # Merge nested settings defaults (for new settings like esl_*)
+                if 'settings' in config:
+                    for key in DEFAULT_CONFIG.get('settings', {}):
+                        if key not in config['settings']:
+                            config['settings'][key] = DEFAULT_CONFIG['settings'][key]
                 return config
         except (json.JSONDecodeError, IOError) as e:
             print(f"Error loading config: {e}")
     return DEFAULT_CONFIG.copy()
+
+
+def init_config():
+    """Initialize config on first run. Creates config from ENV if no config exists."""
+    path = get_config_path()
+    if not path.exists():
+        print("[Config] First run - creating config from environment variables...")
+        import_from_env()
+        return True
+    return False
 
 
 def save_config(config):
@@ -620,6 +637,13 @@ def import_from_env():
     if 'settings' not in config:
         config['settings'] = DEFAULT_CONFIG['settings'].copy()
     config['settings']['default_country_code'] = os.environ.get('DEFAULT_COUNTRY_CODE', '49')
+
+    # Import ESL connection settings
+    # ESL connection: combine FS_HOST:FS_PORT into single address
+    esl_host = os.environ.get('FS_HOST', '127.0.0.1')
+    esl_port = os.environ.get('FS_PORT', '8021')
+    config['settings']['esl_address'] = config['settings'].get('esl_address', '') or f'{esl_host}:{esl_port}'
+    config['settings']['esl_password'] = os.environ.get('FS_PASS', config['settings'].get('esl_password', 'ClueCon'))
 
     save_config(config)
     return imported

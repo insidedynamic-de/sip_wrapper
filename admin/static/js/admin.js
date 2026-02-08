@@ -1,5 +1,6 @@
 // SIP Wrapper Admin JavaScript
 
+const _base = window.BASE_URL || '';
 let refreshIntervalId = null;
 const STORAGE_KEY = 'adminRefreshInterval';
 
@@ -18,7 +19,7 @@ function initTranslations(translations) {
 
 // Language switching
 function setLang(lang) {
-    fetch('/api/set-lang', {
+    fetch(_base + '/api/set-lang', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({lang: lang})
@@ -28,7 +29,7 @@ function setLang(lang) {
 // Refresh status from API
 function refreshStatus() {
     // Refresh main status (gateways, users, profiles)
-    fetch('/api/status')
+    fetch(_base + '/api/status')
         .then(r => r.json())
         .then(data => {
             updateDashboardUI(data);
@@ -57,7 +58,7 @@ function refreshLogsSilent() {
     const container = document.getElementById('logs-preview-container');
     if (!container) return;
 
-    fetch('/api/logs?count=10')
+    fetch(_base + '/api/logs?count=10')
         .then(r => r.json())
         .then(data => {
             if (!data.logs || data.logs.length === 0) {
@@ -92,7 +93,7 @@ function refreshActiveCalls() {
     const card = document.getElementById('active-calls-card');
     if (!container || !card) return;
 
-    fetch('/api/active-calls')
+    fetch(_base + '/api/active-calls')
         .then(r => r.json())
         .then(data => {
             // Update call count in stat card
@@ -165,7 +166,7 @@ function refreshCDRSilent() {
     const container = document.getElementById('cdr-container');
     if (!container) return;
 
-    fetch('/api/cdr?count=10')
+    fetch(_base + '/api/cdr?count=10')
         .then(r => r.json())
         .then(data => {
             if (!data.calls || data.calls.length === 0) {
@@ -361,7 +362,7 @@ function refreshCDR() {
 
     container.innerHTML = '<div class="p-3 text-center text-muted"><i class="bi bi-arrow-clockwise spin me-2"></i>Loading...</div>';
 
-    fetch('/api/cdr?count=10')
+    fetch(_base + '/api/cdr?count=10')
         .then(r => r.json())
         .then(data => {
             if (!data.calls || data.calls.length === 0) {

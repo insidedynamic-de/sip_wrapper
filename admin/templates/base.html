@@ -8,6 +8,8 @@
     <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
     <script>
+        // Dynamic base URL for reverse proxy support (Coolify etc.)
+        window.BASE_URL = '{{ request.script_root }}';
         // Apply theme immediately to prevent flash
         (function() {
             const mode = localStorage.getItem('themeMode') || 'light';
@@ -39,32 +41,32 @@
                 </div>
                 <ul class="nav flex-column mt-3">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="/">
+                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
                             <i class="bi bi-speedometer2"></i> {{ t('dashboard') }}
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'manage' %}active{% endif %}" href="/manage">
+                        <a class="nav-link {% if request.endpoint == 'manage' %}active{% endif %}" href="{{ url_for('manage') }}">
                             <i class="bi bi-gear"></i> {{ t('config') }}
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'security' %}active{% endif %}" href="/security">
+                        <a class="nav-link {% if request.endpoint == 'security' %}active{% endif %}" href="{{ url_for('security') }}">
                             <i class="bi bi-shield-lock"></i> {{ t('security') }}
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'logs' %}active{% endif %}" href="/logs">
+                        <a class="nav-link {% if request.endpoint == 'logs' %}active{% endif %}" href="{{ url_for('logs') }}">
                             <i class="bi bi-journal-text"></i> {{ t('logs') }}
                         </a>
                     </li>
                     <li class="nav-item mt-3 border-top border-secondary pt-3">
-                        <a class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}" href="/profile">
+                        <a class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}">
                             <i class="bi bi-person-circle"></i> {{ t('profile') }}
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-danger" href="/logout">
+                        <a class="nav-link text-danger" href="{{ url_for('logout') }}">
                             <i class="bi bi-box-arrow-left"></i> {{ t('logout') }}
                         </a>
                     </li>

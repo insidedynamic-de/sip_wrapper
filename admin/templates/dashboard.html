@@ -269,7 +269,7 @@
         <div class="card h-100">
             <div class="card-header py-2 d-flex justify-content-between align-items-center">
                 <span><i class="bi bi-diagram-3 me-2"></i>{{ t('gateway_status') }}</span>
-                <a href="/manage" class="btn btn-sm btn-link py-0">{{ t('config') }} &rarr;</a>
+                <a href="{{ url_for('manage') }}" class="btn btn-sm btn-link py-0">{{ t('config') }} &rarr;</a>
             </div>
             <div class="card-body p-0">
                 {% if gateways %}
@@ -318,7 +318,7 @@
         <div class="card h-100">
             <div class="card-header py-2 d-flex justify-content-between align-items-center">
                 <span><i class="bi bi-people me-2"></i>{{ t('user_registrations') }}</span>
-                <a href="/manage" class="btn btn-sm btn-link py-0">{{ t('config') }} &rarr;</a>
+                <a href="{{ url_for('manage') }}" class="btn btn-sm btn-link py-0">{{ t('config') }} &rarr;</a>
             </div>
             <div class="card-body p-0">
                 {% if registrations %}

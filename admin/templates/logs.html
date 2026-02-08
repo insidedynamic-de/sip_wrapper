@@ -142,7 +142,7 @@ const i18n = {
 async function refreshLogs() {
     const limit = document.getElementById('log-limit').value;
     try {
-        const response = await fetch(`/api/logs?count=${limit}`);
+        const response = await fetch(`${window.BASE_URL||''}/api/logs?count=${limit}`);
         const data = await response.json();
         allLogs = data.logs || [];
         logStatus = data.status || {};
@@ -281,7 +281,7 @@ async function setLogLevel() {
     btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>...';
 
     try {
-        const response = await fetch('/api/fs-loglevel', {
+        const response = await fetch((window.BASE_URL||'') + '/api/fs-loglevel', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ level: level })
@@ -322,7 +322,7 @@ async function setLogLevel() {
 // Get current log level from config
 async function getLogLevel() {
     try {
-        const response = await fetch('/api/fs-loglevel');
+        const response = await fetch((window.BASE_URL||'') + '/api/fs-loglevel');
         const data = await response.json();
         console.log('getLogLevel response:', data);
 
@@ -345,7 +345,7 @@ async function toggleSofiaTrace() {
     btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>...';
 
     try {
-        const response = await fetch('/api/sofia-trace', {
+        const response = await fetch((window.BASE_URL||'') + '/api/sofia-trace', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -382,7 +382,7 @@ async function toggleSofiaTrace() {
 // Get log sources info
 async function getLogSources() {
     try {
-        const response = await fetch('/api/log-sources');
+        const response = await fetch((window.BASE_URL||'') + '/api/log-sources');
         const data = await response.json();
         if (data.sources && data.sources.length > 0) {
             document.getElementById('log-sources-info').style.display = 'block';
@@ -399,7 +399,7 @@ async function showDebugDump() {
     container.innerHTML = '<div class="p-3 text-center"><i class="bi bi-hourglass-split"></i> Loading debug info...</div>';
 
     try {
-        const response = await fetch('/api/sofia-debug');
+        const response = await fetch((window.BASE_URL||'') + '/api/sofia-debug');
         const data = await response.json();
 
         if (data.success && data.debug) {

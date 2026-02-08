@@ -13,10 +13,40 @@ import threading
 from datetime import datetime
 from collections import deque
 
-# ESL connection settings (from environment)
-FS_HOST = os.environ.get('FS_HOST', '127.0.0.1')
-FS_PORT = int(os.environ.get('FS_PORT', '8021'))
-FS_PASS = os.environ.get('FS_PASS', 'ClueCon')
+# ESL connection settings from JSON config (initialized from ENV on first run)
+def parse_esl_address(address):
+    """Parse ESL address string into (host, port) tuple.
+    Formats: 'hostname.domain' (port=8021), '1.2.3.4:8021', 'fs.local:9021'
+    """
+    if not address:
+        return '127.0.0.1', 8021
+    address = address.strip()
+    if ':' in address:
+        parts = address.rsplit(':', 1)
+        host = parts[0]
+        try:
+            port = int(parts[1])
+        except ValueError:
+            port = 8021
+    else:
+        host = address
+        port = 8021
+    return host, port
+
+
+def _get_esl_settings():
+    """Get ESL settings from JSON config"""
+    try:
+        import config_store
+        settings = config_store.get_settings()
+        address = settings.get('esl_address', '127.0.0.1:8021')
+        host, port = parse_esl_address(address)
+        password = settings.get('esl_password', 'ClueCon') or 'ClueCon'
+        return host, port, password
+    except Exception:
+        return ('127.0.0.1', 8021, 'ClueCon')
+
+FS_HOST, FS_PORT, FS_PASS = _get_esl_settings()
 
 # Try to import greenswitch (requires gevent)
 try:

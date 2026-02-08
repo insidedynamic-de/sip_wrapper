@@ -14,6 +14,9 @@ from functools import wraps
 # Config store for CRUD operations
 import config_store
 
+# Auto-initialize config from ENV on first run
+config_store.init_config()
+
 # ESL Event Subscriber for real-time FreeSWITCH events
 import esl_events
 
@@ -116,10 +119,19 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 ADMIN_USER = os.environ.get('ADMIN_USER', 'admin')
 ADMIN_PASS = os.environ.get('ADMIN_PASS', 'admin')
 
-# FreeSWITCH connection settings
-FS_HOST = os.environ.get('FS_HOST', '127.0.0.1')
-FS_PORT = int(os.environ.get('FS_PORT', '8021'))
-FS_PASS = os.environ.get('FS_PASS', 'ClueCon')
+# FreeSWITCH ESL connection settings from JSON config
+def _get_esl_config():
+    try:
+        from esl_events import parse_esl_address
+        settings = config_store.get_settings()
+        address = settings.get('esl_address', '127.0.0.1:8021')
+        host, port = parse_esl_address(address)
+        password = settings.get('esl_password', 'ClueCon') or 'ClueCon'
+        return host, port, password
+    except Exception:
+        return ('127.0.0.1', 8021, 'ClueCon')
+
+FS_HOST, FS_PORT, FS_PASS = _get_esl_config()
 
 # Security: IP-based access control for FS commands
 # Format: comma-separated IPs or CIDR ranges
