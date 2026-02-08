@@ -528,17 +528,21 @@ generate_event_socket() {
   # Determine ACL for ESL connections
   local esl_acl="loopback.auto"
 
-  # If FS_ALLOWED_IPS is set to 0.0.0.0 or empty, allow all
-  if [ "${FS_ALLOWED_IPS:-127.0.0.1}" = "0.0.0.0" ] || [ -z "$FS_ALLOWED_IPS" ]; then
+  # Support generic ENV names (APIKEY, API_PORT, API_ACL) with fallback to old names
+  local acl_value="${API_ACL:-${FS_ALLOWED_IPS:-127.0.0.1}}"
+  local api_port="${API_PORT:-${FS_PORT:-8021}}"
+  local api_key="${APIKEY:-${FS_PASS:-ClueCon}}"
+
+  if [ "$acl_value" = "0.0.0.0" ] || [ -z "$acl_value" ]; then
     esl_acl="any_v4.auto"
-    echo_log "  ESL ACL: any_v4.auto (all IPs allowed)"
-  elif [ "$FS_ALLOWED_IPS" = "127.0.0.1" ]; then
+    echo_log "  ACL: any_v4.auto (all IPs allowed)"
+  elif [ "$acl_value" = "127.0.0.1" ]; then
     esl_acl="loopback.auto"
-    echo_log "  ESL ACL: loopback.auto (localhost only)"
+    echo_log "  ACL: loopback.auto (localhost only)"
   else
     # Custom IP - we'll use any_v4 for simplicity, firewall should handle restrictions
     esl_acl="any_v4.auto"
-    echo_log "  ESL ACL: any_v4.auto (custom IP: $FS_ALLOWED_IPS - use firewall for restrictions)"
+    echo_log "  ACL: any_v4.auto (custom IP: $acl_value - use firewall for restrictions)"
   fi
 
   cat > "$FS_CONF/autoload_configs/event_socket.conf.xml" <<EOF
@@ -547,8 +551,8 @@ generate_event_socket() {
   <settings>
     <param name="nat-map" value="false"/>
     <param name="listen-ip" value="::"/>
-    <param name="listen-port" value="${FS_PORT:-8021}"/>
-    <param name="password" value="${FS_PASS:-ClueCon}"/>
+    <param name="listen-port" value="${api_port}"/>
+    <param name="password" value="${api_key}"/>
     <param name="apply-inbound-acl" value="$esl_acl"/>
   </settings>
 </configuration>

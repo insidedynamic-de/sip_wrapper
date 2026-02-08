@@ -1,9 +1,14 @@
 {
   "version": 1,
-  "updated_at": "2026-02-08T19:06:52.939410",
+  "updated_at": "2026-02-08T20:13:00.008430",
   "license": {
     "key": "",
-    "client_name": ""
+    "client_name": "",
+    "trial_started_at": "2026-02-08T20:13:00.008253",
+    "trial_days": 14,
+    "max_connections": 2,
+    "connection_licensed": false,
+    "license_expires_at": null
   },
   "settings": {
     "fs_domain": "",

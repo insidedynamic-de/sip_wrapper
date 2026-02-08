@@ -649,10 +649,10 @@ def import_from_env():
         config['settings'] = DEFAULT_CONFIG['settings'].copy()
     config['settings']['default_country_code'] = os.environ.get('DEFAULT_COUNTRY_CODE', '49')
 
-    # Import ESL connection settings
+    # Import API connection settings (generic names with fallback to old names)
     config['settings']['esl_host'] = os.environ.get('FS_HOST', config['settings'].get('esl_host', '127.0.0.1'))
-    config['settings']['esl_port'] = int(os.environ.get('FS_PORT', config['settings'].get('esl_port', 8021)))
-    config['settings']['esl_password'] = os.environ.get('FS_PASS', config['settings'].get('esl_password', 'ClueCon'))
+    config['settings']['esl_port'] = int(os.environ.get('API_PORT', '') or os.environ.get('FS_PORT', config['settings'].get('esl_port', 8021)))
+    config['settings']['esl_password'] = os.environ.get('APIKEY', '') or os.environ.get('FS_PASS', config['settings'].get('esl_password', 'ClueCon'))
 
     save_config(config)
     return imported

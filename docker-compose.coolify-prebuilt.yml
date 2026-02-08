@@ -46,11 +46,7 @@ services:
         # Show banner
         echo ""
         echo "================================================================================"
-        if [ -n "$CLIENT_NAME" ]; then
-          echo "  InsideDynamic Wrapper v$$WRAPPER_VERSION - ($LICENSE_KEY) für $CLIENT_NAME"
-        else
-          echo "  InsideDynamic Wrapper v$$WRAPPER_VERSION - ($LICENSE_KEY)"
-        fi
+        echo "  InsideDynamic Wrapper v$$WRAPPER_VERSION"
         echo "================================================================================"
         echo "  https://github.com/insidedynamic-de/sip_wrapper"
         echo "  (c) 2025 InsideDynamic GmbH - Mannheim, Germany"
@@ -249,20 +245,24 @@ services:
 
         echo "✓ Logging configured (console + file)"
 
-        # Create event_socket.conf.xml for ESL event streaming
-        cat > /etc/freeswitch/autoload_configs/event_socket.conf.xml << 'ESLEOF'
+        # Create event_socket.conf.xml for API connection
+        ESL_ACL="loopback.auto"
+        if [ "$API_ACL" = "0.0.0.0" ] || [ -z "$API_ACL" ]; then
+          ESL_ACL="any_v4.auto"
+        fi
+        cat > /etc/freeswitch/autoload_configs/event_socket.conf.xml << ESLEOF
         <configuration name="event_socket.conf" description="Socket Client">
           <settings>
             <param name="nat-map" value="false"/>
             <param name="listen-ip" value="0.0.0.0"/>
-            <param name="listen-port" value="8021"/>
-            <param name="password" value="ClueCon"/>
-            <param name="apply-inbound-acl" value="loopback.auto"/>
+            <param name="listen-port" value="${API_PORT:-8021}"/>
+            <param name="password" value="${APIKEY:-ClueCon}"/>
+            <param name="apply-inbound-acl" value="$$ESL_ACL"/>
           </settings>
         </configuration>
         ESLEOF
 
-        echo "✓ Event Socket configured (ESL on port 8021)"
+        echo "✓ Event Socket configured (port $API_PORT)"
 
         # Start Admin Portal
         echo ""
@@ -283,38 +283,33 @@ services:
         echo "FreeSWITCH is starting..."
         echo ""
         echo "Admin Portal: http://localhost:$ADMIN_PORT"
-        if [ -n "$SERVICE_FQDN_ADMIN_8888" ]; then
-          echo "Admin Portal (HTTPS): https://$SERVICE_FQDN_ADMIN_8888"
-        fi
-        echo ""
-        echo "Log files: /var/log/freeswitch/"
-        echo "  - freeswitch.log (main log)"
-        echo "  - Use SIP Trace button for SIP debug"
+        echo "Config: Admin UI → config.json"
+        echo "Logs: Admin Portal → ESL Events"
         echo "=========================================="
 
         # Start FreeSWITCH in background
         /usr/bin/freeswitch -nonat -nf -nc -conf /etc/freeswitch -log /var/log/freeswitch -db /var/lib/freeswitch/db &
         FS_PID=$$!
 
-        # Wait for FreeSWITCH to start (ESL port 8021)
+        # Wait for FreeSWITCH to start (API port)
         echo "Waiting for FreeSWITCH to start..."
         for i in 1 2 3 4 5 6 7 8 9 10; do
-          if nc -z 127.0.0.1 8021 2>/dev/null; then
-            echo "✓ FreeSWITCH ESL ready"
+          if nc -z 127.0.0.1 ${API_PORT:-8021} 2>/dev/null; then
+            echo "✓ FreeSWITCH API ready"
             break
           fi
           sleep 1
         done
 
-        # Set log level via ESL using Python (write script to temp file to avoid YAML issues)
+        # Set log level via API using Python (write script to temp file to avoid YAML issues)
         sleep 2
-        cat > /tmp/esl_setup.py << 'ESLPYEOF'
+        cat > /tmp/esl_setup.py << ESLPYEOF
         import socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            s.connect(('127.0.0.1', 8021))
+            s.connect(('127.0.0.1', ${API_PORT:-8021}))
             s.recv(1024)
-            s.send(b'auth ClueCon\n\n')
+            s.send(b'auth ${APIKEY:-ClueCon}\n\n')
             s.recv(1024)
             s.send(b'api fsctl loglevel 7\n\n')
             s.recv(1024)
@@ -322,7 +317,7 @@ services:
             s.recv(1024)
             print('Log level set to DEBUG (7)')
         except Exception as e:
-            print(f'ESL setup: {e}')
+            print(f'API setup: {e}')
         finally:
             s.close()
         ESLPYEOF
@@ -337,32 +332,23 @@ services:
         wait $$FS_PID
 
     environment:
-      # LICENSE
-      LICENSE_KEY: ${LICENSE_KEY:-UNLICENSED}
-      CLIENT_NAME: ${CLIENT_NAME:-}
-
-      # REQUIRED
+      # REQUIRED - SIP Domain & External IP
       FS_DOMAIN: ${FS_DOMAIN}
       EXTERNAL_SIP_IP: ${EXTERNAL_SIP_IP}
       EXTERNAL_RTP_IP: ${EXTERNAL_RTP_IP}
-      USERS: ${USERS:-}
-      GATEWAYS: ${GATEWAYS:-}
 
-      # ROUTING
-      DEFAULT_GATEWAY: ${DEFAULT_GATEWAY:-}
-      DEFAULT_EXTENSION: ${DEFAULT_EXTENSION:-}
-      OUTBOUND_ROUTES: ${OUTBOUND_ROUTES:-}
-      OUTBOUND_USER_ROUTES: ${OUTBOUND_USER_ROUTES:-}
-      INBOUND_ROUTES: ${INBOUND_ROUTES:-}
-      DEFAULT_COUNTRY_CODE: ${DEFAULT_COUNTRY_CODE:-49}
-      OUTBOUND_CALLER_ID: ${OUTBOUND_CALLER_ID:-}
+      # API CONNECTION
+      APIKEY: ${APIKEY:-ClueCon}
+      API_PORT: ${API_PORT:-8021}
+      API_ACL: ${API_ACL:-0.0.0.0}
 
-      # ADMIN PORTAL
+      # ADMIN PORTAL (default: admin:admin on port 8888)
       ADMIN_PORT: ${ADMIN_PORT:-8888}
-      ADMIN_USER: ${ADMIN_USER:-admin}
-      ADMIN_PASS: ${ADMIN_PASS:-admin}
-      ADMIN_SECRET: ${ADMIN_SECRET:-insidedynamic-wrapper-secret}
-      SERVICE_FQDN_ADMIN_8888: ${SERVICE_FQDN_ADMIN_8888:-}
+
+      # Everything else is configured via Admin UI → config.json:
+      # - Users, Gateways, Routes, Codecs, Caller ID
+      # - License (14-day trial, then activation)
+      # - SERVICE_FQDN is auto-generated by Coolify
 
     network_mode: host
     restart: unless-stopped
@@ -391,32 +377,22 @@ volumes:
     driver: local
 
 ################################################################################
-# ПРЕИМУЩЕСТВА ЭТОЙ ВЕРСИИ:
+# ENV VARIABLES
 ################################################################################
-# ✅ Не нужно скачивать GPG ключи
-# ✅ Не нужно устанавливать пакеты из SignalWire репозитория
-# ✅ Быстрый запуск (образ уже скомпилирован)
-# ✅ Меньше точек отказа
-# ✅ Работает даже если files.freeswitch.org недоступен
-# ✅ Admin Portal на порту 8888
-# ✅ ESL Events - real-time logs (no file access needed)
-# ✅ i18n поддержка (EN/DE)
+# Required: FS_DOMAIN, EXTERNAL_SIP_IP, EXTERNAL_RTP_IP
+# API:      APIKEY (default: ClueCon), API_PORT (default: 8021),
+#           API_ACL (default: 0.0.0.0 = all, or comma-separated IPs/CIDRs)
+# Optional: ADMIN_PORT (default: 8888)
 #
-# ИСПОЛЬЗОВАНИЕ В COOLIFY:
-# 1. Docker Compose file: docker-compose.coolify-prebuilt.yml
-# 2. Установите ENV переменные
-# 3. Deploy
+# After deploy, configure everything via Admin Portal:
+# - Users, Gateways, Routes, Codecs, Caller ID
+# - Server Settings, License activation (14-day trial)
 #
-# ADMIN PORTAL (HTTPS через Coolify):
-# 1. Service Name: insidedynamic-wrapper
-# 2. В Coolify: Service -> Proxy -> Port: 8888
-# 3. Добавьте домен (например: admin.example.com)
-# 4. URL: https://admin.example.com (port 443 автоматически)
-# 5. Login: admin / admin (или ADMIN_USER / ADMIN_PASS)
+# COOLIFY:
+# 1. Docker Compose: docker-compose.coolify-prebuilt.yml
+# 2. Set required ENV variables
+# 3. Deploy → Coolify generates SERVICE_FQDN automatically
+# 4. Login: admin / admin → Profile to change password
 #
-# ЛОГИ:
-# - Admin Portal → Logs страница (ESL Events, real-time)
-# - Настройки ESL/SIP Debug через Admin Panel
-#
-# Документация: https://insidedynamic.de/wrapper
+# Docs: https://insidedynamic.de/wrapper
 ################################################################################

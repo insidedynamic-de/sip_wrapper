@@ -136,11 +136,12 @@ def _get_esl_config():
 
 FS_HOST, FS_PORT, FS_PASS = _get_esl_config()
 
-# Security: IP-based access control for FS commands
+# Security: IP-based access control
 # Format: comma-separated IPs or CIDR ranges
 # Special values: 0.0.0.0 = allow all, 127.0.0.1 = localhost only (default)
-FS_ALLOWED_IPS = os.environ.get('FS_ALLOWED_IPS', '127.0.0.1').split(',')
-FS_ALLOWED_IPS = [ip.strip() for ip in FS_ALLOWED_IPS if ip.strip()]
+# Supports generic name API_ACL with fallback to FS_ALLOWED_IPS
+_acl_raw = os.environ.get('API_ACL', '') or os.environ.get('FS_ALLOWED_IPS', '127.0.0.1')
+FS_ALLOWED_IPS = [ip.strip() for ip in _acl_raw.split(',') if ip.strip()]
 
 # Try to import ESL library
 try:
