@@ -111,14 +111,14 @@ class ESLEventSubscriber:
         self.esl = None
         self.running = False
         self.connected = False
-        self.greenlet = None
+        self.thread = None
         self.reconnect_delay = 5  # seconds
         self.last_error = None
         self.connection_attempts = 0
         self.last_event_time = None
 
     def start(self):
-        """Start the event subscriber using gevent greenlet"""
+        """Start the event subscriber in a thread with gevent hub"""
         if self.running:
             return
 
@@ -127,9 +127,16 @@ class ESLEventSubscriber:
             return
 
         self.running = True
-        # Use gevent.spawn for proper async operation with greenswitch
-        self.greenlet = gevent.spawn(self._run)
+        # Use a regular thread that runs gevent's event loop internally
+        self.thread = threading.Thread(target=self._thread_main, daemon=True)
+        self.thread.start()
         print(f"[ESL] Event subscriber started for {self.host}:{self.port}")
+
+    def _thread_main(self):
+        """Thread entry point - runs gevent hub"""
+        # Spawn the main loop as a greenlet and run gevent's event loop
+        greenlet = gevent.spawn(self._run)
+        greenlet.join()  # This runs the gevent event loop
 
     def stop(self):
         """Stop the event subscriber"""
@@ -139,11 +146,8 @@ class ESLEventSubscriber:
                 self.esl.stop()
             except:
                 pass
-        if self.greenlet:
-            try:
-                self.greenlet.kill(timeout=5)
-            except:
-                pass
+        if self.thread:
+            self.thread.join(timeout=5)
         print("[ESL] Event subscriber stopped")
 
     def _run(self):
